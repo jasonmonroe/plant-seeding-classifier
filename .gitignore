@@ -1,6 +1,8 @@
 # .gitignore
 
+.DS_Store
 .editorconfig
 .idea
 .venv
 venv
+.vscode

@@ -4,6 +4,8 @@ import warnings
 import random
 
 import numpy as np
+import pandas as pd
+
 import cv2 # OpenCV for image processing
 
 from tensorflow.keras import backend
@@ -19,13 +21,12 @@ from tensorflow.keras.layers import (
     MaxPooling2D,
 )
 
-from notebooks.plant_seed_classification import plant_species
-from src.config import SEED, TEMPORARY_DATA_SPLIT, HALF_DATA_SPLIT, IMAGE_ROWS, IMAGE_COLS, IMAGE_PX_MAX, SM_CNT, MED_CNT, LG_CNT, KERNEL_SIZE_SM, KERNEL_SIZE_MED, DROPOUT_RATE, BASE_EPOCH_CNT, BASE_BATCH_SIZE, TRAINED_EPOCH_CNT, TRAINED_BATCH_SIZE
-from src.preprocess import load_data, load_images, desc_data, desc_images
+from src.config import GENERATOR_BATCH_SIZE, SEED, TEMPORARY_DATA_SPLIT, HALF_DATA_SPLIT, IMAGE_ROWS, IMAGE_COLS, IMAGE_PX_MAX, SM_CNT, MED_CNT, LG_CNT, KERNEL_SIZE_SM, KERNEL_SIZE_MED, DROPOUT_RATE, BASE_EPOCH_CNT, BASE_BATCH_SIZE, TRAINED_EPOCH_CNT, TRAINED_BATCH_SIZE
+from src.preprocess import load_data, load_images, desc_data, desc_images, desc_labels, split_data
 from src.modeling import fit_model, evalute_model, model_performance_classification, get_model_predictions, encode_data, encode_label
-from src.imaging import show_random_image, create_bgr_images, convert_to_rgb, show_random_cv2_image, visualize_raw_image_data, visualize_augmented_image_batch
-from src.utils import init_cnn_session, get_plant_species
-from src.eda import plot_history, plot_histogram, plot_confusion_matrix, show_plant_species_dist, show_labeled_barplot
+from src.imaging import build_generator, generate_image_batch, generate_training_image_batch, show_random_image, create_bgr_images, convert_to_rgb, show_random_cv2_image, visualize_raw_image_data, visualize_augmented_image_batch, get_resized_images
+from src.utils import init_cnn_session, get_plant_species, normalize, show_banner, start_timer, show_timer
+from src.eda import show_plot_history, show_plot_histogram, plot_confusion_matrix, show_plant_species_dist, show_labeled_barplot
 
 def run_main_pipeline():
     # Fix warnings
@@ -138,7 +139,7 @@ def run_main_pipeline():
     show_random_image(images)
 
     # Plot histogram to check distribution
-    plot_histogram(images)
+    show_plot_histogram(images)
 
     """Most of the pixels RGB values are between 50-100 with the peak around 75.  This means most of the image data and value is in the middle."""
 
@@ -176,7 +177,7 @@ def run_main_pipeline():
     
     
     """
-
+    # eda.py 
     show_plant_species_dist()
 
     """Data Pre-Processing
@@ -213,13 +214,13 @@ def run_main_pipeline():
 
     # Resize RGB images
     # Note: This will be used as `independent variables`.
-    resized_images = []
-    for image in rgb_images:
-        resized_image = cv2.resize(image, REDUCED_IMAGE_DIMS, interpolation=cv2.INTER_LINEAR)
-        resized_images.append(resized_image)
+    resized_images = get_resized_images(rgb_images)
 
     """Resized Image Below"""
 
+    show_random_image(resized_images)
+
+    """
     random_resized_image = random.choice(resized_images)
     height, width = random_resized_image.shape[:2]
 
@@ -242,6 +243,8 @@ def run_main_pipeline():
 
     else:
         print('Image resizing failed.')
+    """
+
 
     """#Data Preparation for Modeling
     
@@ -370,8 +373,8 @@ def run_main_pipeline():
     show_timer(start_time)
 
     # Plot History
-    plot_history(base_model_history, base_model_title, 'accuracy')
-    plot_history(base_model_history, base_model_title, 'loss')
+    show_plot_history(base_model_history, base_model_title, 'accuracy')
+    show_plot_history(base_model_history, base_model_title, 'loss')
 
     """Observations
     
@@ -428,6 +431,9 @@ def run_main_pipeline():
     This evaluation confirms that the Base CNN Model is a successful and robust solution for the Plant Seed Classification task, meeting your performance goals.
     """
 
+    # --- Model Performance ---
+
+    
     # Get model training performance
     base_training_perf = model_performance_classification(base_model, x_training_normalized, y_training_encoded)
     print(base_training_perf)
@@ -474,6 +480,7 @@ def run_main_pipeline():
 
     # Augment the data without using validation or test data.  Only training data.
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
+    """
     training_datagen = ImageDataGenerator(
         rotation_range=20,
         zoom_range=0.15,
@@ -482,8 +489,14 @@ def run_main_pipeline():
         horizontal_flip=True,
         fill_mode='nearest'
     )
+    """
+
+    training_datagen = generate_training_image_batch()
 
     # Flowing training images in batches of 48 using training_datagen generator.
+    training_generator = build_generator(training_datagen, x_training_normalized, y_training_encoded)
+    
+    """
     training_generator = training_datagen.flow(
         x_training_normalized,
         y_training_encoded,
@@ -491,15 +504,23 @@ def run_main_pipeline():
         seed=SEED,
         shuffle=True
     )
+    """
 
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-    testing_datagen = ImageDataGenerator()
-    validation_generator = testing_datagen.flow(
+    validation_datagen = ImageDataGenerator() # empty params
+
+    validation_generator = build_generator(validation_datagen, x_validation_normalized, y_validation_encoded, shuffle_flag=False)
+
+
+    """
+    validation_generator = validation_datagen.flow(
         x_validation_normalized,
         y_validation_encoded,
         batch_size=GENERATOR_BATCH_SIZE,
+        seed=SEED,
         shuffle=False
     )
+    """
 
     """#**Data Augmentation**
     
@@ -589,9 +610,9 @@ def run_main_pipeline():
     """
 
     # Look at the images after data has been augmented
-    plot_history(da_model_history, da_model_title, 'accuracy')
+    show_plot_history(da_model_history, da_model_title, 'accuracy')
 
-    plot_history(da_model_history, da_model_title, 'loss')
+    show_plot_history(da_model_history, da_model_title, 'loss')
 
     """Observations
     
@@ -723,9 +744,9 @@ def run_main_pipeline():
     show_timer(start_time)
 
     # Plot history
-    plot_history(tl_model_history, tl_model_title, 'accuracy')
+    show_plot_history(tl_model_history, tl_model_title, 'accuracy')
 
-    plot_history(tl_model_history, tl_model_title, 'loss')
+    show_plot_history(tl_model_history, tl_model_title, 'loss')
 
     """Observations:
     

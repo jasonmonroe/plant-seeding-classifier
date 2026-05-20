@@ -12,9 +12,10 @@ from sklearn.utils import class_weight
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
+ 
 
 # Note: Assume label_encoder() is instantiated
-def encode_label(data: pd.DataFrame) -> np.ndarray:
+def encode_label(data: pd.DataFrame, label_encoder: LabelEncoder, plant_species_cnt: int) -> np.ndarray:
     # Encode categorical features and scale the pixel values
     # Creating one-hot encoded representation of target labels
 

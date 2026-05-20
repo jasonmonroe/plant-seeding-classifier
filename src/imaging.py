@@ -1,12 +1,39 @@
 # imaging.py
 
 import random
-import cv2 # OpenCV for image processing
+import cv2
+from src.config import GENERATOR_BATCH_SIZE, SEED # OpenCV for image processing
 
 def show_random_cv2_image(imgs: np.ndarray) -> None:
     cv2_imshow(random.choice(imgs)) # Using cv2_imshow to display the image
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+def show_random_image(resized_images: list) -> None:
+    random_resized_image = random.choice(resized_images)
+    height, width = random_resized_image.shape[:2]
+
+    show_banner('Resized Image')
+    print(f'Height: {height}, Width: {width}')
+
+    # Check if resized worked: Get height, width of image
+    if height == REDUCED_IMAGE_DIMS[0] and width == REDUCED_IMAGE_DIMS[1]:
+        print('Image resized successfully.')
+
+        IMAGE_HEIGHT = REDUCED_IMAGE_DIMS[0]
+        IMAGE_WIDTH = REDUCED_IMAGE_DIMS[1]
+        IMAGE_DIMS = REDUCED_IMAGE_DIMS
+        IMAGE_PARAMS = IMAGE_DIMS + (IMAGE_CHANNELS, )
+
+        show_random_cv2_image(resized_images)
+
+        print('\nUpdating Image: height, width, dims, params...\n')
+        del REDUCED_IMAGE_DIMS
+
+    else:
+        print('Image resizing failed.')
+
+    
 
 
 def create_bgr_images(imgs: np.ndarray) -> list:
@@ -91,3 +118,33 @@ def visualize_augmented_image_batch(train_generator: NumpyArrayIterator, enc: La
     plt.show()
 
 
+def get_resized_images(imgs: np.ndarray) -> list:
+    resized_images = []
+    for img in imgs:
+        resized_image = cv2.resize(img, REDUCED_IMAGE_DIMS, interpolation=cv2.INTER_LINEAR)
+        resized_images.append(resized_image)
+
+    return resized_images
+
+
+
+def generate_training_image_batch():
+    return ImageDataGenerator(
+        rotation_range=20,
+        zoom_range=0.15,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        horizontal_flip=True,
+        fill_mode='nearest'
+    )
+
+
+def build_generator(datagen: ImageDataGenerator, x_training_normalized: np.ndarray, y_training_encoded: np.ndarray, shuffle_flag: bool=True) -> NumpyArrayIterator:
+
+    return datagen.flow(
+        x_training_normalized,
+        y_training_encoded,
+        batch_size=GENERATOR_BATCH_SIZE,
+        seed=SEED,
+        shuffle=shuffle_flag
+    )

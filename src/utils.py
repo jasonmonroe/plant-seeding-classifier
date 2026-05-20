@@ -3,9 +3,11 @@ import random
 
 import time
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 
-from src.config import SECS_IN_MIN, MSEC, SEED
+from src.config import SECS_IN_MIN, MSEC, SEED, IMAGE_PX_MAX
+
 
 def start_timer() -> float:
     """

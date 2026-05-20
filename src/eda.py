@@ -72,7 +72,7 @@ def plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarray) ->
 
     plt.show()
 
-def plot_history(his: History, title: str, column: str) -> None:
+def show_plot_history(his: History, title: str, column: str) -> None:
     """
     Plots training and validation metrics from a Keras history object
     with enhanced style (ggplot, markers, grid).
@@ -124,7 +124,7 @@ def plot_history(his: History, title: str, column: str) -> None:
     plt.tight_layout()
     plt.show()
 
-def plot_histogram(img: np.ndarray, title: str=''):
+def show_plot_histogram(img: np.ndarray, title: str=''):
     """
     Generates an enhanced, appealing histogram of an image's pixel intensities.
 

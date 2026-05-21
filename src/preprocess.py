@@ -39,15 +39,13 @@ def describe_data(df: pd.DataFrame):
 def describe_labels(labels, images):
 
     # Print the shapes to confirm successful loading
-    print(f"Loaded Images shape (Features, X): {images.shape}, Type: {type(images)}")
+    
     print(f"Loaded Labels shape (Target, Y): {labels.shape}, Type: {type(labels)}")
 
     # Outputs: (batch_size, height, width, channels)
     print(labels.shape)
     print(f'Total number of labels: {images.shape[0]}')
 
-    print(images.shape)
-    print(f'Total number of images: {images.shape[0]}')
 
 
 def describe_images(images):
@@ -59,6 +57,11 @@ def describe_images(images):
 
     print("Print the first element")
     print(images[:1])  # Print the first element
+
+    print(f"Loaded Images shape (Features, X): {images.shape}, Type: {type(images)}")
+
+    print(images.shape)
+    print(f'Total number of images: {images.shape[0]}')
 
 
 def split_data(df_features: pd.DataFrame, df_target):

@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from google.colab.patches import cv2_imshow
+# Google Colab -> from google.colab.patches import cv2_imshow
 
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.image import (
@@ -20,9 +20,15 @@ from src.config import GENERATOR_BATCH_SIZE, IMAGE_COLS, IMAGE_PX_MAX, IMAGE_ROW
 
 
 def show_random_cv2_image(imgs: np.ndarray) -> None:
-    cv2_imshow(random.choice(imgs)) # Using cv2_imshow to display the image
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2_imshow(random.choice(imgs)) # Using cv2_imshow to display the image
+    img = random.choice(imgs)
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    plt.title("Random Image (OpenCV Display)")
+    plt.axis('off')
+    plt.show()
+
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
 
 # def show_random_image(resized_images: list) -> None:

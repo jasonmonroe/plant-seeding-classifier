@@ -1190,7 +1190,7 @@ This training history is successful because the Base CNN Model achieved an excel
 The Results are Excellent (for this model):
 *   Accuracy is higher for training then validation.
 *   Closest the data comes together is after the 8th epoch.
-*   Loss data decreases linearlly.
+*   Loss data decreases linearly.
 *   Training loss diminishes more extremely than validation losses as epochs increase.  In other words it more volatile dealing with the training loss.
 
 
@@ -1536,7 +1536,7 @@ plot_history(tl_model_history, tl_model_title, 'loss')
 
 """
 
-# Evalutate model
+# Evaluate model
 start_time = start_timer()
 show_banner(tl_model_title, 'Evaluation')
 
@@ -1657,7 +1657,7 @@ pd.DataFrame({
 * CNN Model accuracy was 95.2%.
 * CNN Model with Augmented Data was 71%.
 * Transfer Learning Model was at 92%.
-* Vizualing the prediction displayed the correct results the majority of the time!
+* Visualizing the prediction displayed the correct results the majority of the time!
 * The Image Data Manipulator was the biggest factor in determining accuracy.
 * Have better photos that show plants at various stages of growth.
 * Keep backgrounds consistent so that we can focus on the seeding/plants.

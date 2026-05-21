@@ -1,10 +1,17 @@
 # modeling.py
 
+import random
 from typing import Any, Tuple
+
 import numpy as np
 import pandas as pd
-from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, DROPOUT_RATE, IMAGE_ROWS, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SEED, SM_CNT, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT, XLG_CNT, XXLG_CNT
+
+import matplotlib.pyplot as plt
 import tensorflow as tf
+
+from sklearn.preprocessing import LabelEncoder
+from sklearn.utils import class_weight
+from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import (
@@ -17,15 +24,14 @@ from tensorflow.keras.layers import (
     GlobalAveragePooling2D, # Import the GlobalAveragePooling2D layer
     MaxPooling2D,
 )
-
-
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator
-from sklearn.preprocessing import LabelEncoder
-from sklearn.utils import class_weight
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+
+from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, DROPOUT_RATE, IMAGE_ROWS, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SEED, SM_CNT, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT, XLG_CNT, XXLG_CNT
+
 
 # Note: Can we set global variables in a script?
  
@@ -160,7 +166,12 @@ def model_performance_classification(mod: Sequential, predictors: np.ndarray, ta
     rec = recall_score(target_classes, predicted_labels, average='weighted')
     f1 = f1_score(target_classes, predicted_labels, average='weighted')
 
-    perform_df = pd.DataFrame({'Accuracy': [acc], 'Precision': [prec], 'Recall': [rec], 'F1': [f1]})
+    perform_df = pd.DataFrame({
+        'Accuracy': [acc], 
+        'Precision': [prec], 
+        'Recall': [rec], 
+        'F1': [f1]
+        })
 
     return perform_df
 
@@ -192,7 +203,7 @@ def show_visualize_prediction(
         print(f'Index:{index}\n')
 
         # Get the predicted probabilities
-        predicted_probs = mod.predict((x_testing_norm[index].reshape(1, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS)))
+        predicted_probs = mod.predict((x_testing_norm[index].reshape(1, image_height, image_width, image_channels)))
 
         # Get the index of the class with the highest probability
         predicted_class_index = np.argmax(predicted_probs, axis=1)

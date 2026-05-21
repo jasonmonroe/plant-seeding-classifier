@@ -3,19 +3,18 @@
 import numpy as np
 import pandas as pd
 
-import 
+from sklearn.model_selection import train_test_split
 
-from src.config import DIR_PATH, CSV_FILE, NPY_FILE, TEMPORARY_DATA_SPLIT, TRAINING_DATA_SPLIT, TESTING_DATA_SPLIT, HALF_DATA_SPLIT, SEED
+from src.config import NPY_FILE, SOURCE_DIR, CSV_FILE, NPY_FILE, TEMPORARY_DATA_SPLIT, HALF_DATA_SPLIT, SEED
 
 def load_data():
-    return pd.read_csv(DIR_PATH + CSV_FILE)
-
+    return pd.read_csv(SOURCE_DIR + CSV_FILE)
 
 def load_images():
-    return np.load(DIR_PATH + NPY_FILE)
+    return np.load(SOURCE_DIR + NPY_FILE)
 
 
-def desc_data(df: pd.DataFrame):
+def describe_data(df: pd.DataFrame):
     # head
     print(df.head())
 
@@ -37,7 +36,7 @@ def desc_data(df: pd.DataFrame):
     df.isnull().sum()
 
 
-def desc_labels(labels, images):
+def describe_labels(labels, images):
 
     # Print the shapes to confirm successful loading
     print(f"Loaded Images shape (Features, X): {images.shape}, Type: {type(images)}")
@@ -51,7 +50,7 @@ def desc_labels(labels, images):
     print(f'Total number of images: {images.shape[0]}')
 
 
-def desc_images(images)
+def describe_images(images):
     print('Mean:', np.mean(images))
     print('Median:', np.median(images))
     print('Standard Deviation:', np.std(images))
@@ -62,22 +61,22 @@ def desc_images(images)
     print(images[:1])  # Print the first element
 
 
-def split_data(df: pd.DataFrame):
+def split_data(df_features: pd.DataFrame, df_target):
     # INDEPENDENT VARIABLES aka features
-    features_df = resized_images
+    # df are the resized images
+    #df_features = df
 
     # DEPENDENT VARIABLE aka target
-    target_df  = df['Label']
-
+    #df_target = df_label
 
 
     # --- Split data into 70% training data and 30% temporary data --- #
     x_training_data, x_temp_data, y_training_data, y_temp_data = train_test_split(
-        features_df,
-        target_df,
+        df_features,
+        df_target,
         test_size=TEMPORARY_DATA_SPLIT,
         random_state=SEED,
-        stratify=target_df
+        stratify=df_target
     )
 
     # --- Then take remaining temporary data 30% and split in half --- #
@@ -88,5 +87,27 @@ def split_data(df: pd.DataFrame):
         random_state=SEED,
         stratify=y_temp_data
     )
+
+    # Printing the shapes
+    print('Data Shapes')
+
+    # Convert lists to NumPy arrays before checking shape and dtype
+    x_training_data = np.array(x_training_data)
+    y_training_data = np.array(y_training_data)
+    x_validation_data = np.array(x_validation_data)
+    y_validation_data = np.array(y_validation_data)
+    x_testing_data = np.array(x_testing_data)
+    y_testing_data = np.array(y_testing_data)
+
+    print(f'Shape of X training: {x_training_data.shape}')
+    print(f'Shape of Y training: {y_training_data.shape}')
+    print(f'Shape of X validation: {x_validation_data.shape}')
+    print(f'Shape of Y validation: {y_validation_data.shape}')
+    print(f'Shape of X testing: {x_testing_data.shape}')
+    print(f'Shape of Y testing: {y_testing_data.shape}')
+
+    print('Data Types')
+    print(f'Data type of X training: {x_training_data.dtype}')
+    print(f'Data type of Y training: {y_training_data.dtype}')
 
     return x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data

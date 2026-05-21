@@ -1,5 +1,11 @@
 # eda.py
 
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
+
 # Define labeled barplot.
 def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=None) -> None:
     """
@@ -50,7 +56,7 @@ def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=N
     plt.show()  # to avoid overlap
 
 # Define confusion matrix
-def plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarray) -> None:
+def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarray) -> None:
 
     # Obtaining the categorical values from y_testing_encoded and y_pred
     y_pred_arg = np.argmax(y_pred_test, axis=1)
@@ -71,6 +77,7 @@ def plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarray) ->
     )
 
     plt.show()
+    
 
 def show_plot_history(his: History, title: str, column: str) -> None:
     """
@@ -178,7 +185,7 @@ def show_plot_histogram(img: np.ndarray, title: str=''):
     # 6. Display the plot
     plt.show()
 
-def show_plant_species_dist():
+def show_plant_species_dist(df_labels):
 
     column_name = 'Label'
 

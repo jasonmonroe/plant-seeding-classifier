@@ -1,10 +1,11 @@
 # config.py
 
-DIR_PATH = 'data/'
+SOURCE_DIR = 'data/'
 CSV_FILE = 'plant_labels.csv'
 NPY_FILE = 'plant_images.npy'
 
 # Generic (used primarily for Conv2D Filters)
+XXLG_CNT = 512
 XLG_CNT = 256
 LG_CNT = 128
 MED_CNT = 64

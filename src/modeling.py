@@ -1,17 +1,33 @@
 # modeling.py
 
+from typing import Any, Tuple
 import numpy as np
 import pandas as pd
+from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, DROPOUT_RATE, IMAGE_ROWS, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SEED, SM_CNT, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT, XLG_CNT, XXLG_CNT
 import tensorflow as tf
+
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
+from tensorflow.keras.layers import (
+    Activation,
+    BatchNormalization,
+    Conv2D,
+    Dense,
+    Dropout,
+    Flatten,
+    GlobalAveragePooling2D, # Import the GlobalAveragePooling2D layer
+    MaxPooling2D,
+)
+
+
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import class_weight
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-
+# Note: Can we set global variables in a script?
  
 
 # Note: Assume label_encoder() is instantiated
@@ -27,24 +43,24 @@ def encode_label(data: pd.DataFrame, label_encoder: LabelEncoder, plant_species_
 # https://www.tensorflow.org/api_docs/python/tf/keras/utils/to_categorical
 # Used to one-hot encode integer labels into a binary matrix representation that's
 # suitable for classification tasks in deep learing.
-def encode_data(y_training_data: pd.DataFrame, y_testing_data: pd.DataFrame, y_validation_data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def encode_data(label_encoder, y_training_data: pd.DataFrame, y_testing_data: pd.DataFrame, y_validation_data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
-    y_training_encoded = encode_label(y_training_data)
-    y_testing_encoded = encode_label(y_testing_data)
-    y_validation_encoded = encode_label(y_validation_data)
+    y_training_encoded = encode_label(y_training_data, label_encoder)
+    y_testing_encoded = encode_label(y_testing_data, label_encoder)
+    y_validation_encoded = encode_label(y_validation_data, label_encoder)
 
     return y_training_encoded, y_testing_encoded, y_validation_encoded
 
-def get_model_predictions(mod: Sequential, x_training_normalized: np.ndarray, x_testing_normalized: np.ndarray, y_testing_encoded: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    y_predictor_training = mod.predict(x_training_normalized)
-    y_predictor_testing = mod.predict(x_testing_normalized)
+def get_model_predictions(model: Sequential, x_training_normalized: np.ndarray, x_testing_normalized: np.ndarray, y_testing_encoded: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    y_predictor_training = model.predict(x_training_normalized)
+    y_predictor_testing = model.predict(x_testing_normalized)
     y_testing_normalized = np.argmax(y_testing_encoded, axis=1)
 
     return y_predictor_training, y_predictor_testing, y_testing_normalized
 
 # Evaluate Model and return the accuracy and loss analysis
-def evalute_model(mod: Sequential, x_testing_normalized: np.ndarray, y_testing_encoded: np.ndarray) -> Tuple[float, float]:
-    loss, accuracy = mod.evaluate(
+def evalute_model(model: Sequential, x_testing_normalized: np.ndarray, y_testing_encoded: np.ndarray) -> Tuple[float, float]:
+    loss, accuracy = model.evaluate(
         x_testing_normalized,
         y_testing_encoded,
         verbose=2
@@ -217,3 +233,90 @@ def print_classification_report(mod, x_data: np.ndarray, y_true_encoded: np.ndar
         target_names=plant_species,
         digits=4)
     )
+
+
+# --- Model Creation 
+
+# Note: This can be a child class of Modeling
+
+def create_base_model(plant_species_cnt: int, image_params: tuple):
+    return Sequential([
+        # --- Convolution Block 1 ---
+        Conv2D(SM_CNT, KERNEL_SIZE_MED, activation='relu', padding='same', input_shape=image_params),
+        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
+
+        # --- Convolution Block 2 ---
+        Conv2D(MED_CNT, KERNEL_SIZE_MED, activation='relu', padding='same'),
+        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
+
+        # --- Convolution Block 3 ---
+        Conv2D(LG_CNT, KERNEL_SIZE_MED, activation='relu', padding='same'),
+        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
+
+        Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same'),
+        BatchNormalization(),
+        Activation('relu'),
+
+        # --- Classifier ---
+        Flatten(),
+        Dense(LG_CNT, activation='relu'),
+        Dropout(DROPOUT_RATE),               # helps prevent overfitting on small datasets
+        Dense(plant_species_cnt, activation='softmax')
+    ])
+
+
+def create_data_augmented_model(plant_species_cnt: int, image_params: tuple):
+    return Sequential([
+
+        # Block 1
+        Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same', input_shape=image_params),
+        BatchNormalization(),
+        Activation('relu'),
+        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
+
+        # Block 2
+        Conv2D(MED_CNT, KERNEL_SIZE_MED, padding='same'),
+        BatchNormalization(),
+        Activation('relu'),
+        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
+
+        # Block 3
+        Conv2D(LG_CNT, KERNEL_SIZE_MED, padding='same'),
+        BatchNormalization(),
+        Activation('relu'),
+        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
+
+        # Glabal Pooling and Dense Layers
+        GlobalAveragePooling2D(),
+        Dense(XLG_CNT),
+        BatchNormalization(),
+        Activation('relu'),
+        Dropout(DROPOUT_RATE),
+        Dense(plant_species_cnt, activation='softmax'),
+    ])
+
+
+def create_vgg_model(image_params):
+    return VGG16(
+        weights='imagenet',
+        include_top=False,
+        input_shape=image_params
+    )
+
+
+def create_transfer_learning_model(vgg_model, plant_species_cnt: int):
+    return Sequential([
+        vgg_model,
+        GlobalAveragePooling2D(),  # converts 2D features to 1D vector
+        Dense(XXLG_CNT, activation='relu'),
+        Dropout(DROPOUT_RATE),
+        Dense(plant_species_cnt, activation='softmax')
+    ])
+
+
+def get_accuracy_data():
+    pass
+
+
+def show_accuracy():
+    pass

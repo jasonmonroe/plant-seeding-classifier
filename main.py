@@ -3,10 +3,16 @@ import sys
 import warnings
 import random
 
+
 import numpy as np
 import pandas as pd
 
 import cv2 # OpenCV for image processing
+
+from sklearn.preprocessing import LabelEncoder
+
+# TensorFlow and Keras libraries
+import tensorflow as tf
 
 from tensorflow.keras import backend
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
@@ -21,19 +27,29 @@ from tensorflow.keras.layers import (
     MaxPooling2D,
 )
 
-from src.config import GENERATOR_BATCH_SIZE, SEED, TEMPORARY_DATA_SPLIT, HALF_DATA_SPLIT, IMAGE_ROWS, IMAGE_COLS, IMAGE_PX_MAX, SM_CNT, MED_CNT, LG_CNT, KERNEL_SIZE_SM, KERNEL_SIZE_MED, DROPOUT_RATE, BASE_EPOCH_CNT, BASE_BATCH_SIZE, TRAINED_EPOCH_CNT, TRAINED_BATCH_SIZE
-from src.preprocess import load_data, load_images, desc_data, desc_images, desc_labels, split_data
-from src.modeling import fit_model, evalute_model, model_performance_classification, get_model_predictions, encode_data, encode_label
-from src.imaging import build_generator, generate_image_batch, generate_training_image_batch, show_random_image, create_bgr_images, convert_to_rgb, show_random_cv2_image, visualize_raw_image_data, visualize_augmented_image_batch, get_resized_images
-from src.utils import init_cnn_session, get_plant_species, normalize, show_banner, start_timer, show_timer
-from src.eda import show_plot_history, show_plot_histogram, plot_confusion_matrix, show_plant_species_dist, show_labeled_barplot
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.optimizers import Adam
+
+from tensorflow.keras.preprocessing.image import (
+    ImageDataGenerator,
+    img_to_array,
+    load_img,
+    NumpyArrayIterator # The iterator is generally created by ImageDataGenerator
+)
+
+# Local Source Files
+from src.config import DA_LEARNING_RATE, GENERATOR_BATCH_SIZE, L2_LEARNING_RATE, SEED, TEMPORARY_DATA_SPLIT, HALF_DATA_SPLIT, IMAGE_ROWS, IMAGE_COLS, IMAGE_PX_MAX, SM_CNT, MED_CNT, LG_CNT, KERNEL_SIZE_SM, KERNEL_SIZE_MED, DROPOUT_RATE, BASE_EPOCH_CNT, BASE_BATCH_SIZE, TL_LEARNING_RATE, TRAINED_EPOCH_CNT, TRAINED_BATCH_SIZE
+from src.preprocess import load_data, load_images, describe_data, describe_images, describe_labels, split_data
+from src.modeling import create_base_model, create_data_augmented_model, create_transfer_learning_model, create_vgg_model, fit_model, evalute_model, fit_trained_model, model_performance_classification, get_model_predictions, encode_data, encode_label, print_classification_report, show_visualize_prediction
+from src.imaging import build_generator, generate_training_image_batch, is_resized, show_augmented_image_batch, show_random_image, create_bgr_images, convert_to_rgb, show_random_cv2_image, show_raw_image_data, show_augmented_image_batch, get_resized_images, normalize
+from src.utils import init_cnn_session, get_plant_species, show_banner, start_timer, show_timer
+from src.eda import show_plot_confusion_matrix, show_plot_history, show_plot_histogram, show_plot_confusion_matrix, show_plant_species_dist, show_labeled_barplot
 
 def run_main_pipeline():
+
     # Fix warnings
-
     warnings.filterwarnings('ignore')
-
-
 
     #CUDA_LAUNCH_BLOCKING = 1
     print("Number of GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
@@ -76,29 +92,28 @@ def run_main_pipeline():
     #Understand the shape of the dataset
     """
 
-    desc_data(df_labels)
+    describe_data(df_labels)
 
     """There is no missing data in the csv file."""
 
-    show_banner('Plant Seeding Counts')
+    print('Plant Seeding Counts')
     counts = df_labels['Label'].value_counts()
     print(counts)
     print('')
 
-
-    desc_labels(labels, images)
+    describe_labels(labels, images)
 
     """Get Image Data"""
+    image_height = images.shape[1]
+    image_width = images.shape[2]
+    image_channels = images.shape[3]
 
-    IMAGE_HEIGHT = images.shape[1]
-    IMAGE_WIDTH = images.shape[2]
-    IMAGE_CHANNELS = images.shape[3]
-
-    print(f'Height: {IMAGE_HEIGHT}, Width:{IMAGE_WIDTH}, RGB Channels: {IMAGE_CHANNELS}')
+    print(f'Height: {image_height}, Width:{image_width}, RGB Channels: {image_channels}')
 
     """Get Plant Species"""
     plant_species = get_plant_species(df_labels)
-    print(f'\nPlant Species Count: {len(plant_species)}')
+    plant_species_cnt = len(plant_species)
+    print(f'\nPlant Species Count: {plant_species_cnt}')
 
     """
     Observations:
@@ -111,8 +126,6 @@ def run_main_pipeline():
     *   height: 128
     *   width: 128
     *   channels: 3
-    
-    
     """
 
     # ==================================
@@ -121,19 +134,13 @@ def run_main_pipeline():
     # mean, median, std dev, min, max
     start_time = start_timer()
 
-    show_banner('Image Information')
-    desc_images(images)
+    print('Image Information')
+    describe_images(images)
    
     show_timer(start_time)
 
 
     """Define Functions"""
-
-
-
-
-
-
 
     # Randomly sample pixel data
     show_random_image(images)
@@ -160,7 +167,7 @@ def run_main_pipeline():
     """
 
     # Plot images like a grid.
-    visualize_raw_image_data(images, labels)
+    show_raw_image_data(images, labels)
 
     # Label barplot with label
     show_labeled_barplot(df_labels, 'Label', perc=True)
@@ -171,8 +178,8 @@ def run_main_pipeline():
     * Data is not even.  Some labels are less than others meaning there are fewer types of plants in the sample set.
     * If all labels were even the average would be 8.3% a piece.  Anything over is over represented.  Anything under is under represented.
     * **Charlock** is the closest label to the average.
-    *   **Loose Silky-Ben** has the most labels with 13.8%.
-    *   **Maize** and **Common wheat** are tied for last at 4.7%.
+    * **Loose Silky-Ben** has the most labels with 13.8%.
+    * **Maize** and **Common wheat** are tied for last at 4.7%.
     
     
     
@@ -192,12 +199,10 @@ def run_main_pipeline():
     # Convert the BGR images to RGB images.
     # First, we will display the image as it is imported which means in BGR format.
     bgr_images = create_bgr_images(images)
-
     show_random_cv2_image(bgr_images)
 
     # Now to convert BGR to RGB
     rgb_images = convert_to_rgb(bgr_images)
-
     show_random_cv2_image(rgb_images)
 
     """RGB Image (that has been converted).
@@ -209,16 +214,27 @@ def run_main_pipeline():
     **Note:** Your scores will reduce if you lower image size. So it's your choice.
     """
 
-    reduce_by = 1 # 2
-    REDUCED_IMAGE_DIMS = (IMAGE_HEIGHT // reduce_by, IMAGE_WIDTH // reduce_by)
+   
 
     # Resize RGB images
     # Note: This will be used as `independent variables`.
-    resized_images = get_resized_images(rgb_images)
+
+     # You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
+    reduce_by = 1 # Note: was 2
+    resized_img_dims = (image_height // reduce_by, image_width // reduce_by)
+
+    resized_images = get_resized_images(rgb_images, resized_img_dims)
 
     """Resized Image Below"""
+    random_img = show_random_image(resized_images)
 
-    show_random_image(resized_images)
+    # Check if that image was resized
+    if is_resized(random_img, resized_img_dims):
+        image_dims = resized_img_dims;
+        image_params = image_dims + image_channels
+        # Get Image params for the base model
+
+
 
     """
     random_resized_image = random.choice(resized_images)
@@ -228,31 +244,32 @@ def run_main_pipeline():
     print(f'Height: {height}, Width: {width}')
 
     # Check if resized worked: Get height, width of image
-    if height == REDUCED_IMAGE_DIMS[0] and width == REDUCED_IMAGE_DIMS[1]:
+    if height == resized_img_dims[0] and width == resized_img_dims[1]:
         print('Image resized successfully.')
 
-        IMAGE_HEIGHT = REDUCED_IMAGE_DIMS[0]
-        IMAGE_WIDTH = REDUCED_IMAGE_DIMS[1]
-        IMAGE_DIMS = REDUCED_IMAGE_DIMS
+        IMAGE_HEIGHT = resized_img_dims[0]
+        IMAGE_WIDTH = resized_img_dims[1]
+        IMAGE_DIMS = resized_img_dims
         IMAGE_PARAMS = IMAGE_DIMS + (IMAGE_CHANNELS, )
 
         show_random_cv2_image(resized_images)
 
         print('\nUpdating Image: height, width, dims, params...\n')
-        del REDUCED_IMAGE_DIMS
+        del resized_img_dims
 
     else:
         print('Image resizing failed.')
     """
 
 
-    """#Data Preparation for Modeling
+    """
+    Data Preparation for Modeling
     
     - Before you proceed to build a model, you need to split the data into train, test, and validation to be able to evaluate the model that you build on the train data
     - You'll have to encode categorical features and scale the pixel values.
     - You will build a model using the train data and then check its performance
     
-    **Split the dataset**
+    Split the dataset
     """
 
     # ===========================================
@@ -265,29 +282,8 @@ def run_main_pipeline():
     # Validation Data ~ 10%
     # Testing Data ~ 10%
 
-    x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data = split_data(df_labels)
+    x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data = split_data(resized_images, df_labels['Label'])
 
-    # Printing the shapes
-    show_banner('Data Shapes')
-
-    # Convert lists to NumPy arrays before checking shape and dtype
-    x_training_data = np.array(x_training_data)
-    y_training_data = np.array(y_training_data)
-    x_validation_data = np.array(x_validation_data)
-    y_validation_data = np.array(y_validation_data)
-    x_testing_data = np.array(x_testing_data)
-    y_testing_data = np.array(y_testing_data)
-
-    print(f'Shape of X training: {x_training_data.shape}')
-    print(f'Shape of Y training: {y_training_data.shape}')
-    print(f'Shape of X validation: {x_validation_data.shape}')
-    print(f'Shape of Y validation: {y_validation_data.shape}')
-    print(f'Shape of X testing: {x_testing_data.shape}')
-    print(f'Shape of Y testing: {y_testing_data.shape}')
-
-    show_banner('Data Types')
-    print(f'Data type of X training: {x_training_data.dtype}')
-    print(f'Data type of Y training: {y_training_data.dtype}')
 
     """#Encode the target labels"""
 
@@ -296,6 +292,7 @@ def run_main_pipeline():
     label_encoder = LabelEncoder()
 
     y_training_encoded, y_testing_encoded, y_validation_encoded = encode_data(
+        label_encoder,
         y_training_data,
         y_testing_data,
         y_validation_data
@@ -307,6 +304,9 @@ def run_main_pipeline():
     x_training_normalized = normalize(x_training_data)
     x_testing_normalized = normalize(x_testing_data)
     x_validation_normalized = normalize(x_validation_data)
+
+
+    # --- Model Building --- #
 
     """Model Building
     
@@ -324,29 +324,7 @@ def run_main_pipeline():
     # Intializing a sequential CNN model
 
     base_model_title = 'Base CNN Model'
-    base_model = Sequential([
-        # --- Convolution Block 1 ---
-        Conv2D(SM_CNT, KERNEL_SIZE_MED, activation='relu', padding='same', input_shape=IMAGE_PARAMS),
-        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
-
-        # --- Convolution Block 2 ---
-        Conv2D(MED_CNT, KERNEL_SIZE_MED, activation='relu', padding='same'),
-        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
-
-        # --- Convolution Block 3 ---
-        Conv2D(LG_CNT, KERNEL_SIZE_MED, activation='relu', padding='same'),
-        MaxPooling2D(pool_size=KERNEL_SIZE_SM),
-
-        Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same'),
-        BatchNormalization(),
-        Activation('relu'),
-
-        # --- Classifier ---
-        Flatten(),
-        Dense(LG_CNT, activation='relu'),
-        Dropout(DROPOUT_RATE),               # helps prevent overfitting on small datasets
-        Dense(plant_species_cnt, activation='softmax')
-    ])
+    base_model = create_base_model(plant_species_cnt, image_params)
 
     # Compile Model
     base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -376,29 +354,22 @@ def run_main_pipeline():
     show_plot_history(base_model_history, base_model_title, 'accuracy')
     show_plot_history(base_model_history, base_model_title, 'loss')
 
-    """Observations
-    
-    
+    """
+    Observations:
     
     By comparing the final Training Accuracy ($\mathbf{90.53\%}$) and Validation Accuracy ($\mathbf{80.63\%}$), we can draw two conclusions:
     
-    
     Final Accuracy Gap: There is an $\mathbf{9.90\%}$ gap between the training and validation accuracy ($\mathbf{90.53\%} - \mathbf{80.63\%}$).This confirms that the model is overfitting, meaning it learned the training data much better than the validation data. However, a $10\%$ gap is manageable and a strong improvement from earlier runs.
-    
     
     Best Epoch: The peak validation accuracy of $\mathbf{82.32\%}$ was hit at Epoch 24 before dropping slightly at the end. The validation loss ($\mathbf{0.7476}$) was the lowest at Epoch 30, indicating a stable final state.
     
-    
     This training history is successful because the Base CNN Model achieved an excellent generalization accuracy of over $80\%$, which is why it performed so well on the final testing set.
-    
-    
     
     The Results are Excellent (for this model):
     *   Accuracy is higher for training then validation.
     *   Closest the data comes together is after the 8th epoch.
     *   Loss data decreases linearlly.
     *   Training loss diminishes more extremely than validation losses as epochs increase.  In other words it more volatile dealing with the training loss.
-    
     
     """
 
@@ -446,7 +417,7 @@ def run_main_pipeline():
     )
 
     # Plotting confusion matrix
-    plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
+    show_plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
 
     show_banner(base_model_title, 'Classification Report')
     print_classification_report(base_model, x_testing_normalized, y_testing_encoded)
@@ -457,6 +428,9 @@ def run_main_pipeline():
     
     **Hint**: Use **ReduceLRonPlateau()** function that will be used to decrease the learning rate by some factor, if the loss is not decreasing for some time. This may start decreasing the loss at a smaller learning rate. There is a possibility that the loss may still not decrease. This may lead to executing the learning rate reduction again in an attempt to achieve a lower loss.
     """
+
+
+
 
     # Define ReduceLRonPlateau()
     reduce_lr = ReduceLROnPlateau(
@@ -534,6 +508,7 @@ def run_main_pipeline():
     init_cnn_session()
 
     da_model_title = 'Data Augmented CNN Model'
+    """
     da_model = Sequential()
 
 
@@ -562,6 +537,9 @@ def run_main_pipeline():
     da_model.add(Activation('relu'))
     da_model.add(Dropout(DROPOUT_RATE))
     da_model.add(Dense(plant_species_cnt, activation='softmax'))
+    """
+
+    da_model = create_data_augmented_model()
 
     # Compile Data Augmented CNN Model
     da_model.compile(optimizer=Adam(learning_rate=DA_LEARNING_RATE), loss='categorical_crossentropy', metrics=['accuracy'])
@@ -611,19 +589,16 @@ def run_main_pipeline():
 
     # Look at the images after data has been augmented
     show_plot_history(da_model_history, da_model_title, 'accuracy')
-
     show_plot_history(da_model_history, da_model_title, 'loss')
 
-    """Observations
+    """
+    Observations:
     
-    
-    *   The results are unexpected.  The validation accuracy is static until the 5th epochs and then climbs .10% by the 8th epochs and then tepids off.
-    *   Train accuracy bounces up and down before the accuracy increases while validation accuracy increases.
+    * The results are unexpected.  The validation accuracy is static until the 5th epochs and then climbs .10% by the 8th epochs and then tepids off.
+    * Train accuracy bounces up and down before the accuracy increases while validation accuracy increases.
     * Validation accuracy increases as the epochs increase which means it's learning more per epoch. (This is what we want).
     * Training accuracy is a hit or miss but eventually goes up after the 25th epoch.  We need better results.
     * The losses are closely aligned by each epoch.  The training losses still bounce up and down but overall decreases each epoch.
-    
-    
     """
 
     # Evaluate the CNN Model w/ Data Augmentation
@@ -645,7 +620,7 @@ def run_main_pipeline():
         y_training_encoded
     )
 
-    da_model_training_perf
+    print(da_model_training_perf)
 
     # 0	0.723158	0.734437	0.723158	0.709289
 
@@ -657,13 +632,13 @@ def run_main_pipeline():
     )
 
     # Show confusion matrix for augmented data
-    plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
+    show_plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
 
     show_banner(da_model_title, 'Classification Report')
     print_classification_report(da_model, x_testing_normalized, y_testing_encoded)
 
     """Final Model
-    
+     
     Comment on the final model you have selected and use the same in the below code to visualize the image.
     """
 
@@ -671,7 +646,7 @@ def run_main_pipeline():
 
     """VGG16 Model"""
 
-    IMAGE_PARAMS = (LG_CNT, LG_CNT, 3)
+    image_params = (LG_CNT, LG_CNT, 3)
 
     # ==================================
     #  CNN Model: VGG16
@@ -679,11 +654,13 @@ def run_main_pipeline():
     vgg_model_title = 'VGG16 Model'
 
     # Summary of the whole model
-    vgg_model = VGG16(
-        weights='imagenet',
-        include_top=False,
-        input_shape=IMAGE_PARAMS
-    )
+    #vgg_model = VGG16(
+    #    weights='imagenet',
+    #    include_top=False,
+    #    input_shape=image_params
+    #)
+
+    vgg_model = create_vgg_model(image_params)
 
     head_input = GlobalAveragePooling2D()(vgg_model.output)
     head_output = Dense(units=plant_species_cnt, activation='softmax')(head_input)
@@ -693,15 +670,20 @@ def run_main_pipeline():
     # Get visual model summary
     vgg_model.summary()
 
-    """#Transfer Learning Model
+    """
+    Transfer Learning Model
     
     The purpose of using a Transfer Learning Model (TLM) is to leverage knowledge gained from a massive, general task to solve a specific, smaller task.
     """
+
+
+    # --- Transfer Learning Model --- #
 
     # USE THIS
     tl_model_title = 'Transfer Learning Model'
 
     # Create the transfer learning model
+    """
     tl_model = Sequential([
         vgg_model,
         GlobalAveragePooling2D(),  # converts 2D features to 1D vector
@@ -709,6 +691,8 @@ def run_main_pipeline():
         Dropout(DROPOUT_RATE),
         Dense(plant_species_cnt, activation='softmax')
     ])
+    """
+    tl_model = create_transfer_learning_model(vgg_model, plant_species_cnt)
 
     # Unfreeze the top 4 layers
     for layer in tl_model.layers[-4:]:
@@ -724,9 +708,7 @@ def run_main_pipeline():
     tl_model.summary()
 
 
-
     start_time = start_timer()
-
     show_banner(tl_model_title, 'Fitting Training Model')
 
     tl_model_history = fit_trained_model(
@@ -745,7 +727,6 @@ def run_main_pipeline():
 
     # Plot history
     show_plot_history(tl_model_history, tl_model_title, 'accuracy')
-
     show_plot_history(tl_model_history, tl_model_title, 'loss')
 
     """Observations:
@@ -774,7 +755,7 @@ def run_main_pipeline():
 
     # Model performance classification
     tl_model_training_perf = model_performance_classification(tl_model, x_training_normalized, y_training_encoded)
-    tl_model_training_perf
+    print(tl_model_training_perf)
 
     # Get prediction data for new model
     y_predictor_training, y_predictor_testing, y_testing_normalized = get_model_predictions(
@@ -803,7 +784,7 @@ def run_main_pipeline():
     show_banner(tl_model_title, f'{prediction_correct} / {total} \nPrediction Accuracy: {pct:.2f}%')
 
     # Show images of manipulated data prior to training
-    visualize_augmented_image_batch(training_generator, label_encoder)
+    show_augmented_image_batch(training_generator, label_encoder)
 
     show_banner(tl_model_title + ' with '+ vgg_model_title, 'Classification Report')
     print_classification_report(tl_model, x_testing_normalized, y_testing_encoded)
@@ -811,9 +792,7 @@ def run_main_pipeline():
     """Conclusions"""
 
     print(base_training_perf)
-
     print(da_model_training_perf)
-
     print(tl_model_training_perf)
 
     """#Final Results"""
@@ -869,6 +848,8 @@ def run_main_pipeline():
         'Testing Loss': testing_loss,
     })
 
+    # --- FINDINGS ----
+
     """Actionable Insights and Business Recommendations
     
     *   The model correctly identified seedings.
@@ -905,5 +886,3 @@ if __name__ == '__main__':
         sys.exit(1)
 
 # --- End of Program --- #
-
-

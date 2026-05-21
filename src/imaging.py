@@ -2,38 +2,51 @@
 
 import random
 import cv2
-from src.config import GENERATOR_BATCH_SIZE, SEED # OpenCV for image processing
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from google.colab.patches import cv2_imshow
+
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.preprocessing.image import (
+    ImageDataGenerator,
+    img_to_array,
+    load_img,
+    NumpyArrayIterator # The iterator is generally created by ImageDataGenerator
+)
+
+from src.config import GENERATOR_BATCH_SIZE, IMAGE_COLS, IMAGE_PX_MAX, IMAGE_ROWS, SEED # OpenCV for image processing
+
 
 def show_random_cv2_image(imgs: np.ndarray) -> None:
     cv2_imshow(random.choice(imgs)) # Using cv2_imshow to display the image
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def show_random_image(resized_images: list) -> None:
-    random_resized_image = random.choice(resized_images)
-    height, width = random_resized_image.shape[:2]
 
-    show_banner('Resized Image')
-    print(f'Height: {height}, Width: {width}')
+# def show_random_image(resized_images: list) -> None:
+def is_resized(img, resized_img_dims) -> bool:
+    #random_img = random.choice(resized_images)
+    height, width = img.shape[:2]
 
-    # Check if resized worked: Get height, width of image
-    if height == REDUCED_IMAGE_DIMS[0] and width == REDUCED_IMAGE_DIMS[1]:
-        print('Image resized successfully.')
-
-        IMAGE_HEIGHT = REDUCED_IMAGE_DIMS[0]
-        IMAGE_WIDTH = REDUCED_IMAGE_DIMS[1]
-        IMAGE_DIMS = REDUCED_IMAGE_DIMS
-        IMAGE_PARAMS = IMAGE_DIMS + (IMAGE_CHANNELS, )
-
-        show_random_cv2_image(resized_images)
-
-        print('\nUpdating Image: height, width, dims, params...\n')
-        del REDUCED_IMAGE_DIMS
-
-    else:
-        print('Image resizing failed.')
-
+    print(f'Resized Image: Width: {width}, Height: {height}')
     
+    # Check if resized worked: Get height, width of image
+    if height == resized_img_dims[0] and width == resized_img_dims[1]:
+        print('Image resized successfully.  Updating Image: height, width, dims, params...\n')
+   
+        #IMAGE_HEIGHT = REDUCED_IMAGE_DIMS[0]
+        #IMAGE_WIDTH = REDUCED_IMAGE_DIMS[1]
+        #IMAGE_DIMS = REDUCED_IMAGE_DIMS
+        #IMAGE_PARAMS = IMAGE_DIMS + (IMAGE_CHANNELS, )
+
+        show_random_cv2_image(img)
+
+        return True
+    
+    print('Image resizing failed.')
+    return False
 
 
 def create_bgr_images(imgs: np.ndarray) -> list:
@@ -48,6 +61,7 @@ def create_bgr_images(imgs: np.ndarray) -> list:
 
     return bgr_images
 
+
 def convert_to_rgb(imgs: np.ndarray) -> list:
     rgb_images = []
     for img in imgs:
@@ -61,14 +75,19 @@ def convert_to_rgb(imgs: np.ndarray) -> list:
 
     return rgb_images
 
+
 # Show random image using matplotlib
-def show_random_image(imgs: np.ndarray) -> None:
+def show_random_image(imgs: np.ndarray):
     random_index = random.randint(0, len(imgs))
-    plt.imshow(imgs[random_index], cmap='gray')
-    plt.title(f'Random Sample Image | Index: {random_index}')
+    random_img = imgs[random_index]
+    plt.imshow(random_img, cmap='gray')
+    plt.title(f'Random Image (Sample) | Index: {random_index}')
     plt.show()
 
-def visualize_raw_image_data(imgs: np.ndarray, labels: np.ndarray, rows:int=IMAGE_ROWS, cols:int=IMAGE_COLS) -> None:
+    return random_img
+
+
+def show_raw_images(imgs: np.ndarray, labels: np.ndarray, rows:int=IMAGE_ROWS, cols:int=IMAGE_COLS) -> None:
     """
     Visualizes random image data from the input array in a grid layout.
 
@@ -101,14 +120,15 @@ def visualize_raw_image_data(imgs: np.ndarray, labels: np.ndarray, rows:int=IMAG
 
     plt.show()
 
-    # Show images from training data
-def visualize_augmented_image_batch(train_generator: NumpyArrayIterator, enc: LabelEncoder) -> None:
+
+# Show images from training data
+def show_augmented_image_batch(train_generator: NumpyArrayIterator, enc: LabelEncoder) -> None:
     img, img_labels = next(train_generator)
     fig, axes = plt.subplots(4, 4, figsize=(14, 7))
     fig.set_size_inches(12, 12)
 
     categories = np.unique(img_labels)
-    keys = dict(enumerate(label_encoder.classes_))
+    keys = dict(enumerate(enc.classes_))
 
     for (img, label_index, ax) in zip(img, np.argmax(img_labels, axis=1), axes.flatten()):
         ax.imshow(img)
@@ -118,14 +138,14 @@ def visualize_augmented_image_batch(train_generator: NumpyArrayIterator, enc: La
     plt.show()
 
 
-def get_resized_images(imgs: np.ndarray) -> list:
+def get_resized_images(imgs: np.ndarray, REDUCED_IMAGE_DIMS) -> list:
     resized_images = []
+
     for img in imgs:
         resized_image = cv2.resize(img, REDUCED_IMAGE_DIMS, interpolation=cv2.INTER_LINEAR)
         resized_images.append(resized_image)
 
     return resized_images
-
 
 
 def generate_training_image_batch():
@@ -139,12 +159,16 @@ def generate_training_image_batch():
     )
 
 
-def build_generator(datagen: ImageDataGenerator, x_training_normalized: np.ndarray, y_training_encoded: np.ndarray, shuffle_flag: bool=True) -> NumpyArrayIterator:
-
-    return datagen.flow(
+def build_generator(data_gen: ImageDataGenerator, x_training_normalized: np.ndarray, y_training_encoded: np.ndarray, shuffle_flag: bool=True) -> NumpyArrayIterator:
+    return data_gen.flow(
         x_training_normalized,
         y_training_encoded,
         batch_size=GENERATOR_BATCH_SIZE,
         seed=SEED,
         shuffle=shuffle_flag
     )
+
+
+# Normalize the image(s)
+def normalize(img: np.ndarray) -> float:
+    return img.astype('float32') / IMAGE_PX_MAX

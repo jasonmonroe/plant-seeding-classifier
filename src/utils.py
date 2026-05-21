@@ -70,10 +70,6 @@ def init_cnn_session() -> None:
     np.random.seed(SEED)
     tf.random.set_seed(SEED)
 
-        # Normalize the image(s)
-def normalize(img: np.ndarray) -> float:
-    return img.astype('float32') / IMAGE_PX_MAX
-
 
 
 def get_plant_species(df: pd.DataFrame):

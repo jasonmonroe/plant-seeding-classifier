@@ -70,8 +70,6 @@ def init_cnn_session() -> None:
     np.random.seed(SEED)
     tf.random.set_seed(SEED)
 
-
-
 def get_plant_species(df: pd.DataFrame):
     plant_species = sorted(df['Label'].unique().tolist())
 

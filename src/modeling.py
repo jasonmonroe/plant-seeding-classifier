@@ -1,4 +1,4 @@
-# modeling.py
+# modeler.py
 
 import random
 from typing import Any, Tuple
@@ -49,11 +49,11 @@ def encode_label(data: pd.DataFrame, label_encoder: LabelEncoder, plant_species_
 # https://www.tensorflow.org/api_docs/python/tf/keras/utils/to_categorical
 # Used to one-hot encode integer labels into a binary matrix representation that's
 # suitable for classification tasks in deep learing.
-def encode_data(label_encoder, y_training_data: pd.DataFrame, y_testing_data: pd.DataFrame, y_validation_data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def encode_data(label_encoder, y_training_data: pd.DataFrame, y_testing_data: pd.DataFrame, y_validation_data: pd.DataFrame, plant_species_cnt: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
-    y_training_encoded = encode_label(y_training_data, label_encoder)
-    y_testing_encoded = encode_label(y_testing_data, label_encoder)
-    y_validation_encoded = encode_label(y_validation_data, label_encoder)
+    y_training_encoded = encode_label(y_training_data, label_encoder, plant_species_cnt)
+    y_testing_encoded = encode_label(y_testing_data, label_encoder, plant_species_cnt)
+    y_validation_encoded = encode_label(y_validation_data, label_encoder, plant_species_cnt)
 
     return y_training_encoded, y_testing_encoded, y_validation_encoded
 
@@ -109,6 +109,7 @@ def fit_trained_model(
         y_training_encoded: np.ndarray,
         x_validation_normalized: np.ndarray,
         y_validation_encoded: np.ndarray,
+        x_validation_data: np.ndarray,
         datagen: ImageDataGenerator,
         validation_generator: NumpyArrayIterator,
         reduce_lr: ReduceLROnPlateau,
@@ -183,7 +184,10 @@ def show_visualize_prediction(
         x_test: np.ndarray,
         x_testing_norm: np.ndarray,
         y_testing_enc: np.ndarray,
-        show_all: bool=False
+        image_height,
+        image_width,
+        image_channels,
+        show_all: bool=False,
 ) -> Tuple[int, int]:
 
     correct_cnt = 0
@@ -203,7 +207,7 @@ def show_visualize_prediction(
         print(f'Index:{index}\n')
 
         # Get the predicted probabilities
-        predicted_probs = mod.predict((x_testing_norm[index].reshape(1, image_height, image_width, image_channels)))
+        predicted_probs = mod.predict((x_testing_norm[index].reshape(1, image_height, image_width, image_channels)), verbose=0)
 
         # Get the index of the class with the highest probability
         predicted_class_index = np.argmax(predicted_probs, axis=1)
@@ -233,7 +237,7 @@ def show_visualize_prediction(
 
     return correct_cnt, show_cnt
 
-def print_classification_report(mod, x_data: np.ndarray, y_true_encoded: np.ndarray):
+def print_classification_report(mod, x_data: np.ndarray, y_true_encoded: np.ndarray, plant_species: list):
     y_true_labels = np.argmax(y_true_encoded, axis=1)
     y_pred_probs = mod.predict(x_data)
     y_pred_classes = np.argmax(y_pred_probs, axis=1)

@@ -1527,8 +1527,8 @@ plot_history(tl_model_history, tl_model_title, 'loss')
 """### Observations
 
 
-1.   For Transfer Learning Model the acccuracy for validation increased along with the epochs.
-2.   The training accuracy didn't increase too much and actually declined. Not good!
+1. For Transfer Learning Model the accuracy for validation increased along with the epochs.
+2. The training accuracy didn't increase too much and actually declined. Not good!
 3. The Transfer Learning Model's training loss declined as the epochs increased and the validation losses were more consistent.
 4. The model is improving its predictions on the training data by minimizing the error (loss) during backpropagation.
 5. The training accuracy is not enough to evaluate the model's performance.

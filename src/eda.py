@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
 
 # Define labeled barplot.
@@ -138,6 +139,8 @@ def show_plot_histogram(img: np.ndarray, title: str=''):
     Args:
         img (np.array): The input image array (e.g., grayscale).
         title_text (str): Custom title for the plot.
+        :param img:
+        :param title:
     """
 
     # Use a stylish color and add a thin outline (edgecolor)
@@ -185,7 +188,7 @@ def show_plot_histogram(img: np.ndarray, title: str=''):
     # 6. Display the plot
     plt.show()
 
-def show_plant_species_dist(df_labels):
+def show_plant_species_dist(df_labels) -> None:
 
     column_name = 'Label'
 

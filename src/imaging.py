@@ -38,21 +38,6 @@ from src.config import GENERATOR_BATCH_SIZE, IMAGE_COLS, IMAGE_PX_MAX, IMAGE_ROW
 
 
 
-# Show images from training data
-def show_augmented_image_batch(train_generator: NumpyArrayIterator, enc: LabelEncoder) -> None:
-    img, img_labels = next(train_generator)
-    fig, axes = plt.subplots(4, 4, figsize=(14, 7))
-    fig.set_size_inches(12, 12)
-
-    categories = np.unique(img_labels)
-    keys = dict(enumerate(enc.classes_))
-
-    for (img, label_index, ax) in zip(img, np.argmax(img_labels, axis=1), axes.flatten()):
-        ax.imshow(img)
-        ax.set_title(keys[label_index]) # Map numeric label to plant name using keys
-        ax.axis('off')
-
-    plt.show()
 
 
 

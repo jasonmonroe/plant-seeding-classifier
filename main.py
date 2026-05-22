@@ -43,9 +43,10 @@ from tensorflow.keras.preprocessing.image import (
 from models import base
 from models.base import BaseModel
 from models.data_augm import DataAugmentedModel
+from models.transfer_learning import TransferLayerModel
 from models.vgg import Vgg
 from notebooks.plant_seed_classification import training_generator
-from src import image_handler
+
 #from src import image_handler, data_handler
 
 # Local Source Files
@@ -54,7 +55,7 @@ from src.data_handler import DataHandler
 from src.image_handler import ImageHandler
 from models.modeler import Modeler
 from models.cnn_model import CnnModel
-from src.modeling import print_classification_report
+from src.modeling import print_classification_report, show_visualize_prediction
 from src.preprocess import load_data, load_images, describe_data, describe_images, describe_labels, split_data
 #from src.modeling import create_base_model, create_data_augmented_model, create_transfer_learning_model, create_vgg_model, fit_model, evalute_model, fit_trained_model, model_performance_classification, get_model_predictions, encode_data, encode_label, print_classification_report, show_visualize_prediction
 #from src.imaging import build_generator, generate_training_image_batch, show_augmented_image_batch, show_random_image, create_bgr_images, convert_to_rgb, show_random_cv2_image, show_raw_images, show_augmented_image_batch, get_resized_images, normalize
@@ -93,7 +94,7 @@ def run_main_pipeline():
     describe_images(images)
 
     # Randomly sample pixel data
-    image_handle = ImageHandler(images)
+    image_handle = ImageHandler(images, image_width, image_height, image_channels)
     random_img = image_handle.show_random_image(images)
 
     # Plot histogram to check distribution
@@ -183,27 +184,8 @@ def run_main_pipeline():
         image_params = image_dims + (image_channels,)
 
 
-    # Define reduce liner regression and early stopping objects
-    # Define ReduceLRonPlateau()
-    reduce_lr = ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.5,
-        patience=5,
-        min_lr=L2_LEARNING_RATE,
-        verbose=1
-    )
-
-    """
-    Early Stopping
     
-    Monitor validation loss and stop training automatically when the loss starts consistently increasing as a sign of 
-    overfitting.
-    """
-    early_stopping = EarlyStopping(
-        monitor='val_loss',
-        patience=10,
-        restore_best_weights=True
-    )
+   
 
     """
     Data Preparation for Modeling
@@ -334,7 +316,7 @@ def run_main_pipeline():
 
     # Data Augmented CNN Model
 
-    data_augm_model = DataAugmentedModel('Data Augmented CNN Model', image_params)
+    data_augm_model = DataAugmentedModel(image_params)
     data_augm_model.compile()
     data_augm_model.show_summary()
 
@@ -419,471 +401,28 @@ def run_main_pipeline():
 
     # VGG16 Model
     image_params = (LG_CNT, LG_CNT, 3)
+    image_handle.width = LG_CNT
+    image_handle.height = LG_CNT
+    image_handle.channels = 3
+    
     vgg_model = Vgg(image_params)
     vgg_model.show_summary()
 
 
     # Transfer Learning Model
+    tl_model = TransferLayerModel(image_params, vgg_model)
+    tl_model.compile()
+    tl_model.show_summary()
 
-
-
-    # ---> @todo First Draft Below <--- #
-
-    """
-    Encode the target labels
-    """
-
-    # Encode categorical features and scale the pixel values
-    # Creating one-hot encoded representation of target labels
-    label_encoder = LabelEncoder()
-
-    y_training_encoded, y_testing_encoded, y_validation_encoded = encode_data(
-        label_encoder,
-        y_training_data,
-        y_testing_data,
-        y_validation_data,
-        plant_species_cnt
-    )
-
-    """#Data Normalization"""
-
-    # Normalizing the image data
-    x_training_normalized = normalize(x_training_data)
-    x_testing_normalized = normalize(x_testing_data)
-    x_validation_normalized = normalize(x_validation_data)
-
-
-    # --- Model Building --- #
-
-    """Model Building
-    
-    ###CNN Model
-    
-    🧠 What is a CNN Model?
-    A Convolutional Neural Network (CNN), or ConvNet, is a specialized type of deep learning model designed primarily to process data that has a known grid-like topology, such as images (2D grid of pixels) or time-series data (1D grid).
-    """
-
-    init_cnn_session()
-
-    # ==================================
-    #  CNN Model: Base Model
-    # ==================================
-    # Intializing a sequential CNN model
-
-    base_model_title = 'Base CNN Model'
-    base_model = create_base_model(plant_species_cnt, image_params)
-
-    # Compile Model
-    base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-    # Get Model Summary
-    base_model.summary()
-
-    # Calculate the number of parameters.
-    param_cnt = base_model.count_params()
-    print(f'Number of parameters: {param_cnt}')
-
-    # Fit CNN Model and return history.  Also time the optimization.
-    start_time = start_timer()
-    show_banner(base_model_title, 'Fitting Base Model...')
-
-    base_model_history = fit_model(
-        base_model,
-        x_training_normalized,
-        y_training_encoded,
-        x_validation_normalized,
-        y_validation_encoded
-    )
-
-    show_timer(start_time)
-
-    # Plot History
-    show_plot_history(base_model_history, base_model_title, 'accuracy')
-    show_plot_history(base_model_history, base_model_title, 'loss')
-
-    """
-    Observations:
-    
-    By comparing the final Training Accuracy ($90.53%) and Validation Accuracy ($80.63%), we 
-    can draw two conclusions:
-    Final Accuracy Gap: There is an $9.90% gap between the training and validation accuracy 
-    ($90.53%} - 80.63%).This confirms that the model is overfitting, meaning it learned the 
-    training data much better than the validation data. However, a $10%$ gap is manageable and a strong improvement 
-    from earlier runs.
-    
-    r"Best Epoch: The peak validation accuracy of $82.32% was hit at Epoch 24 before dropping slightly at 
-    the end. The validation loss ($0.7476) was the lowest at Epoch 30, indicating a stable final state.
-    This training history is successful because the Base CNN Model achieved an excellent generalization accuracy of 
-    over 80%, which is why it performed so well on the final testing set.
-    
-    The Results are Excellent (for this model):
-    *   Accuracy is higher for training then validation.
-    *   Closest the data comes together is after the 8th epoch.
-    *   Loss data decreases linearly.
-    *   Training loss diminishes more extremely than validation losses as epochs increase.  In other words it more 
-        volatile dealing with the training loss.
-    """
-
-    # Evaluate CNN Model
-    start_time = start_timer()
-    show_banner(base_model_title, 'Evaluation')
-
-    base_model_loss, base_model_accuracy = evalute_model(
-        base_model,
-        x_testing_normalized,
-        y_testing_encoded
-    )
-
-    show_timer(start_time)
-
-    """🎯 
-    Interpretation
-    
-    r"High Generalization: This 84.00 Test Accuracy is the most important number. When compared to the 
-    Training Accuracy of 90.53 (from the training log), the model maintained strong performance on new 
-    data. This shows the model successfully generalized and did not severely overfit.
-    
-    * Model Stability: The Test Loss of $0.7909 is relatively low, confirming that the model's final weights are stable 
-    and effective at making accurate probability assignments.
-    * Efficiency: The model is highly efficient, evaluating the entire test set in less than half a second.
-    
-    Conclusion:
-    
-    This evaluation confirms that the Base CNN Model is a successful and robust solution for the Plant Seed 
-    Classification task, meeting your performance goals.
-    """
-
-    # --- Model Performance ---
-
-    # Get model training performance
-    base_training_perf = model_performance_classification(base_model, x_training_normalized, y_training_encoded)
-    print(base_training_perf)
-
-    y_predictor_training, y_predictor_testing, y_testing_normalized = get_model_predictions(
-        base_model,
-        x_training_normalized,
-        x_testing_normalized,
-        y_testing_encoded
-    )
-
-    # Plotting confusion matrix
-    show_plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
-
-    show_banner(base_model_title, 'Classification Report')
-    print_classification_report(base_model, x_testing_normalized, y_testing_encoded, plant_species)
-
-
-    """
-    # Define ReduceLRonPlateau()
-    reduce_lr = ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.5,
-        patience=5,
-        min_lr=L2_LEARNING_RATE,
-        verbose=1
-    )
-
-    early_stopping = EarlyStopping(
-        monitor='val_loss',
-        patience=10,
-        restore_best_weights=True
-    )
-    """
-
-    # Augment the data without using validation or test data.  Only training data.
-    # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-    """
-    training_datagen = ImageDataGenerator(
-        rotation_range=20,
-        zoom_range=0.15,
-        width_shift_range=0.1,
-        height_shift_range=0.1,
-        horizontal_flip=True,
-        fill_mode='nearest'
-    )
-    """
-
-    training_datagen = image_handle.generate_training_image_batch()
-
-    # Flowing training images in batches of 48 using training_datagen generator.
-    training_generator = build_generator(training_datagen, x_training_normalized, y_training_encoded)
-    
-    """
-    training_generator = training_datagen.flow(
-        x_training_normalized,
-        y_training_encoded,
-        batch_size=GENERATOR_BATCH_SIZE,
-        seed=SEED,
-        shuffle=True
-    )
-    """
-
-    # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-    validation_datagen = ImageDataGenerator() # empty params
-    validation_generator = build_generator(validation_datagen, x_validation_normalized, y_validation_encoded, shuffle_flag=False)
-
-
-    """
-    validation_generator = validation_datagen.flow(
-        x_validation_normalized,
-        y_validation_encoded,
-        batch_size=GENERATOR_BATCH_SIZE,
-        seed=SEED,
-        shuffle=False
-    )
-    """
-
-    """
-    Data Augmentation
-    
-    Remember, data augmentation should not be used in the validation/test data set.
-    
-    CNN Model with Data Augmentation
-    
-    The purpose of using a Data Augmented Model (DAM)—or more accurately, applying data augmentation during training—is 
-    to artificially increase the size and diversity of your training data without collecting new physical images.
-    """
-
-    init_cnn_session()
-
-    da_model_title = 'Data Augmented CNN Model'
-
-    """
-    da_model = Sequential()
-
-    # --- Block 1 ---
-    da_model.add(Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same', input_shape=IMAGE_PARAMS))
-    da_model.add(BatchNormalization())
-    da_model.add(Activation('relu'))
-    da_model.add(MaxPooling2D(pool_size=KERNEL_SIZE_SM))
-
-    # --- Block 2 ---
-    da_model.add(Conv2D(MED_CNT, KERNEL_SIZE_MED, padding='same'))
-    da_model.add(BatchNormalization())
-    da_model.add(Activation('relu'))
-    da_model.add(MaxPooling2D(pool_size=KERNEL_SIZE_SM))
-
-    # --- Block 3 ---
-    da_model.add(Conv2D(LG_CNT, KERNEL_SIZE_MED, padding='same'))
-    da_model.add(BatchNormalization())
-    da_model.add(Activation('relu'))
-    da_model.add(MaxPooling2D(pool_size=KERNEL_SIZE_SM))
-
-    # --- Global Pooling and Dense Layers ---
-    da_model.add(GlobalAveragePooling2D())
-    da_model.add(Dense(XLG_CNT))
-    da_model.add(BatchNormalization())
-    da_model.add(Activation('relu'))
-    da_model.add(Dropout(DROPOUT_RATE))
-    da_model.add(Dense(plant_species_cnt, activation='softmax'))
-    """
-
-    da_model = create_data_augmented_model(plant_species_cnt, image_params)
-
-    # Compile Data Augmented CNN Model
-    da_model.compile(
-        optimizer=Adam(learning_rate=DA_LEARNING_RATE),
-        loss='categorical_crossentropy',
-        metrics=['accuracy']
-    )
-
-    # Generate summary
-    da_model.summary()
 
     start_time = start_timer()
-
-    show_banner(da_model_title, 'Fitting Training Model')
-
-    # Fit model with augmented data
-    da_model_history = fit_trained_model(
-        da_model,
-        x_training_normalized,
-        y_training_encoded,
-        x_validation_normalized,
-        y_validation_encoded,
-        x_validation_data,
-        training_datagen,
-        validation_generator,
-        reduce_lr,
-        early_stopping
-    )
-
+    show_banner(tl_model.title, 'Fitting Training Model')
+    tl_model.fit_trained_model(train_datagen, val_generator)
     show_timer(start_time)
 
-    """
-    "The training accuracy starts low and increases, but the final score is much lower than the $90% seen in the Base 
-    CNN.
-    
-    The validation accuracy reached a peak of $70.95% at Epoch 27, which aligns with the final 
-    $71.58% testing accuracy you reported for this model."
-
-    Key Observations and Callback Activity
-    
-    Training vs. Validation: 
-    Throughout the run, the Validation Accuracy is often higher than the Training Accuracy
-     (e.g., Epoch 27: Train approx 66%, Val $70.95%). This is the signature of strong regularization (via data 
-     augmentation), which prevented the model from overfitting.
-    
-    Learning Rate Reduction: 
-    The ReduceLROnPlateau callback triggered twice:
-    
-    Epoch 6: Learning Rate reduced from $1 \\times 10^{-4 to $5 \\times 10^{-5 because the validation metrics 
-    plateaued or failed to improve.
-    
-    Epoch 36: Learning Rate reduced again from $5 \\times 10^{-5 to $2.5 \\times 10^{-5. This is a common strategy 
-    to help the model escape local minima and continue learning, even if very slowly.
-    
-    
-    Conclusion: This training log confirms the model was stable and effectively prevented overfitting, but the 
-    difficulty in learning the highly augmented training data resulted in a lower final performance (the 
-    71.58% test accuracy).
-    """
-
-    # Look at the images after data has been augmented
-    show_plot_history(da_model_history, da_model_title, 'accuracy')
-    show_plot_history(da_model_history, da_model_title, 'loss')
-
-    """
-    Observations:
-    
-    * The results are unexpected.  The validation accuracy is static until the 5th epochs and then climbs .10% by the 
-    8th epochs and then tepid's off.
-    * Train accuracy bounces up and down before the accuracy increases while validation accuracy increases.
-    * Validation accuracy increases as the epochs increase which means it's learning more per epoch. (This is what we 
-    want).
-    * Training accuracy is a hit or miss but eventually goes up after the 25th epoch.  We need better results.
-    * The losses are closely aligned by each epoch.  The training losses still bounce up and down but overall decreases 
-    each epoch.
-    """
-
-    # Evaluate the CNN Model w/ Data Augmentation
-    start_time = start_timer()
-    show_banner(da_model_title, 'Evaluation')
-
-    da_model_loss, da_model_accuracy = evalute_model(
-        da_model,
-        x_testing_normalized,
-        y_testing_encoded
-    )
-
-    show_timer(start_time)
-
-    # Get CNN Model w/ Data Augmentation training performance
-    da_model_training_perf = model_performance_classification(
-        da_model,
-        x_training_normalized,
-        y_training_encoded
-    )
-
-    print(da_model_training_perf)
-
-    # 0	0.723158	0.734437	0.723158	0.709289
-
-    y_predictor_training, y_predictor_testing, y_testing_normalized = get_model_predictions(
-        da_model,
-        x_training_normalized,
-        x_testing_normalized,
-        y_testing_encoded
-    )
-
-    # Show confusion matrix for augmented data
-    show_plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
-
-    show_banner(da_model_title, 'Classification Report')
-    print_classification_report(da_model, x_testing_normalized, y_testing_encoded, plant_species)
-
-    """
-    Final Model
-     
-    Comment on the final model you have selected and use the same in the below code to visualize the image.
-    """
-
-    init_cnn_session()
-
-    # VGG16 Model
-
-    image_params = (LG_CNT, LG_CNT, 3)
-
-    # ==================================
-    #  CNN Model: VGG16
-    # ==================================
-    vgg_model_title = 'VGG16 Model'
-
-    # Summary of the whole model
-    #vgg_model = VGG16(
-    #    weights='imagenet',
-    #    include_top=False,
-    #    input_shape=image_params
-    #)
-
-    vgg_model = create_vgg_model(image_params)
-
-    head_input = GlobalAveragePooling2D()(vgg_model.output)
-    head_output = Dense(units=plant_species_cnt, activation='softmax')(head_input)
-
-    # Visualizing the prediction
-
-    # Get visual model summary
-    vgg_model.summary()
-
-    """
-    Transfer Learning Model
-    
-    The purpose of using a Transfer Learning Model (TLM) is to leverage knowledge gained from a massive, general task to solve a specific, smaller task.
-    """
-
-    # --- Transfer Learning Model --- #
-
-    # USE THIS
-    tl_model_title = 'Transfer Learning Model'
-
-    # Create the transfer learning model
-    """
-    tl_model = Sequential([
-        vgg_model,
-        GlobalAveragePooling2D(),  # converts 2D features to 1D vector
-        Dense(512, activation='relu'),
-        Dropout(DROPOUT_RATE),
-        Dense(plant_species_cnt, activation='softmax')
-    ])
-    """
-
-    tl_model = create_transfer_learning_model(vgg_model, plant_species_cnt)
-
-    # Unfreeze the top 4 layers
-    for layer in tl_model.layers[-4:]:
-        layer.trainable = True
-
-    # Recompile with lower learning rate
-    tl_model.compile(
-        optimizer=Adam(learning_rate=TL_LEARNING_RATE),
-        loss='categorical_crossentropy',
-        metrics=['accuracy']
-    )
-
-    tl_model.summary()
-
-    start_time = start_timer()
-    show_banner(tl_model_title, 'Fitting Training Model')
-
-    tl_model_history = fit_trained_model(
-        tl_model,
-        x_training_normalized,
-        y_training_encoded,
-        x_validation_normalized,
-        y_validation_encoded,
-        x_validation_data,
-        training_datagen,
-        validation_generator,
-        reduce_lr,
-        early_stopping
-    )
-
-    show_timer(start_time)
-
-    # Plot history
-    show_plot_history(tl_model_history, tl_model_title, 'accuracy')
-    show_plot_history(tl_model_history, tl_model_title, 'loss')
+    #show_plot_history(tl_model.history, tl_model.title, 'accuracy')
+    #show_plot_history(tl_model.history, tl_model.title, 'loss')
+    tl_model.show_history()
 
     """
     Observations:
@@ -897,44 +436,27 @@ def run_main_pipeline():
     5. The training accuracy is not enough to evaluate the model's performance.
     """
 
-    # Evaluate model
     start_time = start_timer()
-    show_banner(tl_model_title, 'Evaluation')
-
-    tl_model_loss, tl_model_accuracy = evalute_model(
-        tl_model,
-        x_testing_normalized,
-        y_testing_encoded
-    )
-
+    show_banner(tl_model.title, 'Evaluation')
+    tl_model.evaluate()
     show_timer(start_time)
 
     # Model performance classification
-    tl_model_training_perf = model_performance_classification(tl_model, x_training_normalized, y_training_encoded)
-    print(tl_model_training_perf)
-
-    # Get prediction data for new model
-    y_predictor_training, y_predictor_testing, y_testing_normalized = get_model_predictions(
-        tl_model,
-        x_training_normalized,
-        x_testing_normalized,
-        y_testing_encoded
-    )
-
-    # Plot confusion matrix
-    show_plot_confusion_matrix(y_testing_encoded, y_predictor_testing)
+    tl_model.calc_performance()
+    _, y_test_pred, _ = tl_model.get_predictions()
+    show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
 
     # Display visualization prediction model
     start_time = start_timer()
     prediction_correct, total = show_visualize_prediction(
-        tl_model,
-        label_encoder,
-        x_testing_data,
-        x_testing_normalized,
-        y_testing_encoded,
-        image_height,
-        image_width,
-        image_channels
+        tl_model.model,
+        tl_model.encoder,
+        tl_model.x_test,
+        tl_model.x_test_norm,
+        tl_model.y_test_enc,
+        image_handle.height,
+        image_handle.width,
+        image_handle.channels
     )
 
     show_timer(start_time)
@@ -942,46 +464,48 @@ def run_main_pipeline():
     pct = (prediction_correct / total) * 100
     show_banner(tl_model_title, f'{prediction_correct} / {total} \nPrediction Accuracy: {pct:.2f}%')
 
-    # Show images of manipulated data prior to training
-    show_augmented_image_batch(training_generator, label_encoder)
+    image_handle.show_augmented_image_batch(train_generator, tl_model.encoder)
 
-    show_banner(tl_model_title + ' with '+ vgg_model_title, 'Classification Report')
-    print_classification_report(tl_model, x_testing_normalized, y_testing_encoded, plant_species)
+    # show_results()
+    show_banner(tl_model.title, + ' with ' + vgg_model.title, 'Classification Report')
+    print_classification_report(tl_model.model, tl_model.x_test_norm, tl_model.y_test_enc, plant_species)
 
-    # Conclusions
+    print(base_model.training_perf)
+    print(data_augm_model.training_perf)
+    print(tl_model.training_perf)
 
-    print(base_training_perf)
-    print(da_model_training_perf)
-    print(tl_model_training_perf)
 
-    # ==================================
-    #  FINAL RESULT METRICS
-    # ==================================
-    #
+    # --- Final Results --- #
+
     # Training Accuracy: >= 90%
     # Validation Accuracy: >= 85%
     # Testing Accuracy: >= 85%
     # Testing Loss: <= 50% (want it closes to 0)
-
     # Build model performance graph.
-    models = [base_model_title, da_model_title, tl_model_title]
+    models = [base_model.title, data_augm_model.title, tl_model.title]
 
     # Indicates how well the model is learning the input data.
-    training_accuracy = [base_model_history.history['accuracy'][-1], da_model_history.history['accuracy'][-1],
-                         tl_model_history.history['accuracy'][-1]]
+    training_accuracy = [
+        base_model.history.history['accuracy'][-1], 
+        data_augm_model.history.history['accuracy'][-1],
+        tl_model.history.history['accuracy'][-1]
+    ]
 
     # Used during the training process to provide a proxy for generalization.  A gap
     # between this and Training Accuracy is a key sign of overfitting.
-    validation_accuracy = [base_model_history.history['val_accuracy'][-1], da_model_history.history['val_accuracy'][-1],
-                           tl_model_history.history['val_accuracy'][-1]]
+    validation_accuracy = [
+        base_model.history.history['val_accuracy'][-1], 
+        data_augm_model.history.history['val_accuracy'][-1],
+        tl_model.history.history['val_accuracy'][-1]
+    ]
 
     # MOST IMPORTANT!!!
     # Measures model's performance on completely unseen data that was held out
     # specifically for final evaluation
-    testing_accuracy = [base_model_accuracy, da_model_accuracy, tl_model_accuracy]
+    testing_accuracy = [base_model.accuracy, data_augm_model.accuracy, tl_model.accuracy]
 
     # Tests the magnitude of the error the model makes on the unseen test data.
-    testing_loss = [base_model_loss, da_model_loss, tl_model_loss]
+    testing_loss = [base_model.loss, data_augm_model.loss, tl_model.loss]
 
     # Creating matrix to view final data
     final_data = pd.DataFrame({
@@ -1015,6 +539,7 @@ def run_main_pipeline():
     * 12 different seedlings suffice but wouldn't hurt to have a few more.
     * There will be economic benefits with using automation to detect seedlings in the future.
     """
+
 
 if __name__ == '__main__':
     try:

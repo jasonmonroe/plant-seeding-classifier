@@ -15,7 +15,7 @@ import numpy as np
 from models.modeler import Modeler
 from notebooks.plant_seed_classification import show_banner
 from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, IMAGE_PX_MAX, SEED, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT
-from src.eda import show_plot_confusion_matrix
+from src.eda import show_plot_confusion_matrix, show_plot_history
 from src.modeling import model_performance_classification, print_classification_report
 
 
@@ -138,6 +138,13 @@ class CnnModel(Modeler):
         show_plot_confusion_matrix(self.y_test_enc, y_test_pred)
         show_banner(self.title, 'Classification Report')
         print_classification_report(self.model, self.x_test_norm, self.y_test_enc, self.plant_species)
+
+
+    def show_history(self):
+        # show plot history for accuracy, loss
+        show_plot_history(self.history, self.title, 'accuracy')
+        show_plot_history(self.history, self.title, 'loss')
+        
 
     def run(self):
         # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,

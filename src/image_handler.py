@@ -10,6 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from numpy import dtype, ndarray
 
+from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.image import (
     ImageDataGenerator,
     img_to_array,
@@ -21,10 +22,11 @@ from src.config import IMAGE_PX_MAX, IMAGE_COLS, IMAGE_ROWS, GENERATOR_BATCH_SIZ
 
 
 class ImageHandler:
-    def __init__(self, images: np.ndarray):
+    def __init__(self, images: np.ndarray, width: int, height: int, channels: int):
         self._images = images
-        self.width = None
-        self.height = None
+        self.width = width
+        self.height = height
+        self.channels = channels
 
     def show_random_image(self, resized_images=None):
         if resized_images is None:
@@ -166,3 +168,21 @@ class ImageHandler:
             seed=SEED,
             shuffle=shuffle_flag
         )
+
+
+    # Show images from training data
+    def show_augmented_image_batch(train_generator: NumpyArrayIterator, enc: LabelEncoder) -> None:
+        img, img_labels = next(train_generator)
+        fig, axes = plt.subplots(4, 4, figsize=(14, 7))
+        fig.set_size_inches(12, 12)
+
+        categories = np.unique(img_labels)
+        keys = dict(enumerate(enc.classes_))
+
+        for (img, label_index, ax) in zip(img, np.argmax(img_labels, axis=1), axes.flatten()):
+            ax.imshow(img)
+            ax.set_title(keys[label_index]) # Map numeric label to plant name using keys
+            ax.axis('off')
+
+        plt.show()
+

@@ -114,12 +114,13 @@ class TransferLayerModel(CnnModel):
         show_plot_confusion_matrix(self.y_test_enc, self.y_test_pred)
         
         prediction_correct, total = self.show_visualize_prediction(
-            self.x_test,
-            self.x_test_norm,
-            self.y_test_enc,
-            image_handle.height,
-            image_handle.width,
-            image_handle.channels
+            #self.x_test,
+            #self.x_test_norm,
+            #self.y_test_enc,
+            image_params
+            #image_handle.height,
+            #image_handle.width,
+            #image_handle.channels
         )
 
         #show_timer(start_time)

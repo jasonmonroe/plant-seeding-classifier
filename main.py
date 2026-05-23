@@ -1,45 +1,15 @@
 # main.py
 import sys
 import warnings
-#import random
 
 import numpy as np
 import pandas as pd
 
 import cv2 # OpenCV for image processing
 
-#from sklearn.preprocessing import LabelEncoder
-
 # TensorFlow and Keras libraries
 import tensorflow as tf
-#from tensorflow.keras import backend
-#from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
-
-"""
-from tensorflow.keras.layers import (
-    Activation,
-    BatchNormalization,
-    Conv2D,
-    Dense,
-    Dropout,
-    Flatten,
-    GlobalAveragePooling2D, # Import the GlobalAveragePooling2D layer
-    MaxPooling2D,
-)
-"""
-
-#from tensorflow.keras.models import Sequential, Model
-#from tensorflow.keras.applications.vgg16 import VGG16
-#from tensorflow.keras.optimizers import Adam
-
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-"""
-# ,
-    #img_to_array,
-    #load_img,
-    #NumpyArrayIterator # The iterator is generally created by ImageDataGenerator
-#)
-"""
 
 # Local Source Files
 from models.base import BaseModel
@@ -47,16 +17,14 @@ from models.data_augm import DataAugmentedModel
 from models.final_report import FinalReport
 from models.transfer_learning import TransferLayerModel
 from models.vgg import Vgg
-from models.final_report import FinalReport
 from models.modeler import Modeler
 from models.cnn_model import CnnModel
 
-#from src.config import LG_CNT, VGG_CHANNELS
 from src.data_handler import DataHandler
 from src.eda import show_plot_histogram,  show_plant_species_dist, show_labeled_barplot
 from src.image_handler import ImageHandler
 
-from src.modeling import print_classification_report, show_visualize_prediction
+#from src.modeling import print_classification_report, show_visualize_prediction
 #from src.preprocess import load_data, load_images, describe_data, describe_images, describe_labels, split_data
 from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
@@ -417,7 +385,7 @@ def run_main_pipeline():
     """
     Observations:
     
-    1. For Transfer Learning Model the acccuracy for validation increased along with the epochs.
+    1. For Transfer Learning Model the accuracy for validation increased along with the epochs.
     2. The training accuracy didn't increase too much and actually declined. Not good!
     3. The Transfer Learning Model's training loss declined as the epochs increased and the validation losses were more
        consistent.
@@ -435,7 +403,7 @@ def run_main_pipeline():
     tl_model.calc_performance()
     #_, y_test_pred, _ = tl_model.get_predictions()
     tl_model.get_predictions()
-    tl_model.show_results()
+    tl_model.show_results(vgg_model.image_params)
     #show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
 
     """
@@ -461,8 +429,8 @@ def run_main_pipeline():
     image_handle.show_augmented_image_batch(train_generator, tl_model.encoder)
 
     # show_results()
-    show_banner(tl_model.title, + ' with ' + vgg_model.title, 'Classification Report')
-    print_classification_report(tl_model.model, tl_model.x_test_norm, tl_model.y_test_enc, plant_species)
+    #show_banner(tl_model.title, + ' with ' + vgg_model.title, 'Classification Report')
+    #print_classification_report(tl_model.model, tl_model.x_test_norm, tl_model.y_test_enc, plant_species)
 
     print('Base Model: Training Performances')
     print(base_model.training_perf)

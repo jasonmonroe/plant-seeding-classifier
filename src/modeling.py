@@ -1,5 +1,5 @@
 # modeler.py
-
+# @todo - DELETE!
 import random
 from typing import Any, Tuple
 
@@ -133,51 +133,13 @@ def fit_trained_model(
     )
 
 
-# ==================================
-#  MODEL PERFORMANCE CLASSIFICATION
-# ==================================
-#
-# Metric, Working (Minimum Signal), Good (Expected Target), Excellent (Production Goal)
-# Test Accuracy, 60%−75%, 75%−85%, >85%
-# Test F1-Score, 0.55−0.70, 0.75−0.85, >0.85
-# Test Loss, <1.5, <0.7, <0.4
-#
-# Define a function to compute different metrics to check performance of a classification model built using stats models
-# @todo -- DELETE
-def model_performance_classification(mod: Sequential, predictors: np.ndarray, target: str, threshold: float=0.5) -> pd.DataFrame:
 
-    """
-    Function to compute different metrics to check classification model performance
-    model: classifer
-    predictors: independent variables
-    target: target variable
-    threshold: threshold for classification
-    """
 
-    # Use np.argmax to get the predicted class index
-    # (i.e: predictors ~ x_training_normalized)
-    predicted_labels = np.argmax(mod.predict(predictors), axis=1)
 
-    # Convert TRUE one-hot encoded target labels to integer class indices
-    # (i.e: target ~ y_training_encoded)
-    target_classes = np.argmax(target, axis=1)
-
-    acc = accuracy_score(target_classes, predicted_labels)
-    prec = precision_score(target_classes, predicted_labels, average='weighted')
-    rec = recall_score(target_classes, predicted_labels, average='weighted')
-    f1 = f1_score(target_classes, predicted_labels, average='weighted')
-
-    perform_df = pd.DataFrame({
-        'Accuracy': [acc], 
-        'Precision': [prec], 
-        'Recall': [rec], 
-        'F1': [f1]
-        })
-
-    return perform_df
 
 
 # Visualizing the predicted and correct label of images from test data, add `pixel height`, `pixel width` labels
+"""
 def show_visualize_prediction(
         mod: Sequential,
         enc: LabelEncoder,
@@ -236,7 +198,7 @@ def show_visualize_prediction(
             print('# ----- [END] ----- #\n\n')
 
         return correct_cnt, show_cnt
-
+"""
 
 
 

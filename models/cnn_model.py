@@ -1,27 +1,24 @@
 # models/cnn_model.py
 
+import random
 from typing import Any, Tuple
-from re import L
 
-from sklearn.preprocessing import LabelEncoder
+import numpy as np
+import pandas as pd
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+#from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import class_weight
-
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import History
-import tensorflow as tf
-import random
-import numpy as np
-
 
 from models.modeler import Modeler
 from notebooks.plant_seed_classification import show_banner
 from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, IMAGE_PX_MAX, SEED, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT
 from src.eda import show_plot_confusion_matrix, show_plot_history
-from src.modeling import model_performance_classification, print_classification_report
-
+#from src.modeling import model_performance_classification, print_classification_report
 
 #from src.modeling import model_performance_classification
-
 
 # Shared
 class CnnModel(Modeler):
@@ -148,9 +145,52 @@ class CnnModel(Modeler):
         # Show plot history for accuracy, loss
         show_plot_history(self.history, self.title, 'accuracy')
         show_plot_history(self.history, self.title, 'loss')
+
+    """
+    ==================================
+     MODEL PERFORMANCE CLASSIFICATION
+    ==================================
+
+    Metric, Working (Minimum Signal), Good (Expected Target), Excellent (Production Goal)
+    Test Accuracy, 60%−75%, 75%−85%, >85%
+    Test F1-Score, 0.55−0.70, 0.75−0.85, >0.85
+    Test Loss, <1.5, <0.7, <0.4
+    
+    Define a function to compute different metrics to check performance of a classification model built using stats models
+    """
+    def model_performance_classification(self, predictors: np.ndarray, target: str) -> pd.DataFrame:
+
+        """
+        Function to compute different metrics to check classification model performance
+        model: classifer
+        predictors: independent variables
+        target: target variable
+        threshold: threshold for classification
+        """
+
+        # Use np.argmax to get the predicted class index
+        # (i.e: predictors ~ x_training_normalized)
+        predicted_labels = np.argmax(self.model.predict(predictors), axis=1)
+
+        # Convert TRUE one-hot encoded target labels to integer class indices
+        # (i.e: target ~ y_training_encoded)
+        target_classes = np.argmax(target, axis=1)
+
+        acc = accuracy_score(target_classes, predicted_labels)
+        prec = precision_score(target_classes, predicted_labels, average='weighted')
+        rec = recall_score(target_classes, predicted_labels, average='weighted')
+        f1 = f1_score(target_classes, predicted_labels, average='weighted')
+
+        perform_df = pd.DataFrame({
+            'Accuracy': [acc], 
+            'Precision': [prec], 
+            'Recall': [rec], 
+            'F1': [f1]
+            })
+
+        return perform_df
         
     def run(self):
         # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,
         # ,
         pass
-

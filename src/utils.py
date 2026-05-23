@@ -1,11 +1,7 @@
 # utils.py
-import random
 
 import time
-#import numpy as np
 import pandas as pd
-#import tensorflow as tf
-
 from src.config import SECS_IN_MIN, MSEC
 
 def start_timer() -> float:

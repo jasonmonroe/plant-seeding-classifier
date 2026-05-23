@@ -1,6 +1,7 @@
 # models/modeler.py
 import numpy as np
 
+from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 
 import tensorflow as tf
@@ -38,7 +39,6 @@ class Modeler:
         self.y_train_enc = self._encode_label(self.y_train)
         self.y_test_enc = self._encode_label(self.y_test)
         self.y_val_enc = self._encode_label(self.y_val)
-
         #return y_training_encoded, y_testing_encoded, y_validation_encoded
 
     def _encode_label(self, data):
@@ -98,17 +98,3 @@ class Modeler:
             target_names=plant_species,
             digits=4)
         )
-
-
-   
-
-
-    def build_metrics(self):
-        pass
-
-    def get_accuracy(self):
-        pass
-
-
-    def create_matrix(self):
-        pass

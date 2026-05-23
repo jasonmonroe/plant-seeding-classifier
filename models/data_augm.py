@@ -8,8 +8,6 @@ from tensorflow.keras.layers import (
     Conv2D,
     Dense,
     Dropout,
-    Flatten,
-    # Import the GlobalAveragePooling2D layer
     GlobalAveragePooling2D,
     MaxPooling2D,
 )
@@ -20,7 +18,7 @@ from src.config import KERNEL_SIZE_MED, SM_CNT, KERNEL_SIZE_SM, MED_CNT, LG_CNT,
 
 class DataAugmentedModel(CnnModel):
     def __init__(self, params):
-        #super().__init__()
+        super().__init__()
         self.title = 'Data Augmented CNN Model'
         self.image_params = params
         self.optimizer = Adam(learning_rate=DA_LEARNING_RATE),

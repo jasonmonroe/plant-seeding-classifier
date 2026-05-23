@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
+from tensorflow.keras.callbacks import History
 
 # Define labeled barplot.
 def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=None) -> None:
@@ -78,7 +78,6 @@ def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarra
     )
 
     plt.show()
-    
 
 def show_plot_history(his: History, title: str, column: str) -> None:
     """
@@ -147,8 +146,8 @@ def show_plot_histogram(img: np.ndarray, title: str=''):
     plt.hist(
         img.ravel(),
         bins=256,
-        color='#4CAF50',  # A pleasant green shade
-        edgecolor='#388E3C', # Darker green for the outline
+        color='#4caf50',  # A pleasant green shade
+        edgecolor='#388e3c', # Darker green for the outline
         alpha=0.85, # Slightly higher alpha for more solid color
         linewidth=0.5 # Thin outline
     )
@@ -219,6 +218,3 @@ def show_plant_species_dist(df_labels) -> None:
     plt.tight_layout()
 
     plt.show()
-
-
-    

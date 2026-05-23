@@ -219,3 +219,6 @@ def show_plant_species_dist(df_labels) -> None:
     plt.tight_layout()
 
     plt.show()
+
+
+    

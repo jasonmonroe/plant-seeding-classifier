@@ -23,7 +23,7 @@ class DataAugmentedModel(CnnModel):
         #super().__init__()
         self.title = 'Data Augmented CNN Model'
         self.image_params = params
-
+        self.optimizer = Adam(learning_rate=DA_LEARNING_RATE),
         self._create()
 
     def _create(self):
@@ -54,9 +54,9 @@ class DataAugmentedModel(CnnModel):
              Dense(self.plant_species_cnt, activation='softmax')
          ])
 
-    def compile(self):
-        self.model.compile(
-            optimizer=Adam(learning_rate=DA_LEARNING_RATE),
-            loss='categorical_crossentropy',
-            metrics=['accuracy']
-        )
+    #def compile(self,):
+    #    self.model.compile(
+    #        optimizer=Adam(learning_rate=DA_LEARNING_RATE),
+    #        loss='categorical_crossentropy',
+    #        metrics=['accuracy']
+    #    )

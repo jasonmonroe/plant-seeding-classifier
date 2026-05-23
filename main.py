@@ -1,23 +1,21 @@
 # main.py
 import sys
 import warnings
-import random
-
+#import random
 
 import numpy as np
 import pandas as pd
 
 import cv2 # OpenCV for image processing
 
-from sklearn.preprocessing import LabelEncoder
+#from sklearn.preprocessing import LabelEncoder
 
 # TensorFlow and Keras libraries
 import tensorflow as tf
+#from tensorflow.keras import backend
+#from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
 
-
-
-from tensorflow.keras import backend
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
+"""
 from tensorflow.keras.layers import (
     Activation,
     BatchNormalization,
@@ -28,39 +26,40 @@ from tensorflow.keras.layers import (
     GlobalAveragePooling2D, # Import the GlobalAveragePooling2D layer
     MaxPooling2D,
 )
+"""
 
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.optimizers import Adam
+#from tensorflow.keras.models import Sequential, Model
+#from tensorflow.keras.applications.vgg16 import VGG16
+#from tensorflow.keras.optimizers import Adam
 
-from tensorflow.keras.preprocessing.image import (
-    ImageDataGenerator,
-    img_to_array,
-    load_img,
-    NumpyArrayIterator # The iterator is generally created by ImageDataGenerator
-)
-
-from models import base
-from models.base import BaseModel
-from models.data_augm import DataAugmentedModel
-from models.transfer_learning import TransferLayerModel
-from models.vgg import Vgg
-from notebooks.plant_seed_classification import training_generator
-
-#from src import image_handler, data_handler
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+"""
+# ,
+    #img_to_array,
+    #load_img,
+    #NumpyArrayIterator # The iterator is generally created by ImageDataGenerator
+#)
+"""
 
 # Local Source Files
-from src.config import DA_LEARNING_RATE, L2_LEARNING_RATE, LG_CNT, TL_LEARNING_RATE
-from src.data_handler import DataHandler
-from src.image_handler import ImageHandler
+from models.base import BaseModel
+from models.data_augm import DataAugmentedModel
+from models.final_report import FinalReport
+from models.transfer_learning import TransferLayerModel
+from models.vgg import Vgg
+from models.final_report import FinalReport
 from models.modeler import Modeler
 from models.cnn_model import CnnModel
+
+#from src.config import LG_CNT, VGG_CHANNELS
+from src.data_handler import DataHandler
+from src.eda import show_plot_histogram,  show_plant_species_dist, show_labeled_barplot
+from src.image_handler import ImageHandler
+
 from src.modeling import print_classification_report, show_visualize_prediction
-from src.preprocess import load_data, load_images, describe_data, describe_images, describe_labels, split_data
-#from src.modeling import create_base_model, create_data_augmented_model, create_transfer_learning_model, create_vgg_model, fit_model, evalute_model, fit_trained_model, model_performance_classification, get_model_predictions, encode_data, encode_label, print_classification_report, show_visualize_prediction
-#from src.imaging import build_generator, generate_training_image_batch, show_augmented_image_batch, show_random_image, create_bgr_images, convert_to_rgb, show_random_cv2_image, show_raw_images, show_augmented_image_batch, get_resized_images, normalize
-from src.utils import init_cnn_session, get_plant_species, show_banner, start_timer, show_timer
-from src.eda import show_plot_confusion_matrix, show_plot_history, show_plot_histogram, show_plot_confusion_matrix, show_plant_species_dist, show_labeled_barplot
+#from src.preprocess import load_data, load_images, describe_data, describe_images, describe_labels, split_data
+from src.utils import get_plant_species, show_banner, start_timer, show_timer
+
 
 def run_main_pipeline():
 
@@ -79,9 +78,8 @@ def run_main_pipeline():
 
     # Get Plant Species
     plant_species = get_plant_species(df_labels)
-    plant_species_cnt = len(plant_species)
-    print(f'\nPlant Species Count: {plant_species_cnt}')
-
+    #plant_species_cnt = len(plant_species)
+   
     # ==================================
     #  IMAGE INFORMATION
     # ==================================
@@ -91,7 +89,7 @@ def run_main_pipeline():
     image_width, image_height, image_channels = plant.describe_images()
     images = plant.get_images()
 
-    describe_images(images)
+    #image_handle.describe_images(images)
 
     # Randomly sample pixel data
     image_handle = ImageHandler(images, image_width, image_height, image_channels)
@@ -147,14 +145,10 @@ def run_main_pipeline():
 
     # Convert the BGR images to RGB images.
     # First, we will display the image as it is imported which means in BGR format.
-
-    #show_random_cv2_image(bgr_images)
     image_handle.show_random_cv2_image()
     bgr_images = image_handle.create_bgr_images()
 
     # Now to convert BGR to RGB
-    #rgb_images = convert_to_rgb(bgr_images)
-    #show_random_cv2_image(rgb_images)
     rgb_images = image_handle.convert_to_rgb(bgr_images)
 
     """
@@ -174,18 +168,14 @@ def run_main_pipeline():
     resized_img_dims = (image_height // reduce_by, image_width // reduce_by)
     resized_images = image_handle.get_resized_images(rgb_images, resized_img_dims)
 
-    # Resized Image Below
+    # Random resized image to be shown...
     random_img = image_handle.show_random_image(resized_images)
 
     # Check if that image was resized
-    image_params = (image_height, image_width, image_channels)
+    image_params = (resized_img_dims[0], resized_img_dims[1], resized_img_dims[2])
     if image_handle.is_resized(random_img, resized_img_dims):
         image_dims = resized_img_dims
         image_params = image_dims + (image_channels,)
-
-
-    
-   
 
     """
     Data Preparation for Modeling
@@ -197,8 +187,6 @@ def run_main_pipeline():
     Split the dataset
     """
 
-    #x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data = split_data(resized_images, df_labels['Label'])
-
     (x_training_data,
      y_training_data,
      x_validation_data,
@@ -207,11 +195,9 @@ def run_main_pipeline():
      y_testing_data) = plant.split_data(resized_images)
 
     # Load parent model class for data preparation
-
     #modeler = Modeler(plant_species_cnt, x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data)
 
-
-    # Build Cnn Model
+    # Build CNN Model
     cnn_model = CnnModel(
         plant_species,
         x_training_data,
@@ -246,8 +232,9 @@ def run_main_pipeline():
     base_model.fit_model()
 
     show_timer(start_time)
-    show_plot_history(base_model.history, base_model.title, 'accuracy')
-    show_plot_history(base_model.history, base_model.title, 'loss')
+    base_model.show_history()
+    #show_plot_history(base_model.history, base_model.title, 'accuracy')
+    #show_plot_history(base_model.history, base_model.title, 'loss')
 
     """
     Observations:
@@ -296,12 +283,15 @@ def run_main_pipeline():
 
     # Model Performance Classification
     base_model.calc_performance()
-    _, y_test_pred, _ = base_model.get_predictions()
+    #_, y_test_pred, _ = base_model.get_predictions()
+    base_model.get_predictions()
 
     # Plotting Confusion Matrix
-    show_plot_confusion_matrix(base_model.y_test_enc, y_test_pred)
-    show_banner(base_model.title, 'Classification Report')
-    print_classification_report(base_model.model, base_model.x_test_norm, base_model.y_test_enc, plant_species)
+    base_model.show_results()
+
+    #show_plot_confusion_matrix(base_model.y_test_enc, y_test_pred)
+    #show_banner(base_model.title, 'Classification Report')
+    #print_classification_report(base_model.model, base_model.x_test_norm, base_model.y_test_enc, plant_species)
 
     """
     Data Augmentation
@@ -315,7 +305,6 @@ def run_main_pipeline():
     """
 
     # Data Augmented CNN Model
-
     data_augm_model = DataAugmentedModel(image_params)
     data_augm_model.compile()
     data_augm_model.show_summary()
@@ -357,12 +346,11 @@ def run_main_pipeline():
     Learning Rate Reduction: 
     The ReduceLROnPlateau callback triggered twice:
     
-    Epoch 6: Learning Rate reduced from $1 \\times 10^{-4 to $5 \\times 10^{-5 because the validation metrics 
+    Epoch 6: Learning Rate reduced from $1 times 10^{-4 to $5 times 10^{-5 because the validation metrics 
     plateaued or failed to improve.
     
-    Epoch 36: Learning Rate reduced again from $5 \\times 10^{-5 to $2.5 \\times 10^{-5. This is a common strategy 
+    Epoch 36: Learning Rate reduced again from $5 times 10^{-5 to $2.5 times 10^{-5. This is a common strategy 
     to help the model escape local minima and continue learning, even if very slowly.
-    
     
     Conclusion: This training log confirms the model was stable and effectively prevented overfitting, but the 
     difficulty in learning the highly augmented training data resulted in a lower final performance (the 
@@ -370,8 +358,9 @@ def run_main_pipeline():
     """
 
     # Look at the images after data has been augmented
-    show_plot_history(data_augm_model.history, data_augm_model.title, 'accuracy')
-    show_plot_history(data_augm_model.history, data_augm_model.title, 'loss')
+    data_augm_model.show_history()
+    #show_plot_history(data_augm_model.history, data_augm_model.title, 'accuracy')
+    #show_plot_history(data_augm_model.history, data_augm_model.title, 'loss')
 
     """
     Observations:
@@ -388,29 +377,30 @@ def run_main_pipeline():
 
     # Evaluate the CNN Model w/ Data Augmentation
     start_time = start_timer()
-    show_banner(data_augm_model.title, 'Evaluation')
     data_augm_model.evaluate()
     show_timer(start_time)
 
     # Get CNN Model w/ Data Augmentation training performance
     data_augm_model.calc_performance()
-    _, y_test_pred, _ = data_augm_model.get_predictions()
-    show_plot_confusion_matrix(data_augm_model.y_test_enc, y_test_pred)
-    show_banner(data_augm_model.title, 'Classification Report')
-    print_classification_report(data_augm_model.model, data_augm_model.x_test_norm, data_augm_model.y_test_enc, plant_species)
+    #_, y_test_pred, _ = data_augm_model.get_predictions()
+    data_augm_model.get_predictions()
+    data_augm_model.show_results()
+
+    #show_plot_confusion_matrix(data_augm_model.y_test_enc, y_test_pred)
+    #show_banner(data_augm_model.title, 'Classification Report')
+    #print_classification_report(data_augm_model.model, data_augm_model.x_test_norm, data_augm_model.y_test_enc, plant_species)
 
     # VGG16 Model
-    image_params = (LG_CNT, LG_CNT, 3)
-    image_handle.width = LG_CNT
-    image_handle.height = LG_CNT
-    image_handle.channels = 3
+    #image_params = (LG_CNT, LG_CNT, VGG_CHANNELS)
+    #image_handle.width = LG_CNT
+    #image_handle.height = LG_CNT
+    #image_handle.channels = VGG_CHANNELS
     
-    vgg_model = Vgg(image_params)
+    vgg_model = Vgg()
     vgg_model.show_summary()
 
-
     # Transfer Learning Model
-    tl_model = TransferLayerModel(image_params, vgg_model)
+    tl_model = TransferLayerModel(vgg_model)
     tl_model.compile()
     tl_model.show_summary()
 
@@ -437,15 +427,18 @@ def run_main_pipeline():
     """
 
     start_time = start_timer()
-    show_banner(tl_model.title, 'Evaluation')
+    #show_banner(tl_model.title, 'Evaluation')
     tl_model.evaluate()
     show_timer(start_time)
 
     # Model performance classification
     tl_model.calc_performance()
-    _, y_test_pred, _ = tl_model.get_predictions()
-    show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
+    #_, y_test_pred, _ = tl_model.get_predictions()
+    tl_model.get_predictions()
+    tl_model.show_results()
+    #show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
 
+    """
     # Display visualization prediction model
     start_time = start_timer()
     prediction_correct, total = show_visualize_prediction(
@@ -462,7 +455,8 @@ def run_main_pipeline():
     show_timer(start_time)
 
     pct = (prediction_correct / total) * 100
-    show_banner(tl_model_title, f'{prediction_correct} / {total} \nPrediction Accuracy: {pct:.2f}%')
+    show_banner(tl_model.title, f'{prediction_correct} / {total} \nPrediction Accuracy: {pct:.2f}%')
+    """
 
     image_handle.show_augmented_image_batch(train_generator, tl_model.encoder)
 
@@ -470,55 +464,19 @@ def run_main_pipeline():
     show_banner(tl_model.title, + ' with ' + vgg_model.title, 'Classification Report')
     print_classification_report(tl_model.model, tl_model.x_test_norm, tl_model.y_test_enc, plant_species)
 
+    print('Base Model: Training Performances')
     print(base_model.training_perf)
+
+    print('Data Augmented Model: Training Performance')
     print(data_augm_model.training_perf)
+
+    print('Transfer Layer Model: Training Performance')
     print(tl_model.training_perf)
 
-
     # --- Final Results --- #
-
-    # Training Accuracy: >= 90%
-    # Validation Accuracy: >= 85%
-    # Testing Accuracy: >= 85%
-    # Testing Loss: <= 50% (want it closes to 0)
-    # Build model performance graph.
-    models = [base_model.title, data_augm_model.title, tl_model.title]
-
-    # Indicates how well the model is learning the input data.
-    training_accuracy = [
-        base_model.history.history['accuracy'][-1], 
-        data_augm_model.history.history['accuracy'][-1],
-        tl_model.history.history['accuracy'][-1]
-    ]
-
-    # Used during the training process to provide a proxy for generalization.  A gap
-    # between this and Training Accuracy is a key sign of overfitting.
-    validation_accuracy = [
-        base_model.history.history['val_accuracy'][-1], 
-        data_augm_model.history.history['val_accuracy'][-1],
-        tl_model.history.history['val_accuracy'][-1]
-    ]
-
-    # MOST IMPORTANT!!!
-    # Measures model's performance on completely unseen data that was held out
-    # specifically for final evaluation
-    testing_accuracy = [base_model.accuracy, data_augm_model.accuracy, tl_model.accuracy]
-
-    # Tests the magnitude of the error the model makes on the unseen test data.
-    testing_loss = [base_model.loss, data_augm_model.loss, tl_model.loss]
-
-    # Creating matrix to view final data
-    final_data = pd.DataFrame({
-        'Models': models,
-        'Training Accuracy': training_accuracy,
-        'Validation Accuracy': validation_accuracy,
-        'Testing Accuracy': testing_accuracy,
-        'Testing Loss': testing_loss,
-    })
-
-    # --- FINDINGS ----
-    print(final_data)
-
+    final = FinalReport(base_model, data_augm_model, tl_model)
+    final.output_report()
+    
     """
     Actionable Insights and Business Recommendations
     

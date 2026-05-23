@@ -12,6 +12,7 @@ import tensorflow as tf
 import random
 import numpy as np
 
+
 from models.modeler import Modeler
 from notebooks.plant_seed_classification import show_banner
 from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, IMAGE_PX_MAX, SEED, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT
@@ -29,11 +30,8 @@ class CnnModel(Modeler):
         self.__init_session()
         self._reduce_lr = self.reduce_lr()
         self._early_stopping = self.early_stopping()
+        self.optimizer = None
 
-        #self.title = title
-        #self.image_params = image_params
-
-        #self.plant_species_cnt = plant_species_cnt
         self.title = None
         self.model = None
 
@@ -41,10 +39,17 @@ class CnnModel(Modeler):
         self.loss = None
         self.accuracy = None
 
+        self.y_test_pred = None
+        self.y_train_pred = None
+        
         self.training_perf = None
 
-    # Private function
     def __init_session(self) -> None:
+        """
+        Clears the current Keras session, resetting all layers and models previously created, 
+        freeing up memory and resources.
+        """
+
         print('__init_session()')
         tf.keras.backend.clear_session()
         random.seed(SEED)
@@ -54,7 +59,9 @@ class CnnModel(Modeler):
     def show_summary(self):
         self.model.summary()
 
-    # Called from child model(s)
+    def compile(self):
+        self.model.compile(optimizer=self.optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+
     def fit_model(self):
         y_train_classes = np.argmax(self.y_train_enc)
 
@@ -103,9 +110,10 @@ class CnnModel(Modeler):
 
         return self.history
 
-
     def evaluate(self)-> tuple[Any | None, Any]:
-        # aka evaluate_model()
+        
+        show_banner(self.title, 'Evaluation')
+
         self.loss, self.accuracy = self.model.evaluate(
             self.x_test_norm,
             self.y_test_enc,
@@ -116,7 +124,6 @@ class CnnModel(Modeler):
 
         return self.loss, self.accuracy
 
-    # model_performance_classification()
     def calc_performance(self):
         self.training_perf = model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
@@ -126,26 +133,22 @@ class CnnModel(Modeler):
         return self.training_perf
 
     def get_predictions(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        y_train_pred = self.model.predict(self.x_train_norm)
-        y_test_pred = self.model.predict(self.x_test_norm)
-        y_test_norm = np.argmax(self.y_test_enc, axis=1)
+        self.y_train_pred = self.model.predict(self.x_train_norm)
+        self.y_test_pred = self.model.predict(self.x_test_norm)
+        self.y_test_norm = np.argmax(self.y_test_enc, axis=1)
         
-        return y_train_pred, y_test_pred, y_test_norm
+        return self.y_train_pred, self.y_test_pred, self.y_test_norm
 
-
-    # todo
     def show_results(self):
-        show_plot_confusion_matrix(self.y_test_enc, y_test_pred)
+        show_plot_confusion_matrix(self.y_test_enc, self.y_test_pred)
         show_banner(self.title, 'Classification Report')
         print_classification_report(self.model, self.x_test_norm, self.y_test_enc, self.plant_species)
 
-
     def show_history(self):
-        # show plot history for accuracy, loss
+        # Show plot history for accuracy, loss
         show_plot_history(self.history, self.title, 'accuracy')
         show_plot_history(self.history, self.title, 'loss')
         
-
     def run(self):
         # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,
         # ,

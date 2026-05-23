@@ -1,11 +1,12 @@
 # models/modeler.py
+import numpy as np
 
 from sklearn.preprocessing import LabelEncoder
 
 import tensorflow as tf
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
 
-from src.config import IMAGE_PX_MAX, L2_LEARNING_RATE
+from src.config import IMAGE_PX_MAX, IMAGE_ROWS, L2_LEARNING_RATE
 
 # Parent Class
 # 1. Encode data, then normalize it
@@ -31,6 +32,7 @@ class Modeler:
         self.x_train_norm = None
         self.x_val_norm = None
         self.x_test_norm = None
+        self.y_test_norm = None
 
     def encode_data(self):
         self.y_train_enc = self._encode_label(self.y_train)
@@ -85,6 +87,20 @@ class Modeler:
             restore_best_weights=True
         )
 
+    def print_classification_report(mod, x_data: np.ndarray, y_true_encoded: np.ndarray, plant_species: list):
+        y_true_labels = np.argmax(y_true_encoded, axis=1)
+        y_pred_probs = mod.predict(x_data)
+        y_pred_classes = np.argmax(y_pred_probs, axis=1)
+
+        print(classification_report(
+            y_true_labels,
+            y_pred_classes,
+            target_names=plant_species,
+            digits=4)
+        )
+
+
+   
 
 
     def build_metrics(self):

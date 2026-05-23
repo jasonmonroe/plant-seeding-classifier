@@ -143,7 +143,7 @@ def fit_trained_model(
 # Test Loss, <1.5, <0.7, <0.4
 #
 # Define a function to compute different metrics to check performance of a classification model built using stats models
-
+# @todo -- DELETE
 def model_performance_classification(mod: Sequential, predictors: np.ndarray, target: str, threshold: float=0.5) -> pd.DataFrame:
 
     """
@@ -188,72 +188,63 @@ def show_visualize_prediction(
         image_width,
         image_channels,
         show_all: bool=False,
-) -> Tuple[int, int]:
+    ) -> Tuple[int, int]:
 
-    correct_cnt = 0
-    image_cnt = len(x_testing_norm)
-    show_cnt = IMAGE_ROWS
+        correct_cnt = 0
+        image_cnt = len(x_testing_norm)
+        show_cnt = IMAGE_ROWS
 
-    if show_all:
-        show_cnt = image_cnt
-
-    for i in range(0, show_cnt):
         if show_all:
-            index = i
-        else:
-            index = random.randint(0, image_cnt)
+            show_cnt = image_cnt
 
-        print(f'# ----- [{i} of {show_cnt}] ----- #')
-        print(f'Index:{index}\n')
+        for i in range(0, show_cnt):
+            if show_all:
+                index = i
+            else:
+                index = random.randint(0, image_cnt)
 
-        # Get the predicted probabilities
-        predicted_probs = mod.predict((x_testing_norm[index].reshape(1, image_height, image_width, image_channels)), verbose=0)
+            print(f'# ----- [{i} of {show_cnt}] ----- #')
+            print(f'Index:{index}\n')
 
-        # Get the index of the class with the highest probability
-        predicted_class_index = np.argmax(predicted_probs, axis=1)
+            # Get the predicted probabilities
+            predicted_probs = mod.predict((x_testing_norm[index].reshape(1, image_height, image_width, image_channels)), verbose=0)
 
-        # Use the index to get the predicted label
-        predicted_label = enc.inverse_transform(predicted_class_index)
-        predicted_label = predicted_label[0]
+            # Get the index of the class with the highest probability
+            predicted_class_index = np.argmax(predicted_probs, axis=1)
 
-        # Using inverse_transform() to get the output label from the output vector.
-        true_label_index = np.argmax(y_testing_enc[index])  # Get index of true label
-        true_label = enc.classes_[true_label_index]         # Get true label from index
+            # Use the index to get the predicted label
+            predicted_label = enc.inverse_transform(predicted_class_index)
+            predicted_label = predicted_label[0]
 
-        plt.figure(figsize=(2, 2))
-        plt.imshow(x_test[index])
-        plt.show()
+            # Using inverse_transform() to get the output label from the output vector.
+            true_label_index = np.argmax(y_testing_enc[index])  # Get index of true label
+            true_label = enc.classes_[true_label_index]         # Get true label from index
 
-        print('Predicted Label:', predicted_label)
-        print('True Label: ', true_label)
+            plt.figure(figsize=(2, 2))
+            plt.imshow(x_test[index])
+            plt.show()
 
-        if predicted_label == true_label:
-            print('✅ Correct Prediction!')
-            correct_cnt += 1
-        else:
-            print('❌ Incorrect Prediction')
+            print('Predicted Label:', predicted_label)
+            print('True Label: ', true_label)
 
-        print('# ----- [END] ----- #\n\n')
+            if predicted_label == true_label:
+                print('✅ Correct Prediction!')
+                correct_cnt += 1
+            else:
+                print('❌ Incorrect Prediction')
 
-    return correct_cnt, show_cnt
+            print('# ----- [END] ----- #\n\n')
 
-def print_classification_report(mod, x_data: np.ndarray, y_true_encoded: np.ndarray, plant_species: list):
-    y_true_labels = np.argmax(y_true_encoded, axis=1)
-    y_pred_probs = mod.predict(x_data)
-    y_pred_classes = np.argmax(y_pred_probs, axis=1)
+        return correct_cnt, show_cnt
 
-    print(classification_report(
-        y_true_labels,
-        y_pred_classes,
-        target_names=plant_species,
-        digits=4)
-    )
+
+
 
 
 # --- Model Creation 
 
 # Note: This can be a child class of Modeling
-
+"""
 def create_base_model(plant_species_cnt: int, image_params: tuple):
     return Sequential([
         # --- Convolution Block 1 ---
@@ -335,3 +326,4 @@ def get_accuracy_data():
 
 def show_accuracy():
     pass
+"""

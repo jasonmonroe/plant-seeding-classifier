@@ -4,12 +4,13 @@ from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 from tensorflow.keras.applications.vgg16 import VGG16
 
 from models.cnn_model import CnnModel
+from src.config import LG_CNT, VGG_CHANNELS
 
 
 class Vgg(CnnModel):
-    def __init__(self, params):
+    def __init__(self):
         self.title = 'VGG26 Model'
-        self.image_params = params
+        self.image_params = (LG_CNT, LG_CNT, VGG_CHANNELS)
         self.head_output = self.get_head_output()
 
 

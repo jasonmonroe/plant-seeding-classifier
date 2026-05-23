@@ -1,3 +1,4 @@
+# @todo - DELETE
 # imaging.py
 
 import random
@@ -49,5 +50,5 @@ from src.config import GENERATOR_BATCH_SIZE, IMAGE_COLS, IMAGE_PX_MAX, IMAGE_ROW
 
 
 # Normalize the image(s)
-def normalize(img: np.ndarray) -> float:
-    return img.astype('float32') / IMAGE_PX_MAX
+#def normalize(img: np.ndarray) -> float:
+#    return img.astype('float32') / IMAGE_PX_MAX

@@ -9,3 +9,6 @@ venv
 
 notebooks/.DS_Store
 notebooks/.ipynb_checkpoints
+
+# Ignore large data files
+data/plan_images.npy

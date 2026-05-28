@@ -15,7 +15,8 @@ import pandas as pd
 
 class FinalReport():
     def __init__(self, base_model, data_augm_model, tl_model):
-        
+
+        print(f'type={type(base_model)}')
         self.models = [base_model.title, data_augm_model.title, tl_model.title]
         self.loss = [base_model.loss, data_augm_model.loss, tl_model.title]
 

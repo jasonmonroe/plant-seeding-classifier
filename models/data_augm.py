@@ -26,11 +26,13 @@ from src.config import (
 
 
 class DataAugmentedModel(CnnModel):
-    def __init__(self, params):
-        super().__init__()
+    def __init__(self, params, dataset):
+        super().__init__(dataset=dataset)
         self.title = 'Data Augmented CNN Model'
         self.image_params = params
-        self.optimizer = Adam(learning_rate=DA_LEARNING_RATE),
+        self.optimizer = Adam(learning_rate=DA_LEARNING_RATE)
+
+        self._load_dataset(dataset)
         self._create()
 
     def _create(self):

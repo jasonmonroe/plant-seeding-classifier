@@ -1,5 +1,17 @@
 # eda.py
 
+"""
+Exploratory Data Analysis
+
+- EDA is an important part of any project involving data.
+- It is important to investigate and understand the data better before building a model with it.
+- A few questions have been mentioned below which will help you understand the data better.
+- A thorough analysis of the data, in addition to the questions mentioned below, should be done.
+
+1. How are these different category plant images different from each other?
+2. Is the dataset provided an imbalance? (Check with using bar plots)
+"""
+
 import numpy as np
 import pandas as pd
 import seaborn as sns

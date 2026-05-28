@@ -12,9 +12,10 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from models.base import BaseModel
 from models.cnn_model import CnnModel
 from models.data_augm import DataAugmentedModel
-from models.final_report import FinalReport
+from src.final_report import FinalReport
 from models.transfer_learning import TransferLayerModel
-from models.vgg import Vgg
+from models.vgg import VggModel
+
 from src.data_handler import DataHandler
 from src.eda import show_plot_histogram, show_plant_species_dist, show_labeled_barplot
 from src.image_handler import ImageHandler
@@ -30,7 +31,6 @@ def run_main_pipeline():
 
     # Initialize Data Handler for Plant Seedlings
     plant = DataHandler()
-
     plant.describe_data()
     plant.describe_label()
     df_labels = plant.get_labels()
@@ -62,21 +62,10 @@ def run_main_pipeline():
     # Check for NaN values
     print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
 
-    """
-    Exploratory Data Analysis
-    
-    - EDA is an important part of any project involving data.
-    - It is important to investigate and understand the data better before building a model with it.
-    - A few questions have been mentioned below which will help you understand the data better.
-    - A thorough analysis of the data, in addition to the questions mentioned below, should be done.
-    
-    1. How are these different category plant images different from each other?
-    2. Is the dataset provided an imbalance? (Check with using bar plots)
-    """
+    # Perform Exploratory Data Analysis
 
     # Plot images like a grid.
-    labels = plant.get_labels(True)
-    image_handle.show_raw_images(labels)
+    image_handle.show_raw_images(df_labels.values.ravel())
 
     # Label barplot with label
     show_labeled_barplot(df_labels, 'Label', perc=True)
@@ -141,46 +130,63 @@ def run_main_pipeline():
     
     Split the dataset
     """
+    prog_start_time = start_timer()
 
-    (x_training_data,
+    """
+     (x_training_data,
      y_training_data,
      x_validation_data,
      y_validation_data,
      x_testing_data,
      y_testing_data) = plant.split_data(resized_images)
+    """
+
+
+    dataset = plant_species(resized_images)
 
     # Load parent model class for data preparation
     #modeler = Modeler(plant_species_cnt, x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data)
     # @todo - Start Here!
     # Build CNN Model
-    cnn_model = CnnModel(
+    cnn = CnnModel(
         plant_species,
-        x_training_data,
-        y_training_data,
-        x_validation_data,
-        y_validation_data,
-        x_testing_data,
-        y_testing_data,
+        dataset
+        #x_training_data,
+        #y_training_data,
+        #x_validation_data,
+        #y_validation_data,
+        #x_testing_data,
+        #y_testing_data,
     )
 
     # Encode and normalize data to set attributes
-    cnn_model.encode_data()
-    cnn_model.normalize()
+    cnn.encode_data()
+    cnn.normalize()
+
+    # Now return the processed dataset for each model
+    dataset = cnn.get_proc_dataset()
 
     # --- Build Models --- #
+
     """
     🧠 What is a CNN Model?
     A Convolutional Neural Network (CNN), or ConvNet, is a specialized type of deep learning model designed primarily 
     to process data that has a known grid-like topology, such as images (2D grid of pixels) or time-series data 
     (1D grid).
     """
-    base_model = BaseModel(image_params) #@todo - do i pass enc values here or should i set them one-boy-one?
-    base_model.y_train_enc = cnn_model.y_train_enc
-    base_model.y_test_enc = cnn_model.y_test_enc
-    base_model.y_val_enc = cnn_model.y_val_enc
-    base_model.x_train_norm = cnn_model.x_train_norm
-    base_model.x_test_norm = cnn_model.x_test_norm
-    base_model.x_val_norm = cnn_model.x_val_norm
+
+    # @todo When creating grand child obj does it have the parent model dataset?
+    base_model = BaseModel(image_params, dataset)
+    """ 
+    #@todo - do i pass enc values here or should i set them one-boy-one?
+    Commenting out
+    base_model.y_train_enc = cnn.y_train_enc
+    base_model.y_test_enc = cnn.y_test_enc
+    base_model.y_val_enc = cnn.y_val_enc
+    base_model.x_train_norm = cnn.x_train_norm
+    base_model.x_test_norm = cnn.x_test_norm
+    base_model.x_val_norm = cnn.x_val_norm
+    """
 
     # Note: base model created...
     base_model.compile()
@@ -236,7 +242,6 @@ def run_main_pipeline():
     * Efficiency: The model is highly efficient, evaluating the entire test set in less than half a second.
     
     Conclusion:
-    
     This evaluation confirms that the Base CNN Model is a successful and robust solution for the Plant Seed 
     Classification task, meeting your performance goals.
     """
@@ -260,13 +265,18 @@ def run_main_pipeline():
     """
 
     # Data Augmented CNN Model
-    data_augm_model = DataAugmentedModel(image_params)
-    data_augm_model.y_train_enc = cnn_model.y_train_enc
-    data_augm_model.y_test_enc = cnn_model.y_test_enc
-    data_augm_model.y_val_enc = cnn_model.y_val_enc
-    data_augm_model.x_train_norm = cnn_model.x_train_norm
-    data_augm_model.x_test_norm = cnn_model.x_test_norm
-    data_augm_model.x_val_norm = cnn_model.x_val_norm
+    data_augm_model = DataAugmentedModel(image_params, dataset)
+
+    """
+    Commenting Out
+    data_augm_model.y_train_enc = cnn.y_train_enc
+    data_augm_model.y_test_enc = cnn.y_test_enc
+    data_augm_model.y_val_enc = cnn.y_val_enc
+    data_augm_model.x_train_norm = cnn.x_train_norm
+    data_augm_model.x_test_norm = cnn.x_test_norm
+    data_augm_model.x_val_norm = cnn.x_val_norm
+    """
+
     data_augm_model.compile()
     data_augm_model.show_summary()
 
@@ -276,7 +286,11 @@ def run_main_pipeline():
     # Augment the data without using validation or test data.  Only training data.
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
     train_datagen = image_handle.generate_training_image_batch()
-    train_generator = image_handle.build_generator(train_datagen, base_model.x_train_norm, base_model.y_train_enc)
+    train_generator = image_handle.build_generator(
+        train_datagen,
+        data_augm_model.x_train_norm,
+        data_augm_model.y_train_enc
+    )
 
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
     val_datagen = ImageDataGenerator()
@@ -287,6 +301,7 @@ def run_main_pipeline():
         shuffle_flag=False
     )
 
+    #data_augm_model.run(True, val_datagen, val_generator)
     data_augm_model.fit_trained_model(train_datagen, val_generator)
     show_timer(start_time)
 
@@ -313,12 +328,13 @@ def run_main_pipeline():
     Epoch 36: Learning Rate reduced again from $5 times 10^{-5 to $2.5 times 10^{-5. This is a common strategy 
     to help the model escape local minima and continue learning, even if very slowly.
     
-    Conclusion: This training log confirms the model was stable and effectively prevented overfitting, but the 
+    Conclusion: 
+    This training log confirms the model was stable and effectively prevented overfitting, but the 
     difficulty in learning the highly augmented training data resulted in a lower final performance (the 
     71.58% test accuracy).
     """
 
-    # Look at the images after data has been augmented
+    # Look at the images after data has been augmented.
     data_augm_model.show_history()
 
     """
@@ -351,18 +367,21 @@ def run_main_pipeline():
     #image_handle.height = LG_CNT
     #image_handle.channels = VGG_CHANNELS
     
-    vgg_model = Vgg()
+    vgg_model = VggModel()
     vgg_model.show_summary()
 
     # Transfer Learning Model
-    tl_model = TransferLayerModel(vgg_model)
-    tl_model.y_train_enc = cnn_model.y_train_enc
-    tl_model.y_test_enc = cnn_model.y_test_enc
-    tl_model.y_val_enc = cnn_model.y_val_enc
-    tl_model.x_train_norm = cnn_model.x_train_norm
-    tl_model.x_test_norm = cnn_model.x_test_norm
-    tl_model.x_val_norm = cnn_model.x_val_norm
-    
+    tl_model = TransferLayerModel(vgg_model, dataset)
+    """
+    Commenting out
+    tl_model.y_train_enc = cnn.y_train_enc
+    tl_model.y_test_enc = cnn.y_test_enc
+    tl_model.y_val_enc = cnn.y_val_enc
+    tl_model.x_train_norm = cnn.x_train_norm
+    tl_model.x_test_norm = cnn.x_test_norm
+    tl_model.x_val_norm = cnn.x_val_norm
+    """
+    #tl_model.run()
     tl_model.compile()
     tl_model.show_summary()
 
@@ -396,7 +415,7 @@ def run_main_pipeline():
     #show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
 
 
-    image_handle.show_augmented_image_batch(train_generator, tl_model.encoder)
+    image_handle.show_augmented_image_batch(train_generator)
 
 
     print('Base Model: Training Performances')
@@ -411,7 +430,9 @@ def run_main_pipeline():
     # --- Final Results --- #
     final = FinalReport(base_model, data_augm_model, tl_model)
     final.output_report()
-    
+
+    show_timer(prog_start_time)
+
     """
     Actionable Insights and Business Recommendations
     

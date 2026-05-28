@@ -18,17 +18,22 @@ from src.config import DROPOUT_RATE, IMAGE_ROWS, TL_LEARNING_RATE, XXLG_CNT
 from src.eda import show_plot_confusion_matrix
 from src.utils import show_banner
 
-"""
-Transfer Learning Model
 
-The purpose of using a Transfer Learning Model (TLM) is to leverage knowledge gained from a massive, general task to 
-solve a specific, smaller task.
-"""
 
 class TransferLayerModel(CnnModel):
-    def __init__(self, vgg_model):
+    """
+    Transfer Learning Model
+
+    The purpose of using a Transfer Learning Model (TLM) is to leverage knowledge gained from a massive, general task to
+    solve a specific, smaller task.
+    """
+
+    def __init__(self, vgg_model, dataset):
+        super().__init__(dataset=dataset)
         self.title = 'Transfer Learning Model'
         self.optimizer = Adam(learning_rate=TL_LEARNING_RATE)
+
+        self._load_dataset(dataset)
         self._create(vgg_model)
 
     def _create(self, vgg_model):

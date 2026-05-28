@@ -7,8 +7,9 @@ from models.cnn_model import CnnModel
 from src.config import LG_CNT, VGG_CHANNELS
 
 
-class Vgg(CnnModel):
+class VggModel(CnnModel):
     def __init__(self):
+        #super().__init__(plant_species, dataset)
         self.title = 'VGG26 Model'
         self.image_params = (LG_CNT, LG_CNT, VGG_CHANNELS)
         self.head_output = self.get_head_output()

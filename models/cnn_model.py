@@ -37,27 +37,36 @@ from src.eda import (
     show_plot_history
 )
 
-from src.utils import show_banner
+from src.utils import show_banner, early_stopping, reduce_lr
 
 class CnnModel(Modeler):
-    def __init__(self, plant_species, x_train, y_train, x_val, y_val, x_test, y_test):
-        super().__init__(plant_species, x_train, y_train, x_val, y_val, x_test, y_test)
-        self.__init_session()
-        self._reduce_lr = self.reduce_lr()
-        self._early_stopping = self.early_stopping()
-        self.optimizer = None
+    def __init__(self, plant_species, dataset: dict):
+        super().__init__(plant_species, dataset)
 
+        self._reduce_lr = reduce_lr()
+        self._early_stopping = early_stopping()
+
+        self.optimizer = None
         self.title = ''
         self.model = None
 
         self.history = None
         self.loss = None
         self.accuracy = None
-
         self.y_test_pred = None
         self.y_train_pred = None
-        
         self.training_perf = None
+
+        self.__init_session()
+
+        """
+            tl_model.y_train_enc = cnn.y_train_enc
+            tl_model.y_test_enc = cnn.y_test_enc
+            tl_model.y_val_enc = cnn.y_val_enc
+            tl_model.x_train_norm = cnn.x_train_norm
+            tl_model.x_test_norm = cnn.x_test_norm
+            tl_model.x_val_norm = cnn.x_val_norm
+        """
 
     def __init_session(self) -> None:
         """
@@ -70,6 +79,16 @@ class CnnModel(Modeler):
         random.seed(SEED)
         np.random.seed(SEED)
         tf.random.set_seed(SEED)
+
+    # protected
+    """
+    def _load_dataset(self, dataset:dict):
+        print('_load_dataset()')
+        for key, value in dataset.items():
+            print(f'Debug: set {key} = {value}')
+            setattr(self, key, value)
+    """
+
 
     def show_summary(self):
         self.model.summary()
@@ -126,7 +145,7 @@ class CnnModel(Modeler):
 
     def evaluate(self)-> tuple[Any | None, Any]:
         
-        show_banner(self.title, 'Evaluation')
+        print(f'{self.title} Evaluation')
 
         self.loss, self.accuracy = self.model.evaluate(
             self.x_test_norm,
@@ -138,13 +157,13 @@ class CnnModel(Modeler):
 
         return self.loss, self.accuracy
 
+    # @todo - look into this mismatch
     def calc_performance(self):
         self.training_perf = self.show_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
-        print('Training Performance')
-        print(self.training_perf)
+        #print(f'Training Performance')
+        #print(self.training_perf)
 
-        return self.training_perf
 
     def get_predictions(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         self.y_train_pred = self.model.predict(self.x_train_norm)
@@ -176,7 +195,7 @@ class CnnModel(Modeler):
    
    Define a function to compute different metrics to check performance of a classification model built using stats models
    """
-    def show_model_performance_classification(self, predictors: np.ndarray, target: str) -> pd.DataFrame:
+    def show_model_performance_classification(self, model, predictors: np.ndarray, target: str) -> pd.DataFrame:
 
         """
         Function to compute different metrics to check classification model performance
@@ -208,18 +227,27 @@ class CnnModel(Modeler):
 
         return perform_df
 
-
-
-
-    def run(self):
+    def run(self, datagen=None, val_generator=None) -> None:
+        print(f'Run(): {self.title}')
         # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,
         # show results,
         self.compile()
         self.show_summary()
-        show_banner(self.title, 'Training')
-        self.fit_model()
+        show_banner(self.title, 'Fitting Training Model')
+
+        #start_time = start_timer()
+        if datagen is not None and val_generator is not None:
+            self.fit_trained_model(datagen, val_generator)
+        else:
+            self.fit_model()
+        #show_timer(start_time)
+
         self.show_history()
+
+        #start_time = start_timer()
+        print('Evaluate()')
         self.evaluate()
+        #show_timer(start_time)
         self.calc_performance()
         self.get_predictions()
         self.show_results()

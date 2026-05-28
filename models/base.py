@@ -17,12 +17,15 @@ from src.config import DROPOUT_RATE, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, ME
 
 
 class BaseModel(CnnModel):
-    def __init__(self, params):
-        #super().__init__()
+    def __init__(self, image_params, dataset):
+        # @todo - do I have to pass plant_species to super constructor as well?
+        super().__init__(dataset=dataset)
 
-        self.title = 'Base CNN Model'
-        self.image_params = params
+        self.title = 'CNN Base Model'
+        self.image_params = image_params
         self.optimizer = 'adam'
+        self.__dict__.update(dataset)
+        #self._load_dataset(dataset)
         self._create()
 
     def _create(self):

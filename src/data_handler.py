@@ -7,20 +7,18 @@ from sklearn.model_selection import train_test_split
 
 from src.config import CSV_FILE, HALF_DATA_SPLIT, NPY_FILE, SEED, SOURCE_DIR, TEMPORARY_DATA_SPLIT
 
-"""
-# Loading the dataset
-
-Assuming DIR_PATH, CSV_FILE, and NPY_FILE are defined in the environment.
-
-Load the labels (target variable) from the CSV file
-This assumes the CSV file contains one column or one row per image for the label.
-We convert the labels to a flattened NumPy array immediately.
-"""
-
-
-
 
 class DataHandler:
+    """
+    Loading the dataset
+
+    Assuming DIR_PATH, CSV_FILE, and NPY_FILE are defined in the environment.
+
+    Load the labels (target variable) from the CSV file
+    This assumes the CSV file contains one column or one row per image for the label.
+    We convert the labels to a flattened NumPy array immediately.
+    """
+
     def __init__(self):
         #self._features = None
         #self._target = None
@@ -42,9 +40,7 @@ class DataHandler:
         self._labels = self.load_data()
         self._images = self.load_images()
 
-    def get_labels(self, values=False):
-        if values:
-            return self._labels.values.ravel()
+    def get_labels(self):
         return self._labels
 
     def get_images(self):
@@ -73,7 +69,6 @@ class DataHandler:
         print('Describe')
         print(labels.describe().T)
         print(f'Null values: {labels.isnull().sum()}')
-
 
     """
     Observations:
@@ -115,7 +110,7 @@ class DataHandler:
 
         return img.shape[2], img.shape[1], img.shape[3]
 
-    def split_data(self, features: list):
+    def split_data(self, features: list) -> dict:
         """
         # ===========================================
         #  CREATE TRAINING, VALIDATION, TESTING DATA
@@ -173,5 +168,11 @@ class DataHandler:
         print(f'Data type of X training: {x_training_data.dtype}')
         print(f'Data type of Y training: {y_training_data.dtype}')
 
-
-        return x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data
+        return {
+            'x_train': x_training_data,
+            'y_train': y_training_data,
+            'x_val': x_validation_data,
+            'y_val': y_validation_data,
+            'x_test': x_testing_data,
+            'y_test': y_testing_data
+        }

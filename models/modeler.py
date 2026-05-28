@@ -16,28 +16,53 @@ from src.config import IMAGE_PX_MAX
 # Parent Class
 # 1. Encode data, then normalize it
 class Modeler:
-    def __init__(self, plant_species, x_train, y_train, x_val, y_val, x_test, y_test):
-        self.encoder = LabelEncoder()
+    def __init__(self, plant_species, dataset: dict):
+        self._encoder = LabelEncoder()
         self.plant_species = plant_species
         self.plant_species_cnt = len(self.plant_species)
 
-        self.x_train = x_train
-        self.y_train = y_train
+        # Data variables
+        self.x_train = None
+        self.y_train = None
+        self.x_val = None
+        self.y_val = None
+        self.x_test = None
+        self.y_test = None
 
-        self.x_val = x_val
-        self.y_val = y_val
-
-        self.x_test = x_test
-        self.y_test = y_test
-
+        # Encoded variables
         self.y_train_enc = None
         self.y_val_enc = None
         self.y_test_enc = None
 
+        # Normalized variables
         self.x_train_norm = None
         self.x_val_norm = None
         self.x_test_norm = None
         self.y_test_norm = None
+
+        # Set dataset values
+        self.__dict__.update(dataset)
+        #self.set_dataset(dataset)
+
+    def set_dataset(self, dataset: dict):
+        print('set_dataset()')
+        for key, value in dataset.items():
+            setattr(self, key, value)
+            print(f'Debug: set {key} = {value}')
+
+    def get_proc_dataset(self):
+        """
+        Get processed data that has been encoded and normalized.
+        :return: dict of processed data.
+        """
+        return {
+            "x_train_norm": self.x_train_norm,
+            "x_test_norm": self.x_test_norm,
+            "x_val_norm": self.x_val_norm,
+            "y_train_enc": self.y_train_enc,
+            "y_test_enc": self.y_test_enc,
+            "y_val_enc": self.y_val_enc,
+        }
 
     def encode_data(self):
         self.y_train_enc = self._encode_label(self.y_train)
@@ -45,9 +70,9 @@ class Modeler:
         self.y_val_enc = self._encode_label(self.y_val)
         #return y_training_encoded, y_testing_encoded, y_validation_encoded
 
-    def _encode_label(self, data):
+    def _encode_label(self, y_data: pd.DataFrame):
         return tf.keras.utils.to_categorical(
-            self.encoder.fit_transform(data),
+            self._encoder.fit_transform(y_data),
             num_classes=self.plant_species_cnt
         )
 

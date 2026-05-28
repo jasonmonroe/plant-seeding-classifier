@@ -13,7 +13,7 @@ from numpy import dtype, ndarray
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator 
 
-from src.config import IMAGE_PX_MAX, IMAGE_COLS, IMAGE_ROWS, GENERATOR_BATCH_SIZE, SEED
+from src.config import IMAGE_COLS, IMAGE_ROWS, GENERATOR_BATCH_SIZE, SEED
 
 
 class ImageHandler:
@@ -165,12 +165,13 @@ class ImageHandler:
         )
 
     # Show images from training data
-    def show_augmented_image_batch(train_generator: NumpyArrayIterator, encoder: LabelEncoder) -> None:
+    def show_augmented_image_batch(self, train_generator: NumpyArrayIterator) -> None:
         img, img_labels = next(train_generator)
         fig, axes = plt.subplots(4, 4, figsize=(14, 7))
         fig.set_size_inches(12, 12)
 
         categories = np.unique(img_labels)
+        encoder = LabelEncoder()
         keys = dict(enumerate(encoder.classes_))
 
         for (img, label_index, ax) in zip(img, np.argmax(img_labels, axis=1), axes.flatten()):

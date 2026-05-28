@@ -13,7 +13,16 @@ from tensorflow.keras.layers import (
 )
 
 from models.cnn_model import CnnModel
-from src.config import KERNEL_SIZE_MED, SM_CNT, KERNEL_SIZE_SM, MED_CNT, LG_CNT, XLG_CNT, DROPOUT_RATE, DA_LEARNING_RATE
+from src.config import (
+    KERNEL_SIZE_MED, 
+    SM_CNT, 
+    KERNEL_SIZE_SM, 
+    MED_CNT, 
+    LG_CNT, 
+    XLG_CNT, 
+    DROPOUT_RATE, 
+    DA_LEARNING_RATE
+)
 
 
 class DataAugmentedModel(CnnModel):
@@ -51,10 +60,3 @@ class DataAugmentedModel(CnnModel):
              Dropout(DROPOUT_RATE),
              Dense(self.plant_species_cnt, activation='softmax')
          ])
-
-    #def compile(self,):
-    #    self.model.compile(
-    #        optimizer=Adam(learning_rate=DA_LEARNING_RATE),
-    #        loss='categorical_crossentropy',
-    #        metrics=['accuracy']
-    #    )

@@ -65,6 +65,7 @@ class Modeler:
         possibility that the loss may still not decrease. This may lead to executing the learning rate reduction again
         in an attempt to achieve a lower loss.
         """
+        
         return ReduceLROnPlateau(
             monitor='val_loss',
             factor=0.5,
@@ -87,9 +88,9 @@ class Modeler:
             restore_best_weights=True
         )
 
-    def print_classification_report(mod, x_data: np.ndarray, y_true_encoded: np.ndarray, plant_species: list):
+    def print_classification_report(model, x_data: np.ndarray, y_true_encoded: np.ndarray, plant_species: list):
         y_true_labels = np.argmax(y_true_encoded, axis=1)
-        y_pred_probs = mod.predict(x_data)
+        y_pred_probs = model.predict(x_data)
         y_pred_classes = np.argmax(y_pred_probs, axis=1)
 
         print(classification_report(

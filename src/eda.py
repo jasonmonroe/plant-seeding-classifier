@@ -218,3 +218,10 @@ def show_plant_species_dist(df_labels) -> None:
     plt.tight_layout()
 
     plt.show()
+
+
+def print_classification_report():
+    pass
+
+def model_performance_classification():
+    pass

@@ -13,7 +13,6 @@ class Vgg(CnnModel):
         self.image_params = (LG_CNT, LG_CNT, VGG_CHANNELS)
         self.head_output = self.get_head_output()
 
-
     def _create(self):
         self.model = VGG16(
             weights='imagenet',
@@ -26,4 +25,3 @@ class Vgg(CnnModel):
 
     def get_head_output(self):
         return Dense(units=self.plant_species_cnt, activation='softmax')(self.get_head_input())
-

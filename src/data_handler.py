@@ -59,7 +59,6 @@ class DataHandler:
     def load_images(self):
         return np.load(SOURCE_DIR + NPY_FILE)
 
-
     def describe_data(self):
         labels = self._labels
 

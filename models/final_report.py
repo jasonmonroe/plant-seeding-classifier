@@ -35,7 +35,6 @@ class FinalReport():
             ]
         }
 
-
     def output_report(self) -> None:
         report = pd.DataFrame({
             'Models': self.models,
@@ -47,4 +46,3 @@ class FinalReport():
 
         # --- FINDINGS ----
         print(report)
-

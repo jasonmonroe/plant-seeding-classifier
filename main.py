@@ -13,12 +13,12 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Local Source Files
 from models.base import BaseModel
+from models.cnn_model import CnnModel
 from models.data_augm import DataAugmentedModel
 from models.final_report import FinalReport
+from models.modeler import Modeler
 from models.transfer_learning import TransferLayerModel
 from models.vgg import Vgg
-from models.modeler import Modeler
-from models.cnn_model import CnnModel
 
 from src.data_handler import DataHandler
 from src.eda import show_plot_histogram,  show_plant_species_dist, show_labeled_barplot
@@ -164,7 +164,7 @@ def run_main_pipeline():
 
     # Load parent model class for data preparation
     #modeler = Modeler(plant_species_cnt, x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data)
-
+    # @todo - Start Here!
     # Build CNN Model
     cnn_model = CnnModel(
         plant_species,
@@ -176,6 +176,7 @@ def run_main_pipeline():
         y_testing_data,
     )
 
+    # Encode and normalize data to set attributes
     cnn_model.encode_data()
     cnn_model.normalize()
 
@@ -186,7 +187,13 @@ def run_main_pipeline():
     to process data that has a known grid-like topology, such as images (2D grid of pixels) or time-series data 
     (1D grid).
     """
-    base_model = BaseModel(image_params)
+    base_model = BaseModel(image_params) #@todo - do i pass enc values here or should i set them one-boy-one?
+    base_model.y_train_enc = cnn_model.y_train_enc
+    base_model.y_test_enc = cnn_model.y_test_enc
+    base_model.y_val_enc = cnn_model.y_val_enc
+    base_model.x_train_norm = cnn_model.x_train_norm
+    base_model.x_test_norm = cnn_model.x_test_norm
+    base_model.x_val_norm = cnn_model.x_val_norm
 
     # Note: base model created...
     base_model.compile()
@@ -274,6 +281,12 @@ def run_main_pipeline():
 
     # Data Augmented CNN Model
     data_augm_model = DataAugmentedModel(image_params)
+    data_augm_model.y_train_enc = cnn_model.y_train_enc
+    data_augm_model.y_test_enc = cnn_model.y_test_enc
+    data_augm_model.y_val_enc = cnn_model.y_val_enc
+    data_augm_model.x_train_norm = cnn_model.x_train_norm
+    data_augm_model.x_test_norm = cnn_model.x_test_norm
+    data_augm_model.x_val_norm = cnn_model.x_val_norm
     data_augm_model.compile()
     data_augm_model.show_summary()
 
@@ -369,6 +382,13 @@ def run_main_pipeline():
 
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model)
+    tl_model.y_train_enc = cnn_model.y_train_enc
+    tl_model.y_test_enc = cnn_model.y_test_enc
+    tl_model.y_val_enc = cnn_model.y_val_enc
+    tl_model.x_train_norm = cnn_model.x_train_norm
+    tl_model.x_test_norm = cnn_model.x_test_norm
+    tl_model.x_val_norm = cnn_model.x_val_norm
+    
     tl_model.compile()
     tl_model.show_summary()
 

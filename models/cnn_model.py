@@ -14,9 +14,14 @@ from tensorflow.keras.callbacks import History
 
 from models.modeler import Modeler
 from notebooks.plant_seed_classification import show_banner
-from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, IMAGE_PX_MAX, SEED, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT
-from src.eda import show_plot_confusion_matrix, show_plot_history
-#from src.modeling import model_performance_classification, print_classification_report
+from src.config import (
+    BASE_BATCH_SIZE, 
+    BASE_EPOCH_CNT, 
+    SEED, 
+    TRAINED_BATCH_SIZE, 
+    TRAINED_EPOCH_CNT
+)
+from src.eda import show_plot_confusion_matrix, show_plot_history, model_performance_classification, print_classification_report
 
 #from src.modeling import model_performance_classification
 
@@ -29,7 +34,7 @@ class CnnModel(Modeler):
         self._early_stopping = self.early_stopping()
         self.optimizer = None
 
-        self.title = None
+        self.title = ''
         self.model = None
 
         self.history = None
@@ -192,5 +197,5 @@ class CnnModel(Modeler):
         
     def run(self):
         # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,
-        # ,
+        # show results,
         pass

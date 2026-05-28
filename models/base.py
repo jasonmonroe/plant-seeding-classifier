@@ -23,7 +23,6 @@ class BaseModel(CnnModel):
         self.title = 'Base CNN Model'
         self.image_params = params
         self.optimizer = 'adam'
-        #self.history = None
         self._create()
 
     def _create(self):
@@ -50,8 +49,4 @@ class BaseModel(CnnModel):
             Dropout(DROPOUT_RATE), # helps prevent overfitting on small datasets
             Dense(self.plant_species_cnt, activation='softmax')
         ])
-
-    #def compile(self, optimizer):
-    #    self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
     

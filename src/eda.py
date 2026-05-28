@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.callbacks import History
 
+
 # Define labeled barplot.
 def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=None) -> None:
     """
@@ -220,8 +221,3 @@ def show_plant_species_dist(df_labels) -> None:
     plt.show()
 
 
-def print_classification_report():
-    pass
-
-def model_performance_classification():
-    pass

@@ -1,4 +1,6 @@
 # models/modeler.py
+
+import pandas as pd
 import numpy as np
 
 from sklearn.metrics import classification_report
@@ -6,6 +8,18 @@ from sklearn.preprocessing import LabelEncoder
 
 import tensorflow as tf
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    classification_report,
+    recall_score,
+    precision_score,
+    f1_score,
+    r2_score,
+    mean_squared_error,
+    mean_absolute_error,
+    explained_variance_score,
+)
 
 from src.config import IMAGE_PX_MAX, IMAGE_ROWS, L2_LEARNING_RATE
 
@@ -88,7 +102,7 @@ class Modeler:
             restore_best_weights=True
         )
 
-    def print_classification_report(model, x_data: np.ndarray, y_true_encoded: np.ndarray, plant_species: list):
+    def print_classification_report(self, model, x_data: np.ndarray, y_true_encoded: np.ndarray):
         y_true_labels = np.argmax(y_true_encoded, axis=1)
         y_pred_probs = model.predict(x_data)
         y_pred_classes = np.argmax(y_pred_probs, axis=1)
@@ -96,6 +110,53 @@ class Modeler:
         print(classification_report(
             y_true_labels,
             y_pred_classes,
-            target_names=plant_species,
+            target_names=self.plant_species,
             digits=4)
         )
+
+
+    """
+    ==================================
+     MODEL PERFORMANCE CLASSIFICATION
+    ==================================
+
+    Metric, Working (Minimum Signal), Good (Expected Target), Excellent (Production Goal)
+    Test Accuracy, 60%−75%, 75%−85%, >85%
+    Test F1-Score, 0.55−0.70, 0.75−0.85, >0.85
+    Test Loss, <1.5, <0.7, <0.4
+    
+    Define a function to compute different metrics to check performance of a classification model built using stats models
+    """
+    def show_model_performance_classification(self, predictors: np.ndarray, target: str) -> pd.DataFrame:
+
+        """
+        Function to compute different metrics to check classification model performance
+        model: classifier
+        predictors: independent variables
+        target: target variable
+        threshold: threshold for classification
+        """
+
+        # Use np.argmax to get the predicted class index
+        # (i.e: predictors ~ x_training_normalized)
+        predicted_labels = np.argmax(self.model.predict(predictors), axis=1)
+
+        # Convert TRUE one-hot encoded target labels to integer class indices
+        # (i.e: target ~ y_training_encoded)
+        target_classes = np.argmax(target, axis=1)
+
+        acc = accuracy_score(target_classes, predicted_labels)
+        prec = precision_score(target_classes, predicted_labels, average='weighted')
+        rec = recall_score(target_classes, predicted_labels, average='weighted')
+        f1 = f1_score(target_classes, predicted_labels, average='weighted')
+
+        perform_df = pd.DataFrame({
+            'Accuracy': [acc],
+            'Precision': [prec],
+            'Recall': [rec],
+            'F1': [f1]
+        })
+
+        return perform_df
+
+

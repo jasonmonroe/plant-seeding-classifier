@@ -615,7 +615,7 @@ def model_performance_classification(mod: Sequential, predictors: np.ndarray, ta
 
   """
   Function to compute different metrics to check classification model performance
-  model: classifer
+  model: classifier
   predictors: independent variables
   target: target variable
   threshold: threshold for classification

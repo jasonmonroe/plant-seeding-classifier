@@ -11,31 +11,22 @@ import tensorflow as tf
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import class_weight
-from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
-
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import (
-    Activation,
-    BatchNormalization,
-    Conv2D,
-    Dense,
-    Dropout,
-    Flatten,
-    GlobalAveragePooling2D, # Import the GlobalAveragePooling2D layer
-    MaxPooling2D,
-)
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint, History
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, History
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator
 
-
-from src.config import BASE_BATCH_SIZE, BASE_EPOCH_CNT, DROPOUT_RATE, IMAGE_ROWS, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SEED, SM_CNT, TRAINED_BATCH_SIZE, TRAINED_EPOCH_CNT, XLG_CNT, XXLG_CNT
-
+from src.config import (
+    BASE_BATCH_SIZE, 
+    BASE_EPOCH_CNT,
+    SEED,
+    TRAINED_BATCH_SIZE, 
+    TRAINED_EPOCH_CNT
+)
 
 # Note: Can we set global variables in a script?
  
-
 # Note: Assume label_encoder() is instantiated
 def encode_label(data: pd.DataFrame, label_encoder: LabelEncoder, plant_species_cnt: int) -> np.ndarray:
     # Encode categorical features and scale the pixel values

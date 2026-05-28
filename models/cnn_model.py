@@ -6,7 +6,6 @@ from typing import Any, Tuple
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-#from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import class_weight
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -21,11 +20,12 @@ from src.config import (
     TRAINED_BATCH_SIZE, 
     TRAINED_EPOCH_CNT
 )
-from src.eda import show_plot_confusion_matrix, show_plot_history, model_performance_classification, print_classification_report
+from src.eda import (
+    show_plot_confusion_matrix, 
+    show_plot_history
+)
 
-#from src.modeling import model_performance_classification
 
-# Shared
 class CnnModel(Modeler):
     def __init__(self, plant_species, x_train, y_train, x_val, y_val, x_test, y_test):
         super().__init__(plant_species, x_train, y_train, x_val, y_val, x_test, y_test)
@@ -107,7 +107,6 @@ class CnnModel(Modeler):
             validation_steps=(self.x_val.shape[0] // TRAINED_BATCH_SIZE),
             verbose=1,
             callbacks=[self._reduce_lr, self._early_stopping]
-
         )
 
         return self.history
@@ -127,7 +126,7 @@ class CnnModel(Modeler):
         return self.loss, self.accuracy
 
     def calc_performance(self):
-        self.training_perf = model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
+        self.training_perf = show_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
         print('Training Performance')
         print(self.training_perf)
@@ -151,50 +150,6 @@ class CnnModel(Modeler):
         show_plot_history(self.history, self.title, 'accuracy')
         show_plot_history(self.history, self.title, 'loss')
 
-    """
-    ==================================
-     MODEL PERFORMANCE CLASSIFICATION
-    ==================================
-
-    Metric, Working (Minimum Signal), Good (Expected Target), Excellent (Production Goal)
-    Test Accuracy, 60%−75%, 75%−85%, >85%
-    Test F1-Score, 0.55−0.70, 0.75−0.85, >0.85
-    Test Loss, <1.5, <0.7, <0.4
-    
-    Define a function to compute different metrics to check performance of a classification model built using stats models
-    """
-    def model_performance_classification(self, predictors: np.ndarray, target: str) -> pd.DataFrame:
-
-        """
-        Function to compute different metrics to check classification model performance
-        model: classifer
-        predictors: independent variables
-        target: target variable
-        threshold: threshold for classification
-        """
-
-        # Use np.argmax to get the predicted class index
-        # (i.e: predictors ~ x_training_normalized)
-        predicted_labels = np.argmax(self.model.predict(predictors), axis=1)
-
-        # Convert TRUE one-hot encoded target labels to integer class indices
-        # (i.e: target ~ y_training_encoded)
-        target_classes = np.argmax(target, axis=1)
-
-        acc = accuracy_score(target_classes, predicted_labels)
-        prec = precision_score(target_classes, predicted_labels, average='weighted')
-        rec = recall_score(target_classes, predicted_labels, average='weighted')
-        f1 = f1_score(target_classes, predicted_labels, average='weighted')
-
-        perform_df = pd.DataFrame({
-            'Accuracy': [acc], 
-            'Precision': [prec], 
-            'Recall': [rec], 
-            'F1': [f1]
-            })
-
-        return perform_df
-        
     def run(self):
         # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,
         # show results,

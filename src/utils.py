@@ -2,6 +2,7 @@
 
 import time
 import pandas as pd
+
 from src.config import SECS_IN_MIN, MSEC
 
 def start_timer() -> float:
@@ -52,7 +53,6 @@ def show_banner(title: str, section: str='') -> None:
         print('' + section)
 
     print('') # Final newline for spacing
-
 
 def get_plant_species(df: pd.DataFrame):
     plant_species = sorted(df['Label'].unique().tolist())

@@ -4,7 +4,6 @@ import random
 from typing import Tuple
 
 import numpy as np
-
 import matplotlib.pyplot as plt
 from keras.src.optimizers import Adam
 from tensorflow.keras.models import Sequential
@@ -40,16 +39,6 @@ class TransferLayerModel(CnnModel):
         Dropout(DROPOUT_RATE),
         Dense(self.plant_species_cnt, activation='softmax')
     ])
-
-    """
-    def compile(self):
-        self.model.compile(
-            optimizer=self.optimizer,
-            loss='categorical_crossentropy',
-            metrics=['accuracy']
-        )
-    """
-
 
     # Visualizing the predicted and correct label of images from test data, add `pixel height`, `pixel width` labels
     def show_visualize_prediction(

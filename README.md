@@ -53,3 +53,24 @@ rm -rf venv
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+
+
+```
+# 1. Deactivate and completely delete the broken virtual environment
+deactivate 2>/dev/null
+rm -rf venv
+
+# 2. Create a fresh environment using a stable Python version (e.g., 3.11)
+python3.11 -m venv venv
+source venv/bin/activate
+
+# 3. Upgrade your environment's core installation tools
+pip install --upgrade pip setuptools wheel
+
+# 4. Install your updated, cross-platform requirements file
+pip install -r requirements.txt
+
+# 5. Install Apple's official plugin to unlock your Mac's GPU hardware acceleration
+pip install tensorflow-metal
+```

@@ -3,25 +3,15 @@
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 
 import tensorflow as tf
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
+
 from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    classification_report,
-    recall_score,
-    precision_score,
-    f1_score,
-    r2_score,
-    mean_squared_error,
-    mean_absolute_error,
-    explained_variance_score,
+    classification_report
 )
 
-from src.config import IMAGE_PX_MAX, IMAGE_ROWS, L2_LEARNING_RATE
+from src.config import IMAGE_PX_MAX
 
 # Parent Class
 # 1. Encode data, then normalize it
@@ -66,42 +56,6 @@ class Modeler:
         self.x_test_norm = self.x_test.astype('float32') / IMAGE_PX_MAX
         self.x_val_norm = self.x_val.astype('float32') / IMAGE_PX_MAX
 
-
-    def reduce_lr(self):
-        """
-        Model Performance Improvement
-
-        Reducing the Learning Rate:
-
-        Hint:
-        Use ReduceLRonPlateau() function that will be used to decrease the learning rate by some factor, if the loss is
-        not decreasing for some time. This may start decreasing the loss at a smaller learning rate. There is a
-        possibility that the loss may still not decrease. This may lead to executing the learning rate reduction again
-        in an attempt to achieve a lower loss.
-        """
-        
-        return ReduceLROnPlateau(
-            monitor='val_loss',
-            factor=0.5,
-            patience=5,
-            min_lr=L2_LEARNING_RATE,
-            verbose=1
-        )
-
-    def early_stopping(self):
-        """
-        Early Stopping
-
-        Monitor validation loss and stop training automatically when the loss starts consistently increasing as a sign of
-        overfitting.
-        """
-
-        return EarlyStopping(
-            monitor='val_loss',
-            patience=10,
-            restore_best_weights=True
-        )
-
     def print_classification_report(self, model, x_data: np.ndarray, y_true_encoded: np.ndarray):
         y_true_labels = np.argmax(y_true_encoded, axis=1)
         y_pred_probs = model.predict(x_data)
@@ -113,50 +67,3 @@ class Modeler:
             target_names=self.plant_species,
             digits=4)
         )
-
-
-    """
-    ==================================
-     MODEL PERFORMANCE CLASSIFICATION
-    ==================================
-
-    Metric, Working (Minimum Signal), Good (Expected Target), Excellent (Production Goal)
-    Test Accuracy, 60%−75%, 75%−85%, >85%
-    Test F1-Score, 0.55−0.70, 0.75−0.85, >0.85
-    Test Loss, <1.5, <0.7, <0.4
-    
-    Define a function to compute different metrics to check performance of a classification model built using stats models
-    """
-    def show_model_performance_classification(self, predictors: np.ndarray, target: str) -> pd.DataFrame:
-
-        """
-        Function to compute different metrics to check classification model performance
-        model: classifier
-        predictors: independent variables
-        target: target variable
-        threshold: threshold for classification
-        """
-
-        # Use np.argmax to get the predicted class index
-        # (i.e: predictors ~ x_training_normalized)
-        predicted_labels = np.argmax(self.model.predict(predictors), axis=1)
-
-        # Convert TRUE one-hot encoded target labels to integer class indices
-        # (i.e: target ~ y_training_encoded)
-        target_classes = np.argmax(target, axis=1)
-
-        acc = accuracy_score(target_classes, predicted_labels)
-        prec = precision_score(target_classes, predicted_labels, average='weighted')
-        rec = recall_score(target_classes, predicted_labels, average='weighted')
-        f1 = f1_score(target_classes, predicted_labels, average='weighted')
-
-        perform_df = pd.DataFrame({
-            'Accuracy': [acc],
-            'Precision': [prec],
-            'Recall': [rec],
-            'F1': [f1]
-        })
-
-        return perform_df
-
-

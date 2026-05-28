@@ -179,3 +179,8 @@ class ImageHandler:
             ax.axis('off')
 
         plt.show()
+
+    def get_resized_img_dims(self, reduce_by:int=1):
+        # You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
+        # reduce_by = 1 # Note: was 2
+        return self.height // reduce_by, self.width // reduce_by

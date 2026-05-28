@@ -3,9 +3,6 @@ import sys
 import warnings
 
 import numpy as np
-import pandas as pd
-
-import cv2 # OpenCV for image processing
 
 # TensorFlow and Keras libraries
 import tensorflow as tf
@@ -16,16 +13,11 @@ from models.base import BaseModel
 from models.cnn_model import CnnModel
 from models.data_augm import DataAugmentedModel
 from models.final_report import FinalReport
-from models.modeler import Modeler
 from models.transfer_learning import TransferLayerModel
 from models.vgg import Vgg
-
 from src.data_handler import DataHandler
-from src.eda import show_plot_histogram,  show_plant_species_dist, show_labeled_barplot
+from src.eda import show_plot_histogram, show_plant_species_dist, show_labeled_barplot
 from src.image_handler import ImageHandler
-
-#from src.modeling import print_classification_report, show_visualize_prediction
-#from src.preprocess import load_data, load_images, describe_data, describe_images, describe_labels, split_data
 from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
 
@@ -34,7 +26,6 @@ def run_main_pipeline():
     # Fix warnings
     warnings.filterwarnings('ignore')
 
-    #CUDA_LAUNCH_BLOCKING = 1
     print("Number of GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
@@ -46,7 +37,6 @@ def run_main_pipeline():
 
     # Get Plant Species
     plant_species = get_plant_species(df_labels)
-    #plant_species_cnt = len(plant_species)
    
     # ==================================
     #  IMAGE INFORMATION
@@ -57,11 +47,9 @@ def run_main_pipeline():
     image_width, image_height, image_channels = plant.describe_images()
     images = plant.get_images()
 
-    #image_handle.describe_images(images)
-
     # Randomly sample pixel data
     image_handle = ImageHandler(images, image_width, image_height, image_channels)
-    random_img = image_handle.show_random_image(images)
+    image_handle.show_random_image(images)
 
     # Plot histogram to check distribution
     show_plot_histogram(images)
@@ -89,7 +77,6 @@ def run_main_pipeline():
     # Plot images like a grid.
     labels = plant.get_labels(True)
     image_handle.show_raw_images(labels)
-    #show_raw_images(images, labels)
 
     # Label barplot with label
     show_labeled_barplot(df_labels, 'Label', perc=True)
@@ -110,7 +97,6 @@ def run_main_pipeline():
     show_plant_species_dist(df_labels)
 
     # Data Pre-Processing - Convert the BGR images to RGB images.
-
     # Convert the BGR images to RGB images.
     # First, we will display the image as it is imported which means in BGR format.
     image_handle.show_random_cv2_image()
@@ -133,7 +119,8 @@ def run_main_pipeline():
 
      # You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
     reduce_by = 1 # Note: was 2
-    resized_img_dims = (image_height // reduce_by, image_width // reduce_by)
+    #resized_img_dims = (image_height // reduce_by, image_width // reduce_by)
+    resized_img_dims = image_handle.get_resized_img_dims(reduce_by)
     resized_images = image_handle.get_resized_images(rgb_images, resized_img_dims)
 
     # Random resized image to be shown...
@@ -208,8 +195,6 @@ def run_main_pipeline():
 
     show_timer(start_time)
     base_model.show_history()
-    #show_plot_history(base_model.history, base_model.title, 'accuracy')
-    #show_plot_history(base_model.history, base_model.title, 'loss')
 
     """
     Observations:
@@ -258,15 +243,10 @@ def run_main_pipeline():
 
     # Model Performance Classification
     base_model.calc_performance()
-    #_, y_test_pred, _ = base_model.get_predictions()
     base_model.get_predictions()
 
     # Plotting Confusion Matrix
     base_model.show_results()
-
-    #show_plot_confusion_matrix(base_model.y_test_enc, y_test_pred)
-    #show_banner(base_model.title, 'Classification Report')
-    #print_classification_report(base_model.model, base_model.x_test_norm, base_model.y_test_enc, plant_species)
 
     """
     Data Augmentation
@@ -340,8 +320,6 @@ def run_main_pipeline():
 
     # Look at the images after data has been augmented
     data_augm_model.show_history()
-    #show_plot_history(data_augm_model.history, data_augm_model.title, 'accuracy')
-    #show_plot_history(data_augm_model.history, data_augm_model.title, 'loss')
 
     """
     Observations:
@@ -363,13 +341,9 @@ def run_main_pipeline():
 
     # Get CNN Model w/ Data Augmentation training performance
     data_augm_model.calc_performance()
-    #_, y_test_pred, _ = data_augm_model.get_predictions()
     data_augm_model.get_predictions()
     data_augm_model.show_results()
 
-    #show_plot_confusion_matrix(data_augm_model.y_test_enc, y_test_pred)
-    #show_banner(data_augm_model.title, 'Classification Report')
-    #print_classification_report(data_augm_model.model, data_augm_model.x_test_norm, data_augm_model.y_test_enc, plant_species)
 
     # VGG16 Model
     #image_params = (LG_CNT, LG_CNT, VGG_CHANNELS)
@@ -392,14 +366,10 @@ def run_main_pipeline():
     tl_model.compile()
     tl_model.show_summary()
 
-
     start_time = start_timer()
     show_banner(tl_model.title, 'Fitting Training Model')
     tl_model.fit_trained_model(train_datagen, val_generator)
     show_timer(start_time)
-
-    #show_plot_history(tl_model.history, tl_model.title, 'accuracy')
-    #show_plot_history(tl_model.history, tl_model.title, 'loss')
     tl_model.show_history()
 
     """
@@ -421,36 +391,13 @@ def run_main_pipeline():
 
     # Model performance classification
     tl_model.calc_performance()
-    #_, y_test_pred, _ = tl_model.get_predictions()
     tl_model.get_predictions()
     tl_model.show_results(vgg_model.image_params)
     #show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
 
-    """
-    # Display visualization prediction model
-    start_time = start_timer()
-    prediction_correct, total = show_visualize_prediction(
-        tl_model.model,
-        tl_model.encoder,
-        tl_model.x_test,
-        tl_model.x_test_norm,
-        tl_model.y_test_enc,
-        image_handle.height,
-        image_handle.width,
-        image_handle.channels
-    )
-
-    show_timer(start_time)
-
-    pct = (prediction_correct / total) * 100
-    show_banner(tl_model.title, f'{prediction_correct} / {total} \nPrediction Accuracy: {pct:.2f}%')
-    """
 
     image_handle.show_augmented_image_batch(train_generator, tl_model.encoder)
 
-    # show_results()
-    #show_banner(tl_model.title, + ' with ' + vgg_model.title, 'Classification Report')
-    #print_classification_report(tl_model.model, tl_model.x_test_norm, tl_model.y_test_enc, plant_species)
 
     print('Base Model: Training Performances')
     print(base_model.training_perf)

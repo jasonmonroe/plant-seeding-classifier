@@ -25,11 +25,11 @@ class DataHandler:
         self._labels = self.load_data()
         self._images = self.load_images()
 
-    def load_data(self):
+    def load_data(self) -> np.ndarray:
         csv_path = self._source_path / CSV_FILE
         return pd.read_csv(csv_path)
 
-    def load_images(self):
+    def load_images(self) -> np.ndarray:
         """
         https://numpy.org/devdocs/reference/generated/numpy.lib.format.html
         Load the image features (pixel data) from the NPY file.
@@ -39,13 +39,13 @@ class DataHandler:
         npy_path = self._source_path / NPY_FILE
         return np.load(npy_path)
 
-    def get_labels(self):
+    def get_labels(self) -> pd.DataFrame:
         return self._labels
 
-    def get_images(self):
+    def get_images(self) -> np.ndarray:
         return self._images
 
-    def describe_data(self):
+    def describe_data(self) -> None:
         labels = self._labels
 
         count = labels['Label'].value_counts()
@@ -63,8 +63,7 @@ class DataHandler:
         """
         Observations:
         
-        - The data file (labels) has 4750 rows and 1 column.
-        The shape of the npy row:
+        The data file (labels) has 4750 rows and 1 column.  The shape of the npy row:
         
         * batch_size: 4750 (row count)
         * height: 128
@@ -72,14 +71,14 @@ class DataHandler:
         * channels: 3
         """
 
-    def describe_label(self):
+    def describe_label(self) -> None:
         labels = self._labels
         print(f"Loaded Labels shape (Target, Y): {labels.shape}, Type: {type(labels)}")
 
         # Outputs: (batch_size, height, width, channels)
         print(labels.shape)
 
-    def describe_images(self):
+    def describe_images(self) -> tuple:
         """
         Image Information:
         mean, median, std dev, min, max

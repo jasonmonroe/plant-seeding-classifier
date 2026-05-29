@@ -24,9 +24,7 @@ class BaseModel(CnnModel):
         self.optimizer = 'adam'
         self._create()
 
-        print(f'DEBUG: checking base model self.y_train_enc= {self.y_train_enc}')
-
-    def _create(self):
+    def _create(self) -> None:
         print(f'* Creating {self.title} *')
         self.model = Sequential([
             # --- Convolution Block 1 ---

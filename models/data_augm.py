@@ -37,8 +37,8 @@ class DataAugmentedModel(CnnModel):
         self.optimizer = Adam(learning_rate=DA_LEARNING_RATE)
         self._create()
 
-    def _create(self):
-         print(f'Creating {self.title}')
+    def _create(self) -> None:
+         print(f'* Creating {self.title} *')
          self.model = Sequential([
 
              # --- Block 1 ---

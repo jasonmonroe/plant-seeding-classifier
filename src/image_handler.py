@@ -38,7 +38,7 @@ class ImageHandler:
         plt.imshow(random_img, cmap='gray')
         plt.title(title)
         plt.show()
-
+        print(f'type={type(random_img)}')
         return random_img
 
     def show_all_images(self):

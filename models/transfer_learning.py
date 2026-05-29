@@ -39,15 +39,13 @@ class TransferLayerModel(CnnModel):
         vgg_base = vgg16_model.get_base()
         self._create(vgg_base)
 
-    def _create(self, vgg16_base_model):
+    def _create(self, vgg16_base_model) -> None:
         print(f'* Creating {self.title} *')
         
         # We must "unwrap" the Keras model from the VggModel wrapper.
         # vgg16_model.model is the actual Keras Functional model.
         self.model = Sequential([
             vgg16_base_model,
-            # Converts 2D features to 1D vector. 
-            # Note: Ensure VggModel.model output is 4D (include_top=False and no pooling).
             GlobalAveragePooling2D(),  
             Dense(XXLG_CNT, activation='relu'),
             Dropout(DROPOUT_RATE),
@@ -96,6 +94,7 @@ class TransferLayerModel(CnnModel):
 
             # Extract the true index from the one-hot encoded vector
             true_label_index = np.argmax(self.y_test_enc[index])
+
             # Use inverse_transform to ensure consistency with the predicted label logic
             true_label = self._encoder.inverse_transform([true_label_index])[0]
 
@@ -123,7 +122,7 @@ class TransferLayerModel(CnnModel):
         return correct_cnt, show_cnt
 
     # Override parent class show_results
-    def show_results(self):
+    def show_results(self) -> None:
         show_plot_confusion_matrix(self.y_test_enc, self.y_test_pred)
         prediction_correct, total = self.show_visualize_prediction(self.image_params)
 

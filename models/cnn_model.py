@@ -38,7 +38,7 @@ from src.eda import (
     show_plot_history
 )
 
-from src.utils import show_banner, early_stopping, reduce_lr
+from src.utils import show_banner, early_stopping, reduce_lr, start_timer, show_timer
 
 class CnnModel(Modeler):
     def __init__(self, dataset: dict):
@@ -64,7 +64,7 @@ class CnnModel(Modeler):
         Clears the current Keras session, resetting all layers and models previously created, freeing up memory and
         resources.
         """
-        print(f'__init_session({self.title})')
+
         tf.keras.backend.clear_session()
         random.seed(SEED)
         np.random.seed(SEED)
@@ -144,7 +144,7 @@ class CnnModel(Modeler):
 
         return self.history
 
-    def evaluate(self, verbose: int = 2) -> tuple[Any | None, Any]:
+    def evaluate(self, verbose: int = 2) -> tuple[float, float]:
         print(f'{self.title} Evaluation')
         self.loss, self.accuracy = self.model.evaluate(
             self.x_test_norm,
@@ -156,7 +156,7 @@ class CnnModel(Modeler):
 
         return self.loss, self.accuracy
 
-    def calc_performance(self):
+    def calc_performance(self) -> None:
         self.training_perf = self.show_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
     def get_predictions(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -166,12 +166,12 @@ class CnnModel(Modeler):
         
         return self.y_train_pred, self.y_test_pred, self.y_test_true_labels
 
-    def show_results(self):
+    def show_results(self) -> None:
         show_plot_confusion_matrix(self.y_test_enc, self.y_test_pred)
         show_banner(self.title, 'Classification Report')
         self.print_classification_report(self.model, self.x_test_norm, self.y_test_enc)
 
-    def show_history(self):
+    def show_history(self) -> None:
         # Show plot history for accuracy, loss
         show_plot_history(self.history, self.title, 'accuracy')
         show_plot_history(self.history, self.title, 'loss')
@@ -221,22 +221,34 @@ class CnnModel(Modeler):
         return perform_df
 
     def run(self, datagen: ImageDataGenerator=None) -> None:
-        print(f'Run(): {self.title}')
-        # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions,
-        # show results,
+        """
+        Run each model in a sequence:
+        - Compile model
+        - Show model summary
+        - Fit the model with a data generator if necessary
+        - Show the Plot History
+        - Evaluate the model
+        - Calculate the model performance
+        - Get the predictions
+        - Show all the results
+        """
+        print(f'\nRunning {self.title}...')
+        # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions, show results,
+        #param_cnt = self.model.count_params()
+        #print(f'Number of parameters: {param_cnt}')
+
         self.compile()
         self.show_summary()
         show_banner(self.title, 'Fitting Training Model')
 
-        #start_time = start_timer()
+        start_time = start_timer()
         if datagen is None:
             self.fit_model()
         else:
             self.fit_trained_model(datagen)
-        #show_timer(start_time)
+        show_timer(start_time)
 
         self.show_history()
-
         #start_time = start_timer()
         self.evaluate()
         #show_timer(start_time)

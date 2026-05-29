@@ -142,7 +142,7 @@ def run_main_pipeline():
 
     # Base Model
     base_model = BaseModel(image_params, dataset)
-    # -- hide base_model.run()
+    base_model.run()
 
     # Note: base model created...
     # @todo - base_model.compile()
@@ -152,10 +152,10 @@ def run_main_pipeline():
     # @todo - param_cnt = base_model.model.count_params()
     # @todo - print(f'Number of parameters: {param_cnt}')
 
-    start_time = start_timer()
+    #start_time = start_timer()
     # @todo - base_model.fit_model()
 
-    show_timer(start_time)
+    #show_timer(start_time)
     # @todo - base_model.show_history()
 
     """
@@ -182,9 +182,9 @@ def run_main_pipeline():
     """
 
     # Evaluate CNN Model
-    start_time = start_timer()
+    #start_time = start_timer()
     # @todo - base_model.evaluate()
-    show_timer(start_time)
+    #show_timer(start_time)
 
     """
     🎯 Interpretation
@@ -232,15 +232,15 @@ def run_main_pipeline():
         data_augm_model.y_train_enc
     )
 
-    # data_augm_model.run(train_datagen)
+    data_augm_model.run(train_datagen)
 
     # @todo - data_augm_model.compile()
-    # @todo - data_augm_model.show_summary()
+    # @todo -  data_augm_model.show_summary()
 
-    start_time = start_timer()
+    #start_time = start_timer()
     # @todo - show_banner(data_augm_model.title, 'Fitting Training Model')
     # @todo - data_augm_model.fit_trained_model(train_datagen)
-    show_timer(start_time)
+    #show_timer(start_time)
 
     """
     "The training accuracy starts low and increases, but the final score is much lower than the $90% seen in the Base 
@@ -288,9 +288,9 @@ def run_main_pipeline():
     """
 
     # Evaluate the CNN Model w/ Data Augmentation
-    start_time = start_timer()
+    #start_time = start_timer()
     # @todo - data_augm_model.evaluate()
-    show_timer(start_time)
+    #show_timer(start_time)
 
     # Get CNN Model w/ Data Augmentation training performance
     # @todo - data_augm_model.calc_performance()
@@ -304,14 +304,16 @@ def run_main_pipeline():
 
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model, dataset)
-    tl_model.compile()
-    tl_model.show_summary()
+    tl_model.run(train_datagen)
 
-    start_time = start_timer()
-    show_banner(tl_model.title, 'Fitting Training Model')
-    tl_model.fit_trained_model(train_datagen)
-    show_timer(start_time)
-    tl_model.show_history()
+    # @todo - tl_model.compile()
+    # @todo - tl_model.show_summary()
+
+    # @todo - start_time = start_timer()
+    # @todo - show_banner(tl_model.title, 'Fitting Training Model')
+    # @todo - tl_model.fit_trained_model(train_datagen)
+    # @todo - show_timer(start_time)
+    # @todo - tl_model.show_history()
 
     """
     Observations:
@@ -325,14 +327,14 @@ def run_main_pipeline():
     5. The training accuracy is not enough to evaluate the model's performance.
     """
 
-    start_time = start_timer()
-    tl_model.evaluate()
-    show_timer(start_time)
+    # @todo - start_time = start_timer()
+    # @todo - tl_model.evaluate()
+    # @todo - show_timer(start_time)
 
     # Model performance classification
-    tl_model.calc_performance()
-    tl_model.get_predictions()
-    tl_model.show_results()
+    # @todo - tl_model.calc_performance()
+    # @todo - tl_model.get_predictions()
+    # @todo - tl_model.show_results()
 
     image_handle.show_augmented_image_batch(train_generator, _encoder)
 
@@ -347,11 +349,15 @@ def run_main_pipeline():
     print(tl_model.training_perf)
 
     # --- Final Results --- #
-    #final = FinalReport(base_model, data_augm_model, tl_model)
     final = FinalReport([base_model, data_augm_model, tl_model])
     final.output_report()
 
+    print("\n--- End of Program ---")
     show_timer(prog_start_time)
+
+    """
+    Model Performance Analysis1. CNN Base Model (Baseline)Testing Accuracy: 59.58% | Testing Loss: 1.1469Evaluation: This model is performing poorly, but it is serving its exact structural purpose: acting as a weak baseline.The Diagnostic Red Flag: Look at your classification report for Loose Silky-bent. It has a Precision of 1.00 but a Recall of 0.03. This means out of 66 actual samples, it only guessed it correctly twice, missing the other 64 entirely. The model is severely underfitting and likely predicting the dominant classes to minimize macro loss.2. Data Augmented CNN ModelTesting Accuracy: 79.58% | Testing Loss: 0.6053Evaluation: This is a massive structural win. By introducing ImageDataGenerator modifications (rotation, zoom, shifts), you forced the model to learn invariant geometric structures instead of memorizing pixel coordinates.Key Metric: Notice that the training accuracy (80.66%), validation accuracy (78.74%), and testing accuracy (79.58%) are tightly clustered together. This indicates an incredibly stable optimization path with zero overfitting.3. VGG16 Transfer Learning ModelTesting Accuracy: 88.00% | Testing Loss: 0.4187Evaluation: This is your top performer. It leverages spatial feature extractors pre-trained on millions of ImageNet images, which is why it achieves a significantly lower loss and higher accuracy.Key Metric: It jumped straight to 85.89% validation accuracy very early in its training run and held a consistent edge.Final Report Summary & Variance CheckModel StructureTraining AccValidation AccTesting AccTesting LossCNN Base Model67.21%66.95%59.58%1.1469Data Augmented CNN80.66%78.74%79.58%0.6053Transfer Learning88.61%85.89%88.00%
+    """
 
     """
     Actionable Insights and Business Recommendations

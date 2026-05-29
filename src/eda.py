@@ -148,7 +148,7 @@ def show_plot_history(his: History, title: str, column: str) -> None:
     plt.tight_layout()
     plt.show()
 
-def show_plot_histogram(img: np.ndarray, title: str=''):
+def show_plot_histogram(img: np.ndarray, title: str='') -> None:
     """
     Generates an enhanced, appealing histogram of an image's pixel intensities.
 

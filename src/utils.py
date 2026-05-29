@@ -26,28 +26,16 @@ def show_banner(title: str, section: str='') -> None:
     Prints a stylized banner for notebook readability, adjusted to remove
     the trailing hash symbol on the bottom line.
     """
-
-    PADDING = 2
-    # Ensure title length includes the padding space
-    strlen = len(title) + PADDING
+    padding = 2
+    title_upper = title.upper()
+    # The dashes should match the length of the title plus the two spaces of padding
+    dash_count = len(title_upper) + padding
 
     # Start with a newline for spacing
-    print("\n")
-
-    # Top line: # ===============
-    print('# ', end='')
-    print('=' * strlen)
-
-    # Show title: #   Title
-    print('#', end='')
-    print('  ' + title.upper())
-
-    # Bottom line: # ===============
-    print('# ', end='')
-    print('=' * strlen)
-
-    # The trailing '#' is now removed here, and the line implicitly ends
-    # because the next print statement below will start a new line.
+    print("")
+    print('+' + '-' * dash_count + '+')
+    print('| ' + title_upper + ' |')
+    print('+' + '-' * dash_count + '+')
 
     # Show section (if provided)
     if section:
@@ -85,7 +73,6 @@ def reduce_lr() -> ReduceLROnPlateau:
         min_lr=L2_LEARNING_RATE,
         verbose=1
     )
-
 
 def early_stopping() -> EarlyStopping:
     """

@@ -1,5 +1,6 @@
 # data_handler.py
 
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
@@ -20,40 +21,29 @@ class DataHandler:
     """
 
     def __init__(self):
-        #self._features = None
-        #self._target = None
-
-        #self._images = None
-        #self._labels = None
-
-        """
-        self.x_train = None
-        self.y_train = None
-        self.x_val = None
-        self.y_val = None
-        self.x_test = None
-        self.y_test = None
-        """
-
-        #df_labels = self.load_data()
-
+        self._source_path = Path(SOURCE_DIR)
         self._labels = self.load_data()
         self._images = self.load_images()
+
+    def load_data(self):
+        csv_path = self._source_path / CSV_FILE
+        return pd.read_csv(csv_path)
+
+    def load_images(self):
+        """
+        https://numpy.org/devdocs/reference/generated/numpy.lib.format.html
+        Load the image features (pixel data) from the NPY file.
+        This is the correct function to load NumPy's binary data format.
+        """
+
+        npy_path = self._source_path / NPY_FILE
+        return np.load(npy_path)
 
     def get_labels(self):
         return self._labels
 
     def get_images(self):
         return self._images
-
-    def load_data(self):
-        return pd.read_csv(SOURCE_DIR + CSV_FILE)
-
-    # https://numpy.org/devdocs/reference/generated/numpy.lib.format.html
-    # Load the image features (pixel data) from the NPY file
-    # This is the correct function to load NumPy's binary data format.
-    def load_images(self):
-        return np.load(SOURCE_DIR + NPY_FILE)
 
     def describe_data(self):
         labels = self._labels
@@ -70,17 +60,18 @@ class DataHandler:
         print(labels.describe().T)
         print(f'Null values: {labels.isnull().sum()}')
 
-    """
-    Observations:
-    
-    - The data file (labels) has 4750 rows and 1 column.
-    The shape of the npy row:
-    
-    * batch_size: 4750 (row count)
-    * height: 128
-    * width: 128
-    * channels: 3
-    """
+        """
+        Observations:
+        
+        - The data file (labels) has 4750 rows and 1 column.
+        The shape of the npy row:
+        
+        * batch_size: 4750 (row count)
+        * height: 128
+        * width: 128
+        * channels: 3
+        """
+
     def describe_label(self):
         labels = self._labels
         print(f"Loaded Labels shape (Target, Y): {labels.shape}, Type: {type(labels)}")
@@ -89,6 +80,12 @@ class DataHandler:
         print(labels.shape)
 
     def describe_images(self):
+        """
+        Image Information:
+        mean, median, std dev, min, max
+        https://numpy.org/doc/stable/reference/generated/numpy.mean.html
+        """
+
         img = self._images
 
         print('Mean:', np.mean(img))
@@ -110,7 +107,7 @@ class DataHandler:
 
         return img.shape[2], img.shape[1], img.shape[3]
 
-    def split_data(self, features: list) -> dict:
+    def split_data(self, features: np.ndarray) -> dict:
         """
         # ===========================================
         #  CREATE TRAINING, VALIDATION, TESTING DATA
@@ -125,6 +122,10 @@ class DataHandler:
         :param features:
         :return:
         """
+
+        # Ensure features is a numpy array for efficient slicing and processing
+        if not isinstance(features, np.ndarray):
+            features = np.array(features)
 
         target = self._labels['Label']
 
@@ -148,15 +149,6 @@ class DataHandler:
 
         # Printing the shapes
         print('Data Shapes')
-
-        # Convert lists to NumPy arrays before checking shape and dtype
-        x_training_data = np.array(x_training_data)
-        y_training_data = np.array(y_training_data)
-        x_validation_data = np.array(x_validation_data)
-        y_validation_data = np.array(y_validation_data)
-        x_testing_data = np.array(x_testing_data)
-        y_testing_data = np.array(y_testing_data)
-
         print(f'Shape of X training: {x_training_data.shape}')
         print(f'Shape of Y training: {y_training_data.shape}')
         print(f'Shape of X validation: {x_validation_data.shape}')

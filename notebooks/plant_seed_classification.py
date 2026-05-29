@@ -1290,8 +1290,8 @@ training_generator = training_datagen.flow(
 )
 
 # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-testing_datagen = ImageDataGenerator()
-validation_generator = testing_datagen.flow(
+validation_datagen = ImageDataGenerator()
+validation_generator = validation_datagen.flow(
     x_validation_normalized,
     y_validation_encoded,
     batch_size=GENERATOR_BATCH_SIZE,
@@ -1647,8 +1647,8 @@ pd.DataFrame({
 
 """## Actionable Insights and Business Recommendations
 
-*   The model correctly identified seedings.
-*   The predictor value for each model was high enough to correctly identify which seeding was which.
+* The model correctly identified seedlings.
+* The predictor value for each model was high enough to correctly identify which seeding was which.
 * Augmenting the data with encoders changed the accuracy and the loss dramatically.
 * Transfer Learning helped with the final model in identifying seedings compared to the augmented one.
 * Training these models at 64x64 sufficed although 128px would probably be better.
@@ -1663,7 +1663,6 @@ pd.DataFrame({
 * Keep backgrounds consistent so that we can focus on the seeding/plants.
 * 12 different seedings suffice but wouldn't hurt to have a few more.
 * There will be economic benefits with using automation to detect seeding in the future.
-
 _____
 
 # **End of Program**

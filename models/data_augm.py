@@ -1,7 +1,7 @@
 # data_augm.py
 
-from keras.src.optimizers import Adam
-from tensorflow.python.keras.models import Sequential
+from tensorflow.keras.optimizers.legacy import Adam
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import (
     Activation,
     BatchNormalization,
@@ -28,15 +28,20 @@ from src.config import (
 class DataAugmentedModel(CnnModel):
     def __init__(self, params, dataset):
         super().__init__(dataset=dataset)
+
         self.title = 'Data Augmented CNN Model'
         self.image_params = params
+        
+        # Using the legacy Adam optimizer is required on macOS to avoid 
+        # "Could not interpret optimizer identifier" errors when using custom learning rates.
         self.optimizer = Adam(learning_rate=DA_LEARNING_RATE)
-
-        self._load_dataset(dataset)
         self._create()
 
     def _create(self):
+         print(f'Creating {self.title}')
          self.model = Sequential([
+
+             # --- Block 1 ---
              Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same', input_shape=self.image_params),
              BatchNormalization(),
              Activation('relu'),

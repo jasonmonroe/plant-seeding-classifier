@@ -33,11 +33,12 @@ def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=N
 
     total = len(data[feature])  # length of the column
     count = data[feature].nunique()
+    title = 'Labeled Barplot'
 
     if n is None:
-        plt.figure(figsize=(count + 1, 5))
+        plt.figure(num=f"{title}", figsize=(count + 1, 5))
     else:
-        plt.figure(figsize=(n + 1, 5))
+        plt.figure(num=f"{title}", figsize=(n + 1, 5))
 
     plt.xticks(rotation=90, fontsize=15)
     ax = sns.countplot(
@@ -79,7 +80,9 @@ def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarra
     confusion_matrix = tf.math.confusion_matrix(y_test_arg, y_pred_arg)
     f, ax = plt.subplots(figsize=(10, 8))
 
-    plt.title('Confusion Matrix')
+    title = 'Confusion Matrix'
+    plt.figure(num=f"{title}", figsize=(10, 8))
+    plt.title(title)
 
     sns.heatmap(
         confusion_matrix,
@@ -105,12 +108,13 @@ def show_plot_history(his: History, title: str, column: str) -> None:
     train_data = his.history[column]
     validation_data = his.history['val_' + column]
     epochs = range(1, len(train_data) + 1)
+    #epochs = range(len(train_data))
 
     metric_title = column.replace('_', ' ').title()
     full_title = f'{title.title()} - {metric_title}'
 
     # --- Create Plot ---
-    plt.figure(figsize=(10, 6)) # Slightly larger for better viewing
+    plt.figure(num=f"f{full_title}", figsize=(10, 6)) # Slightly larger for better viewing
 
     # Plot training data
     plt.plot(
@@ -205,7 +209,7 @@ def show_plant_species_dist(df_labels) -> None:
     column_name = 'Label'
 
     # Assuming df_labels contains the column 'Label' with your classification target.
-    plt.figure(figsize=(10, 6))
+    plt.figure(num='Distribution of Plant Species', figsize=(10, 6))
 
     # Use the 'y' parameter to create a horizontal bar chart (flipped axes)
     # Use a nice palette for better aesthetics

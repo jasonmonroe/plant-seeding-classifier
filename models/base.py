@@ -8,7 +8,6 @@ from tensorflow.keras.layers import (
     Dense,
     Dropout,
     Flatten,
-    # Import the GlobalAveragePooling2D layer
     MaxPooling2D,
 )
 
@@ -18,17 +17,17 @@ from src.config import DROPOUT_RATE, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, ME
 
 class BaseModel(CnnModel):
     def __init__(self, image_params, dataset):
-        # @todo - do I have to pass plant_species to super constructor as well?
         super().__init__(dataset=dataset)
 
         self.title = 'CNN Base Model'
         self.image_params = image_params
         self.optimizer = 'adam'
-        self.__dict__.update(dataset)
-        #self._load_dataset(dataset)
         self._create()
 
+        print(f'DEBUG: checking base model self.y_train_enc= {self.y_train_enc}')
+
     def _create(self):
+        print(f'* Creating {self.title} *')
         self.model = Sequential([
             # --- Convolution Block 1 ---
             Conv2D(SM_CNT, KERNEL_SIZE_MED, activation='relu', padding='same', input_shape=self.image_params),
@@ -41,7 +40,6 @@ class BaseModel(CnnModel):
             # --- Convolution Block 3 ---
             Conv2D(LG_CNT, KERNEL_SIZE_MED, activation='relu', padding='same'),
             MaxPooling2D(pool_size=KERNEL_SIZE_SM),
-
             Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same'),
             BatchNormalization(),
             Activation('relu'),

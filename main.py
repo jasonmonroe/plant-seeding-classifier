@@ -1,4 +1,5 @@
 # main.py
+
 import sys
 import warnings
 
@@ -31,17 +32,14 @@ def run_main_pipeline():
 
     # Initialize Data Handler for Plant Seedlings
     plant = DataHandler()
-    plant.describe_data()
-    plant.describe_label()
+    # @todo - plant.describe_data()
+    # @todo - plant.describe_label()
     df_labels = plant.get_labels()
 
     # Get Plant Species
     plant_species = get_plant_species(df_labels)
    
-    # ==================================
-    #  IMAGE INFORMATION
-    # ==================================
-    # mean, median, std dev, min, max
+
 
     print('Image Information')
     image_width, image_height, image_channels = plant.describe_images()
@@ -49,10 +47,10 @@ def run_main_pipeline():
 
     # Randomly sample pixel data
     image_handle = ImageHandler(images, image_width, image_height, image_channels)
-    image_handle.show_random_image(images)
+    # @todo - image_handle.show_random_image(images)
 
     # Plot histogram to check distribution
-    show_plot_histogram(images)
+    # @todo - show_plot_histogram(images)
 
     """
     Most of the pixels RGB values are between 50-100 with the peak around 75.  This means most of the image data and 
@@ -65,10 +63,10 @@ def run_main_pipeline():
     # Perform Exploratory Data Analysis
 
     # Plot images like a grid.
-    image_handle.show_raw_images(df_labels.values.ravel())
+    # @todo - image_handle.show_raw_images(df_labels.values.ravel())
 
     # Label barplot with label
-    show_labeled_barplot(df_labels, 'Label', perc=True)
+    # @todo - show_labeled_barplot(df_labels, 'Label', perc=True)
 
     """
     Observations:
@@ -83,12 +81,11 @@ def run_main_pipeline():
     """
     
     # eda.py 
-    show_plant_species_dist(df_labels)
+    # @todo - show_plant_species_dist(df_labels)
 
     # Data Pre-Processing - Convert the BGR images to RGB images.
-    # Convert the BGR images to RGB images.
     # First, we will display the image as it is imported which means in BGR format.
-    image_handle.show_random_cv2_image()
+    # @todo - image_handle.show_random_cv2_image()
     bgr_images = image_handle.create_bgr_images()
 
     # Now to convert BGR to RGB
@@ -106,21 +103,17 @@ def run_main_pipeline():
     # Resize RGB images
     # Note: This will be used as `independent variables`.
 
-     # You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
+    # You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
     reduce_by = 1 # Note: was 2
-    #resized_img_dims = (image_height // reduce_by, image_width // reduce_by)
     resized_img_dims = image_handle.get_resized_img_dims(reduce_by)
     resized_images = image_handle.get_resized_images(rgb_images, resized_img_dims)
 
     # Random resized image to be shown...
-    random_img = image_handle.show_random_image(resized_images)
+    # @todo - image_handle.show_random_image(resized_images)
 
-    # Check if that image was resized
-    image_params = (resized_img_dims[0], resized_img_dims[1], resized_img_dims[2])
-    if image_handle.is_resized(random_img, resized_img_dims):
-        image_dims = resized_img_dims
-        image_params = image_dims + (image_channels,)
-
+    # Create the 3D shape tuple (Height, Width, Channels) for the models
+    image_params = resized_img_dims + (image_channels,)
+   
     """
     Data Preparation for Modeling
     
@@ -132,75 +125,37 @@ def run_main_pipeline():
     """
     prog_start_time = start_timer()
 
-    """
-     (x_training_data,
-     y_training_data,
-     x_validation_data,
-     y_validation_data,
-     x_testing_data,
-     y_testing_data) = plant.split_data(resized_images)
-    """
+    dataset = plant.split_data(resized_images)
+    dataset['plant_species'] = plant_species
 
-
-    dataset = plant_species(resized_images)
-
-    # Load parent model class for data preparation
-    #modeler = Modeler(plant_species_cnt, x_training_data, y_training_data, x_validation_data, y_validation_data, x_testing_data, y_testing_data)
-    # @todo - Start Here!
-    # Build CNN Model
-    cnn = CnnModel(
-        plant_species,
-        dataset
-        #x_training_data,
-        #y_training_data,
-        #x_validation_data,
-        #y_validation_data,
-        #x_testing_data,
-        #y_testing_data,
-    )
-
-    # Encode and normalize data to set attributes
+    # We use a temporary CnnModel instance to handle the initial 
+    # encoding and normalization logic for the entire pipeline.
+    cnn = CnnModel(dataset)
     cnn.encode_data()
     cnn.normalize()
 
-    # Now return the processed dataset for each model
+    # Retrieve the dataset dictionary now populated with normalized/encoded arrays
     dataset = cnn.get_proc_dataset()
 
     # --- Build Models --- #
 
-    """
-    🧠 What is a CNN Model?
-    A Convolutional Neural Network (CNN), or ConvNet, is a specialized type of deep learning model designed primarily 
-    to process data that has a known grid-like topology, such as images (2D grid of pixels) or time-series data 
-    (1D grid).
-    """
-
-    # @todo When creating grand child obj does it have the parent model dataset?
+    # Base Model
     base_model = BaseModel(image_params, dataset)
-    """ 
-    #@todo - do i pass enc values here or should i set them one-boy-one?
-    Commenting out
-    base_model.y_train_enc = cnn.y_train_enc
-    base_model.y_test_enc = cnn.y_test_enc
-    base_model.y_val_enc = cnn.y_val_enc
-    base_model.x_train_norm = cnn.x_train_norm
-    base_model.x_test_norm = cnn.x_test_norm
-    base_model.x_val_norm = cnn.x_val_norm
-    """
+    # -- hide base_model.run()
 
     # Note: base model created...
-    base_model.compile()
-    base_model.show_summary()
+    # @todo - base_model.compile()
+    # @todo - base_model.show_summary()
 
     # Calculate the number of parameters.
-    param_cnt = base_model.model.count_params()
-    print(f'Number of parameters: {param_cnt}')
+    # @todo - param_cnt = base_model.model.count_params()
+    # @todo - print(f'Number of parameters: {param_cnt}')
 
     start_time = start_timer()
-    base_model.fit_model()
+    # @todo - base_model.fit_model()
 
     show_timer(start_time)
-    base_model.show_history()
+    # @todo - base_model.show_history()
 
     """
     Observations:
@@ -227,7 +182,7 @@ def run_main_pipeline():
 
     # Evaluate CNN Model
     start_time = start_timer()
-    base_model.evaluate()
+    # @todo - base_model.evaluate()
     show_timer(start_time)
 
     """
@@ -247,11 +202,11 @@ def run_main_pipeline():
     """
 
     # Model Performance Classification
-    base_model.calc_performance()
-    base_model.get_predictions()
+    # @todo - base_model.calc_performance()
+    # @todo - base_model.get_predictions()
 
     # Plotting Confusion Matrix
-    base_model.show_results()
+    # @todo - base_model.show_results()
 
     """
     Data Augmentation
@@ -267,42 +222,37 @@ def run_main_pipeline():
     # Data Augmented CNN Model
     data_augm_model = DataAugmentedModel(image_params, dataset)
 
-    """
-    Commenting Out
-    data_augm_model.y_train_enc = cnn.y_train_enc
-    data_augm_model.y_test_enc = cnn.y_test_enc
-    data_augm_model.y_val_enc = cnn.y_val_enc
-    data_augm_model.x_train_norm = cnn.x_train_norm
-    data_augm_model.x_test_norm = cnn.x_test_norm
-    data_augm_model.x_val_norm = cnn.x_val_norm
-    """
-
-    data_augm_model.compile()
-    data_augm_model.show_summary()
-
-    start_time = start_timer()
-    show_banner(data_augm_model.title, 'Fitting Training Model')
-
     # Augment the data without using validation or test data.  Only training data.
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-    train_datagen = image_handle.generate_training_image_batch()
+    train_datagen = image_handle.get_train_generator()
     train_generator = image_handle.build_generator(
         train_datagen,
         data_augm_model.x_train_norm,
         data_augm_model.y_train_enc
     )
 
+    """
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-    val_datagen = ImageDataGenerator()
+    val_datagen = image_handle.get_val_generator()
     val_generator = image_handle.build_generator(
         val_datagen,
-        base_model.x_val_norm,
-        base_model.y_val_enc,
+        data_augm_model.x_val_norm,
+        data_augm_model.y_val_enc,
         shuffle_flag=False
     )
+    """
 
-    #data_augm_model.run(True, val_datagen, val_generator)
-    data_augm_model.fit_trained_model(train_datagen, val_generator)
+    # -- hide data_augm_model.run()
+
+    # @todo - data_augm_model.compile()
+    # @todo - data_augm_model.show_summary()
+
+    start_time = start_timer()
+    # @todo - show_banner(data_augm_model.title, 'Fitting Training Model')
+
+
+    #data_augm_model.run(True, train_datagen)
+    # @todo - data_augm_model.fit_trained_model(train_datagen)
     show_timer(start_time)
 
     """
@@ -335,7 +285,7 @@ def run_main_pipeline():
     """
 
     # Look at the images after data has been augmented.
-    data_augm_model.show_history()
+    # @todo - data_augm_model.show_history()
 
     """
     Observations:
@@ -352,42 +302,27 @@ def run_main_pipeline():
 
     # Evaluate the CNN Model w/ Data Augmentation
     start_time = start_timer()
-    data_augm_model.evaluate()
+    # @todo - data_augm_model.evaluate()
     show_timer(start_time)
 
     # Get CNN Model w/ Data Augmentation training performance
-    data_augm_model.calc_performance()
-    data_augm_model.get_predictions()
-    data_augm_model.show_results()
+    # @todo - data_augm_model.calc_performance()
+    # @todo - data_augm_model.get_predictions()
+    # @todo - data_augm_model.show_results()
 
-
-    # VGG16 Model
-    #image_params = (LG_CNT, LG_CNT, VGG_CHANNELS)
-    #image_handle.width = LG_CNT
-    #image_handle.height = LG_CNT
-    #image_handle.channels = VGG_CHANNELS
-    
-    vgg_model = VggModel()
+    # VGG Model
+    # Pass the processed dataset so VggModel() can configure its output layers
+    vgg_model = VggModel(dataset)
     vgg_model.show_summary()
 
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model, dataset)
-    """
-    Commenting out
-    tl_model.y_train_enc = cnn.y_train_enc
-    tl_model.y_test_enc = cnn.y_test_enc
-    tl_model.y_val_enc = cnn.y_val_enc
-    tl_model.x_train_norm = cnn.x_train_norm
-    tl_model.x_test_norm = cnn.x_test_norm
-    tl_model.x_val_norm = cnn.x_val_norm
-    """
-    #tl_model.run()
     tl_model.compile()
     tl_model.show_summary()
 
     start_time = start_timer()
     show_banner(tl_model.title, 'Fitting Training Model')
-    tl_model.fit_trained_model(train_datagen, val_generator)
+    tl_model.fit_trained_model(train_datagen)
     show_timer(start_time)
     tl_model.show_history()
 
@@ -404,19 +339,15 @@ def run_main_pipeline():
     """
 
     start_time = start_timer()
-    #show_banner(tl_model.title, 'Evaluation')
     tl_model.evaluate()
     show_timer(start_time)
 
     # Model performance classification
     tl_model.calc_performance()
     tl_model.get_predictions()
-    tl_model.show_results(vgg_model.image_params)
-    #show_plot_confusion_matrix(tl_model.y_test_enc, y_test_pred)
-
+    tl_model.show_results()
 
     image_handle.show_augmented_image_batch(train_generator)
-
 
     print('Base Model: Training Performances')
     print(base_model.training_perf)

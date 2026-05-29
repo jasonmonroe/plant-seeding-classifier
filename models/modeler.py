@@ -13,75 +13,95 @@ from sklearn.metrics import (
 
 from src.config import IMAGE_PX_MAX
 
-# Parent Class
-# 1. Encode data, then normalize it
+
 class Modeler:
-    def __init__(self, plant_species, dataset: dict):
-        self._encoder = LabelEncoder()
-        self.plant_species = plant_species
-        self.plant_species_cnt = len(self.plant_species)
+    def __init__(self, dataset: dict):
+        self._encoder = dataset.get('_encoder', LabelEncoder())
+        self.plant_species = []
 
         # Data variables
-        self.x_train = None
-        self.y_train = None
-        self.x_val = None
-        self.y_val = None
-        self.x_test = None
-        self.y_test = None
+        self.x_train = []
+        self.y_train = []
+        self.x_val = []
+        self.y_val = []
+        self.x_test = []
+        self.y_test = []
 
         # Encoded variables
-        self.y_train_enc = None
-        self.y_val_enc = None
-        self.y_test_enc = None
+        self.y_train_enc = []
+        self.y_val_enc = []
+        self.y_test_enc = []
 
         # Normalized variables
-        self.x_train_norm = None
-        self.x_val_norm = None
-        self.x_test_norm = None
-        self.y_test_norm = None
+        self.x_train_norm = []
+        self.x_val_norm = []
+        self.x_test_norm = []
+        self.y_test_norm = []
 
-        # Set dataset values
-        self.__dict__.update(dataset)
-        #self.set_dataset(dataset)
+        # Safely inject dataset values
+        self.set_dataset(dataset)
 
-    def set_dataset(self, dataset: dict):
-        print('set_dataset()')
+    @property
+    def plant_species_cnt(self) -> int:
+        # Dynamically return the count of plant species.
+        return len(self.plant_species) if self.plant_species else 0
+
+    def set_dataset(self, dataset: dict) -> None:
+
+        # Dynamically sets attributes based on dictionary keys.
         for key, value in dataset.items():
-            setattr(self, key, value)
-            print(f'Debug: set {key} = {value}')
+            # We check hasattr to ensure we only set attributes defined in __init__.  This prevents accidental
+            # injection of arbitrary dictionary keys.
+            if hasattr(self, key) and key != 'plant_species_cnt':
+                setattr(self, key, value)
+                
+                # Fit the encoder once and only once when the species list is provided.
+                # This ensures that 0, 1, 2... always map to the same species across all instances.
+                if key == 'plant_species' and value:
+                    self._encoder.fit(value)
 
-    def get_proc_dataset(self):
+    def get_proc_dataset(self) -> dict:
         """
         Get processed data that has been encoded and normalized.
         :return: dict of processed data.
         """
         return {
-            "x_train_norm": self.x_train_norm,
-            "x_test_norm": self.x_test_norm,
-            "x_val_norm": self.x_val_norm,
-            "y_train_enc": self.y_train_enc,
-            "y_test_enc": self.y_test_enc,
-            "y_val_enc": self.y_val_enc,
+            '_encoder': self._encoder,
+            'plant_species': self.plant_species,
+            'y_train_enc': self.y_train_enc,
+            'x_train_norm': self.x_train_norm,
+            'y_test_enc': self.y_test_enc,
+            'x_test_norm': self.x_test_norm,
+            'y_val_enc': self.y_val_enc,
+            'x_val_norm': self.x_val_norm
         }
 
-    def encode_data(self):
+    def encode_data(self) -> None:
+        """
+        https://www.tensorflow.org/api_docs/python/tf/keras/utils/to_categorical
+
+        Used to one-hot encode integer labels into a binary matrix representation that's
+        suitable for classification tasks in deep learning.
+        """
+
         self.y_train_enc = self._encode_label(self.y_train)
         self.y_test_enc = self._encode_label(self.y_test)
         self.y_val_enc = self._encode_label(self.y_val)
-        #return y_training_encoded, y_testing_encoded, y_validation_encoded
 
-    def _encode_label(self, y_data: pd.DataFrame):
+    def _encode_label(self, y_data: pd.DataFrame) -> np.ndarray:
+        # We rely on the encoder being pre-fitted in set_dataset to maintain consistent mapping between train, test,
+        # and validation sets.
         return tf.keras.utils.to_categorical(
-            self._encoder.fit_transform(y_data),
+            self._encoder.transform(y_data),
             num_classes=self.plant_species_cnt
         )
 
-    def normalize(self):
+    def normalize(self) -> None:
         self.x_train_norm = self.x_train.astype('float32') / IMAGE_PX_MAX
         self.x_test_norm = self.x_test.astype('float32') / IMAGE_PX_MAX
         self.x_val_norm = self.x_val.astype('float32') / IMAGE_PX_MAX
 
-    def print_classification_report(self, model, x_data: np.ndarray, y_true_encoded: np.ndarray):
+    def print_classification_report(self, model, x_data: np.ndarray, y_true_encoded: np.ndarray) -> None:
         y_true_labels = np.argmax(y_true_encoded, axis=1)
         y_pred_probs = model.predict(x_data)
         y_pred_classes = np.argmax(y_pred_probs, axis=1)

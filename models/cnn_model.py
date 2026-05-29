@@ -157,7 +157,7 @@ class CnnModel(Modeler):
         return self.loss, self.accuracy
 
     def calc_performance(self) -> None:
-        self.training_perf = self.show_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
+        self.training_perf = self.get_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
     def get_predictions(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         self.y_train_pred = self.model.predict(self.x_train_norm)
@@ -188,8 +188,8 @@ class CnnModel(Modeler):
     
     Define a function to compute different metrics to check performance of a classification model built using stats models
     """
-    def show_model_performance_classification(self, model: Sequential, predictors: np.ndarray, target: np.ndarray) -> pd.DataFrame:
-
+    def get_model_performance_classification(self, model: Sequential, predictors: np.ndarray, target: np.ndarray) -> pd.DataFrame:
+         
         """
         Function to compute different metrics to check classification model performance
         model: classifier
@@ -211,14 +211,14 @@ class CnnModel(Modeler):
         rec = recall_score(target_classes, predicted_labels, average='weighted')
         f1 = f1_score(target_classes, predicted_labels, average='weighted')
 
-        perform_df = pd.DataFrame({
+        df_perform = pd.DataFrame({
             'Accuracy': [acc],
             'Precision': [prec],
             'Recall': [rec],
             'F1': [f1]
         })
 
-        return perform_df
+        return df_perform
 
     def run(self, datagen: ImageDataGenerator=None) -> None:
         """
@@ -233,9 +233,6 @@ class CnnModel(Modeler):
         - Show all the results
         """
         print(f'\nRunning {self.title}...')
-        # compile, show summary, show banner, fit, show plot history, evaluate, calc perf, get predictions, show results,
-        #param_cnt = self.model.count_params()
-        #print(f'Number of parameters: {param_cnt}')
 
         self.compile()
         self.show_summary()
@@ -249,9 +246,7 @@ class CnnModel(Modeler):
         show_timer(start_time)
 
         self.show_history()
-        #start_time = start_timer()
         self.evaluate()
-        #show_timer(start_time)
         self.calc_performance()
         self.get_predictions()
         self.show_results()

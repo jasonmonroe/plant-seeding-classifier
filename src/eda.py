@@ -35,10 +35,17 @@ def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=N
     count = data[feature].nunique()
     title = 'Labeled Barplot'
 
+    fig_size_cnt = (count + 1, 5)
+    if n is not None:
+        fig_size_cnt = (n + 1, 5)
+
+    plt.figure(num=f"{title}", figsize=fig_size_cnt)
+    """
     if n is None:
         plt.figure(num=f"{title}", figsize=(count + 1, 5))
     else:
         plt.figure(num=f"{title}", figsize=(n + 1, 5))
+    """
 
     plt.xticks(rotation=90, fontsize=15)
     ax = sns.countplot(
@@ -77,12 +84,14 @@ def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarra
     y_pred_arg = np.argmax(y_pred_test, axis=1)
     y_test_arg = np.argmax(y_testing_enc, axis=1)
 
-    confusion_matrix = tf.math.confusion_matrix(y_test_arg, y_pred_arg)
-    f, ax = plt.subplots(figsize=(10, 8))
-
     title = 'Confusion Matrix'
-    #plt.figure(num=f"{title}", figsize=(10, 8))
-    plt.title(title)
+    confusion_matrix = tf.math.confusion_matrix(y_test_arg, y_pred_arg)
+    
+    # Create the figure and axes, setting the window title via 'num'
+    f, ax = plt.subplots(figsize=(10, 8), num=title)
+
+    # Set the title directly on the axes object
+    ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
 
     sns.heatmap(
         confusion_matrix,
@@ -93,6 +102,11 @@ def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarra
         ax=ax
     )
 
+    # Add axis labels to make the matrix readable
+    ax.set_xlabel('Predicted Labels', fontsize=12)
+    ax.set_ylabel('Actual Labels', fontsize=12)
+
+    plt.tight_layout()
     plt.show()
 
 def show_plot_history(his: History, title: str, column: str) -> None:
@@ -108,8 +122,6 @@ def show_plot_history(his: History, title: str, column: str) -> None:
     train_data = his.history[column]
     validation_data = his.history['val_' + column]
     epochs = range(1, len(train_data) + 1)
-    #epochs = range(len(train_data))
-
     metric_title = column.replace('_', ' ').title()
     full_title = f'{title.title()} - {metric_title}'
 
@@ -120,18 +132,18 @@ def show_plot_history(his: History, title: str, column: str) -> None:
     plt.plot(
         epochs, train_data,
         label=f'Training {metric_title}',
-        color='#1f77b4',       # Blue color
-        linewidth=2            # Thicker line
+        color='#1f77b4',    # Blue color
+        linewidth=2         # Thicker line
     )
 
     # Plot validation data with markers
     plt.plot(
         epochs, validation_data,
         label=f'Validation {metric_title}',
-        color='#ff7f0e',       # Orange color
-        linestyle='--',        # Dashed line
-        marker='o',            # Circle markers
-        markersize=4           # Small markers
+        color='#ff7f0e',    # Orange color
+        linestyle='--',     # Dashed line
+        marker='o',         # Circle markers
+        markersize=4        # Small markers
     )
 
     # --- Add Enhancements ---
@@ -149,6 +161,7 @@ def show_plot_history(his: History, title: str, column: str) -> None:
     plt.show()
 
 def show_plot_histogram(img: np.ndarray, title: str='') -> None:
+
     """
     Generates an enhanced, appealing histogram of an image's pixel intensities.
 
@@ -159,7 +172,7 @@ def show_plot_histogram(img: np.ndarray, title: str='') -> None:
         :param title:
     """
 
-    # Use a stylish color and add a thin outline (edgecolor)
+    # Use a stylish color and add a thin outline (`edgecolor`)
     plt.hist(
         img.ravel(),
         bins=256,

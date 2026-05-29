@@ -29,6 +29,8 @@ def run_main_pipeline():
     # Fix warnings
     warnings.filterwarnings('ignore')
 
+    print('')
+    show_banner('Plant Seedling Classifier')
     print("Number of GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
@@ -39,8 +41,6 @@ def run_main_pipeline():
 
     # Get Plant Species
     plant_species = get_plant_species(df_labels)
-   
-
 
     print('Image Information')
     image_width, image_height, image_channels = plant.describe_images()
@@ -144,20 +144,6 @@ def run_main_pipeline():
     base_model = BaseModel(image_params, dataset)
     base_model.run()
 
-    # Note: base model created...
-    # @todo - base_model.compile()
-    # @todo - base_model.show_summary()
-
-    # Calculate the number of parameters.
-    # @todo - param_cnt = base_model.model.count_params()
-    # @todo - print(f'Number of parameters: {param_cnt}')
-
-    #start_time = start_timer()
-    # @todo - base_model.fit_model()
-
-    #show_timer(start_time)
-    # @todo - base_model.show_history()
-
     """
     Observations:
     
@@ -181,10 +167,6 @@ def run_main_pipeline():
         volatile dealing with the training loss.
     """
 
-    # Evaluate CNN Model
-    #start_time = start_timer()
-    # @todo - base_model.evaluate()
-    #show_timer(start_time)
 
     """
     🎯 Interpretation
@@ -202,12 +184,6 @@ def run_main_pipeline():
     Classification task, meeting your performance goals.
     """
 
-    # Model Performance Classification
-    # @todo - base_model.calc_performance()
-    # @todo - base_model.get_predictions()
-
-    # Plotting Confusion Matrix
-    # @todo - base_model.show_results()
 
     """
     Data Augmentation
@@ -234,14 +210,6 @@ def run_main_pipeline():
 
     data_augm_model.run(train_datagen)
 
-    # @todo - data_augm_model.compile()
-    # @todo -  data_augm_model.show_summary()
-
-    #start_time = start_timer()
-    # @todo - show_banner(data_augm_model.title, 'Fitting Training Model')
-    # @todo - data_augm_model.fit_trained_model(train_datagen)
-    #show_timer(start_time)
-
     """
     "The training accuracy starts low and increases, but the final score is much lower than the $90% seen in the Base 
     CNN.
@@ -253,8 +221,8 @@ def run_main_pipeline():
     
     Training vs. Validation: 
     Throughout the run, the Validation Accuracy is often higher than the Training Accuracy
-     (e.g., Epoch 27: Train approx 66%, Val $70.95%). This is the signature of strong regularization (via data 
-     augmentation), which prevented the model from overfitting.
+    (e.g., Epoch 27: Train approx 66%, Val $70.95%). This is the signature of strong regularization (via data 
+    augmentation), which prevented the model from overfitting.
     
     Learning Rate Reduction: 
     The ReduceLROnPlateau callback triggered twice:
@@ -271,9 +239,6 @@ def run_main_pipeline():
     71.58% test accuracy).
     """
 
-    # Look at the images after data has been augmented.
-    # @todo - data_augm_model.show_history()
-
     """
     Observations:
     
@@ -287,16 +252,6 @@ def run_main_pipeline():
     each epoch.
     """
 
-    # Evaluate the CNN Model w/ Data Augmentation
-    #start_time = start_timer()
-    # @todo - data_augm_model.evaluate()
-    #show_timer(start_time)
-
-    # Get CNN Model w/ Data Augmentation training performance
-    # @todo - data_augm_model.calc_performance()
-    # @todo - data_augm_model.get_predictions()
-    # @todo - data_augm_model.show_results()
-
     # VGG Model
     # Pass the processed dataset so VggModel() can configure its output layers
     vgg_model = VggModel(dataset)
@@ -305,15 +260,6 @@ def run_main_pipeline():
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model, dataset)
     tl_model.run(train_datagen)
-
-    # @todo - tl_model.compile()
-    # @todo - tl_model.show_summary()
-
-    # @todo - start_time = start_timer()
-    # @todo - show_banner(tl_model.title, 'Fitting Training Model')
-    # @todo - tl_model.fit_trained_model(train_datagen)
-    # @todo - show_timer(start_time)
-    # @todo - tl_model.show_history()
 
     """
     Observations:
@@ -327,57 +273,74 @@ def run_main_pipeline():
     5. The training accuracy is not enough to evaluate the model's performance.
     """
 
-    # @todo - start_time = start_timer()
-    # @todo - tl_model.evaluate()
-    # @todo - show_timer(start_time)
-
-    # Model performance classification
-    # @todo - tl_model.calc_performance()
-    # @todo - tl_model.get_predictions()
-    # @todo - tl_model.show_results()
-
     image_handle.show_augmented_image_batch(train_generator, _encoder)
 
-    # --- Performance --- #
-    print('Base Model: Training Performances')
-    print(base_model.training_perf)
+    models = [base_model, data_augm_model, tl_model]
 
-    print('Data Augmented Model: Training Performance')
-    print(data_augm_model.training_perf)
+    # --- Print Model Performance --- #
+    for model in models:
+        print(f'{model.title} Training Performance')
+        print(model.training_perf)
 
-    print('Transfer Layer Model: Training Performance')
-    print(tl_model.training_perf)
+    #print('Base Model: Training Performances')
+    #print(base_model.training_perf)
+
+    #print('Data Augmented Model: Training Performance')
+    #print(data_augm_model.training_perf)
+
+    #print('Transfer Layer Model: Training Performance')
+    #print(tl_model.training_perf)
 
     # --- Final Results --- #
-    final = FinalReport([base_model, data_augm_model, tl_model])
+    final = FinalReport(models)
     final.output_report()
 
     print("\n--- End of Program ---")
     show_timer(prog_start_time)
 
     """
-    Model Performance Analysis1. CNN Base Model (Baseline)Testing Accuracy: 59.58% | Testing Loss: 1.1469Evaluation: This model is performing poorly, but it is serving its exact structural purpose: acting as a weak baseline.The Diagnostic Red Flag: Look at your classification report for Loose Silky-bent. It has a Precision of 1.00 but a Recall of 0.03. This means out of 66 actual samples, it only guessed it correctly twice, missing the other 64 entirely. The model is severely underfitting and likely predicting the dominant classes to minimize macro loss.2. Data Augmented CNN ModelTesting Accuracy: 79.58% | Testing Loss: 0.6053Evaluation: This is a massive structural win. By introducing ImageDataGenerator modifications (rotation, zoom, shifts), you forced the model to learn invariant geometric structures instead of memorizing pixel coordinates.Key Metric: Notice that the training accuracy (80.66%), validation accuracy (78.74%), and testing accuracy (79.58%) are tightly clustered together. This indicates an incredibly stable optimization path with zero overfitting.3. VGG16 Transfer Learning ModelTesting Accuracy: 88.00% | Testing Loss: 0.4187Evaluation: This is your top performer. It leverages spatial feature extractors pre-trained on millions of ImageNet images, which is why it achieves a significantly lower loss and higher accuracy.Key Metric: It jumped straight to 85.89% validation accuracy very early in its training run and held a consistent edge.Final Report Summary & Variance CheckModel StructureTraining AccValidation AccTesting AccTesting LossCNN Base Model67.21%66.95%59.58%1.1469Data Augmented CNN80.66%78.74%79.58%0.6053Transfer Learning88.61%85.89%88.00%
+    ### Model Performance Analysis
+
+    1. CNN Base Model (Baseline)
+       - Metrics: 59.58% Accuracy | 1.1469 Loss
+       - Evaluation: Weak baseline with significant underfitting. 
+       - Diagnostic: 3% recall on "Loose Silky-bent" indicates failure on minority classes and bias toward dominant labels.
+
+    2. Data Augmented CNN Model
+       - Metrics: 79.58% Accuracy | 0.6053 Loss
+       - Evaluation: Structural win. Augmentation forced the model to learn invariant geometric features rather than memorizing pixels.
+       - Stability: Tight clustering of Train (80.66%), Val (78.74%), and Test (79.58%) metrics confirms zero overfitting.
+
+    3. VGG16 Transfer Learning Model
+       - Metrics: 88.00% Accuracy | 0.4187 Loss
+       - Evaluation: Top performer. Pre-trained ImageNet features yielded the lowest loss and highest generalization.
+       - Efficiency: Rapidly converged to ~86% validation accuracy early in the training cycle.
+
+    Final Comparison: [Base: 59.58% | Augmented: 79.58% | VGG16: 88.00%]
     """
 
     """
     Actionable Insights and Business Recommendations
     
-    * The model correctly identified seedlings.
-    * The predictor value for each model was high enough to correctly identify which seedling was which.
-    * Augmenting the data with encoders changed the accuracy and the loss dramatically.
-    * Transfer Learning helped with the final model in identifying seedlings compared to the augmented one.
-    * Training these models at 64x64 sufficed although 128px would probably be better.
-    * The size of the filtering helped determine the results.  
-    * The base CNN model was the best and efficient model to identify the seedlings.
-    * CNN Model accuracy was 95.2%.
-    * CNN Model with Augmented Data was 71%.
-    * Transfer Learning Model was at 92%.
-    * Visualizing the prediction displayed the correct results the majority of the time!
-    * The Image Data Manipulator was the biggest factor in determining accuracy.
-    * Have better photos that show plants at various stages of growth.
-    * Keep backgrounds consistent so that we can focus on the seedling/plants.
-    * 12 different seedlings suffice but wouldn't hurt to have a few more.
-    * There will be economic benefits with using automation to detect seedlings in the future.
+    * Model Efficacy: Transfer Learning is the superior strategy for this domain, achieving 88% accuracy by leveraging 
+    pre-trained spatial hierarchies that a basic CNN (60%) cannot resolve.
+    * Robustness via Augmentation: Implementing geometric transformations (rotation/zoom) was the single most important 
+    factor for stability, improving accuracy by 20% and eliminating the overfitting observed in the baseline.
+    * Resolution Trade-offs: While 64x64 px enabled rapid iteration and low latency, moving to 128x128 px is recommended 
+    for production to better capture the fine-grained leaf serrations necessary for identifying similar species like 
+    "Common Wheat" and "Maize."
+    * Operational Efficiency: The high generalization across training and testing sets (low variance) suggests the model 
+    is ready for integration into automated sorting or monitoring systems.
+    
+    Future Strategic Improvements:
+    * Data Quality: Transition from a static background to a standardized, high-contrast environment to further isolate 
+    seedling morphology from noise.
+    * Growth Stage Tracking: Expand the dataset to include multi-stage growth photos, as seedling appearance changes 
+    significantly between germination and the four-leaf stage.
+    * Dataset Balance: The 3% recall on "Loose Silky-bent" in the baseline highlights a need for oversampling minority 
+    classes or focused data collection for underrepresented species.
+    * Economic Impact: Deploying this automation could significantly reduce labor costs in industrial greenhouses and 
+    improve crop yield by enabling early-stage weed detection.
     """
 
 

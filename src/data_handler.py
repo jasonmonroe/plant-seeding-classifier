@@ -111,12 +111,11 @@ class DataHandler:
         # ===========================================
         #  CREATE TRAINING, VALIDATION, TESTING DATA
         # ===========================================
-        #
-        # https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
-        #
-        # Training Data ~ 80%
-        # Validation Data ~ 10%
-        # Testing Data ~ 10%
+        https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
+
+        Training Data ~ 80%
+        Validation Data ~ 10%
+        Testing Data ~ 10%
 
         :param features:
         :return:
@@ -147,7 +146,7 @@ class DataHandler:
         )
 
         # Printing the shapes
-        print('Data Shapes')
+        print('\nData Shapes')
         print(f'Shape of X training: {x_training_data.shape}')
         print(f'Shape of Y training: {y_training_data.shape}')
         print(f'Shape of X validation: {x_validation_data.shape}')
@@ -155,7 +154,7 @@ class DataHandler:
         print(f'Shape of X testing: {x_testing_data.shape}')
         print(f'Shape of Y testing: {y_testing_data.shape}')
 
-        print('Data Types')
+        print('\nData Types')
         print(f'Data type of X training: {x_training_data.dtype}')
         print(f'Data type of Y training: {y_training_data.dtype}')
 

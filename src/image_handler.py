@@ -150,18 +150,19 @@ class ImageHandler:
 
     # Show images from training data
     def show_augmented_image_batch(self, train_generator: NumpyArrayIterator, encoder: LabelEncoder) -> None:
-        img, img_labels = next(train_generator)
-        fig, axes = plt.subplots(4, 4, figsize=(14, 7))
-        fig.set_size_inches(12, 12)
+        images, labels = next(train_generator)
+        
+        # Initialize subplots with the desired window title (num) and size directly
+        fig, axes = plt.subplots(4, 4, figsize=(12, 12), num="Plant Seedling Labeled Image Batch")
 
-        categories = np.unique(img_labels)
         keys = dict(enumerate(encoder.classes_))
 
-        for (img, label_index, ax) in zip(img, np.argmax(img_labels, axis=1), axes.flatten()):
-            ax.imshow(img)
+        for (image, label_index, ax) in zip(images, np.argmax(labels, axis=1), axes.flatten()):
+            ax.imshow(image)
             ax.set_title(keys[label_index]) # Map numeric label to plant name using keys
             ax.axis('off')
 
+        plt.tight_layout()
         plt.show()
 
     def get_resized_img_dims(self, reduce_by:int=1):

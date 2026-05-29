@@ -7,7 +7,7 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from models.cnn_model import CnnModel
 from src.config import LG_CNT, IMAGE_CHANNELS
 
-# @link https://keras.io/api/applications/vgg/vgg_models/
+# @link https://keras.io/api/applications/vgg/vgg_models
 class VggModel(CnnModel):
     def __init__(self, dataset: dict):
         super().__init__(dataset=dataset)
@@ -18,11 +18,15 @@ class VggModel(CnnModel):
         # Initialize the base VGG16 model
         self._base = self._create_base_model()
 
+        # This locks the 14.7 million parameters so they don't update during training
+        self._base.trainable = False
+
         # Build the final model by connecting the VGG base to the custom head
         self._create(self._get_head_output())
 
     def _create_base_model(self):
-        print(f'* Creating {self.title} *')
+        print(f'\n* Creating {self.title} *')
+
         return VGG16(
             weights='imagenet',
             include_top=False,

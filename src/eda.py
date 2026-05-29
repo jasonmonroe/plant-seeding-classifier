@@ -68,7 +68,7 @@ def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=N
             textcoords="offset points",
         )
 
-    plt.show()  # to avoid overlap
+    plt.show()
 
 # Define confusion matrix
 def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarray) -> None:
@@ -81,7 +81,7 @@ def show_plot_confusion_matrix(y_testing_enc: np.ndarray, y_pred_test: np.ndarra
     f, ax = plt.subplots(figsize=(10, 8))
 
     title = 'Confusion Matrix'
-    plt.figure(num=f"{title}", figsize=(10, 8))
+    #plt.figure(num=f"{title}", figsize=(10, 8))
     plt.title(title)
 
     sns.heatmap(
@@ -114,7 +114,7 @@ def show_plot_history(his: History, title: str, column: str) -> None:
     full_title = f'{title.title()} - {metric_title}'
 
     # --- Create Plot ---
-    plt.figure(num=f"f{full_title}", figsize=(10, 6)) # Slightly larger for better viewing
+    plt.figure(num=f"{full_title}", figsize=(10, 6)) # Slightly larger for better viewing
 
     # Plot training data
     plt.plot(

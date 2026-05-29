@@ -47,18 +47,13 @@ class Modeler:
         return len(self.plant_species) if self.plant_species else 0
 
     def set_dataset(self, dataset: dict) -> None:
-
-        # Dynamically sets attributes based on dictionary keys.
+        """
+        Dynamically sets attributes based on dictionary keys, ensuring
+        we never accidentally wipe out a pre-fitted encoder state.
+        """
         for key, value in dataset.items():
-            # We check hasattr to ensure we only set attributes defined in __init__.  This prevents accidental
-            # injection of arbitrary dictionary keys.
             if hasattr(self, key) and key != 'plant_species_cnt':
                 setattr(self, key, value)
-                
-                # Fit the encoder once and only once when the species list is provided.
-                # This ensures that 0, 1, 2... always map to the same species across all instances.
-                if key == 'plant_species' and value:
-                    self._encoder.fit(value)
 
     def get_proc_dataset(self) -> dict:
         """
@@ -89,10 +84,18 @@ class Modeler:
         self.y_val_enc = self._encode_label(self.y_val)
 
     def _encode_label(self, y_data: pd.DataFrame) -> np.ndarray:
-        # We rely on the encoder being pre-fitted in set_dataset to maintain consistent mapping between train, test,
-        # and validation sets.
+        """
+        Transforms raw targets into one-hot categories, forcing input stability
+        by flattening multidimensional DataFrame structures to a 1D sequence.
+        """
+
+        if hasattr(y_data, 'values'):
+            y_data_flat = y_data.values.ravel()
+        else:
+            y_data_flat = np.squeeze(y_data)
+
         return tf.keras.utils.to_categorical(
-            self._encoder.transform(y_data),
+            self._encoder.transform(y_data_flat),
             num_classes=self.plant_species_cnt
         )
 
@@ -101,7 +104,12 @@ class Modeler:
         self.x_test_norm = self.x_test.astype('float32') / IMAGE_PX_MAX
         self.x_val_norm = self.x_val.astype('float32') / IMAGE_PX_MAX
 
-    def print_classification_report(self, model, x_data: np.ndarray, y_true_encoded: np.ndarray) -> None:
+    def print_classification_report(
+            self,
+            model,
+            x_data: np.ndarray,
+            y_true_encoded: np.ndarray
+    ) -> None:
         y_true_labels = np.argmax(y_true_encoded, axis=1)
         y_pred_probs = model.predict(x_data)
         y_pred_classes = np.argmax(y_pred_probs, axis=1)

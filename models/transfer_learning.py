@@ -79,7 +79,7 @@ class TransferLayerModel(CnnModel):
                 # randrange is exclusive of the stop value, preventing "out of range" errors
                 index = random.randrange(image_cnt)
 
-            print(f'# ----- [{i} of {show_cnt}] ----- #')
+            print(f'# --- [{i} of {show_cnt}] --- #')
             print(f'Index: {index}\n')
 
             # Get the predicted probabilities
@@ -99,7 +99,7 @@ class TransferLayerModel(CnnModel):
             # Use inverse_transform to ensure consistency with the predicted label logic
             true_label = self._encoder.inverse_transform([true_label_index])[0]
 
-            plt.figure(num=f"{self.title} Predictions", figsize=(2, 2))
+            plt.figure(num=f"{self.title} Predictions ({index})", figsize=(4, 4))
 
             try:
                 plt.imshow(self.x_test[index])
@@ -118,7 +118,7 @@ class TransferLayerModel(CnnModel):
             else:
                 print('❌ Incorrect Prediction')
 
-            print('# ----- [END] ----- #\n\n')
+            print('# --- [END] --- #\n\n')
 
         return correct_cnt, show_cnt
 

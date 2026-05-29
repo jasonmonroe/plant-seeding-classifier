@@ -156,7 +156,6 @@ class CnnModel(Modeler):
 
         return self.loss, self.accuracy
 
-    # @todo - look into this mismatch
     def calc_performance(self):
         self.training_perf = self.show_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
@@ -239,7 +238,6 @@ class CnnModel(Modeler):
         self.show_history()
 
         #start_time = start_timer()
-        print('Evaluate()')
         self.evaluate()
         #show_timer(start_time)
         self.calc_performance()

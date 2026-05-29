@@ -6,6 +6,7 @@ import warnings
 import numpy as np
 
 # TensorFlow and Keras libraries
+from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -13,13 +14,13 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from models.base import BaseModel
 from models.cnn_model import CnnModel
 from models.data_augm import DataAugmentedModel
-from src.final_report import FinalReport
 from models.transfer_learning import TransferLayerModel
 from models.vgg import VggModel
 
 from src.data_handler import DataHandler
 from src.eda import show_plot_histogram, show_plant_species_dist, show_labeled_barplot
 from src.image_handler import ImageHandler
+from src.final_report import FinalReport
 from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
 
@@ -98,12 +99,8 @@ def run_main_pipeline():
     it is preferable to reduce the image size from 128 to 64.
     
     Note: Your scores will reduce if you lower image size. So it's your choice.
+    You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
     """
-
-    # Resize RGB images
-    # Note: This will be used as `independent variables`.
-
-    # You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
     reduce_by = 1 # Note: was 2
     resized_img_dims = image_handle.get_resized_img_dims(reduce_by)
     resized_images = image_handle.get_resized_images(rgb_images, resized_img_dims)
@@ -127,6 +124,10 @@ def run_main_pipeline():
 
     dataset = plant.split_data(resized_images)
     dataset['plant_species'] = plant_species
+
+    _encoder = LabelEncoder()
+    _encoder.fit(plant_species)
+    dataset['_encoder'] = _encoder
 
     # We use a temporary CnnModel instance to handle the initial 
     # encoding and normalization logic for the entire pipeline.
@@ -231,27 +232,13 @@ def run_main_pipeline():
         data_augm_model.y_train_enc
     )
 
-    """
-    # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
-    val_datagen = image_handle.get_val_generator()
-    val_generator = image_handle.build_generator(
-        val_datagen,
-        data_augm_model.x_val_norm,
-        data_augm_model.y_val_enc,
-        shuffle_flag=False
-    )
-    """
-
-    # -- hide data_augm_model.run()
+    # data_augm_model.run(train_datagen)
 
     # @todo - data_augm_model.compile()
     # @todo - data_augm_model.show_summary()
 
     start_time = start_timer()
     # @todo - show_banner(data_augm_model.title, 'Fitting Training Model')
-
-
-    #data_augm_model.run(True, train_datagen)
     # @todo - data_augm_model.fit_trained_model(train_datagen)
     show_timer(start_time)
 
@@ -347,8 +334,9 @@ def run_main_pipeline():
     tl_model.get_predictions()
     tl_model.show_results()
 
-    image_handle.show_augmented_image_batch(train_generator)
+    image_handle.show_augmented_image_batch(train_generator, _encoder)
 
+    # --- Performance --- #
     print('Base Model: Training Performances')
     print(base_model.training_perf)
 
@@ -359,7 +347,8 @@ def run_main_pipeline():
     print(tl_model.training_perf)
 
     # --- Final Results --- #
-    final = FinalReport(base_model, data_augm_model, tl_model)
+    #final = FinalReport(base_model, data_augm_model, tl_model)
+    final = FinalReport([base_model, data_augm_model, tl_model])
     final.output_report()
 
     show_timer(prog_start_time)
@@ -386,6 +375,7 @@ def run_main_pipeline():
     """
 
 
+# --- Start Program --- #
 if __name__ == '__main__':
     try:
         run_main_pipeline()

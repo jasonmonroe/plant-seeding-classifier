@@ -2,6 +2,7 @@
 
 import time
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
 
 from src.config import IMAGE_PX_MAX, IMAGE_ROWS, L2_LEARNING_RATE, SECS_IN_MIN, MSEC
@@ -32,7 +33,7 @@ def show_banner(title: str, section: str='') -> None:
     dash_count = len(title_upper) + padding
 
     # Start with a newline for spacing
-    print("")
+    print('')
     print('+' + '-' * dash_count + '+')
     print('| ' + title_upper + ' |')
     print('+' + '-' * dash_count + '+')

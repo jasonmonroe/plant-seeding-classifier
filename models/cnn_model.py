@@ -145,7 +145,7 @@ class CnnModel(Modeler):
         return self.history
 
     def evaluate(self, verbose: int = 2) -> tuple[float, float]:
-        print(f'{self.title} Evaluation')
+        print(f'\n{self.title} Evaluation')
         self.loss, self.accuracy = self.model.evaluate(
             self.x_test_norm,
             self.y_test_enc,

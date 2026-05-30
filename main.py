@@ -29,6 +29,9 @@ def run_main_pipeline():
     # Fix warnings
     warnings.filterwarnings('ignore')
 
+    id = str(start_timer())[0, 6]
+    print(f'Start Run ID: {id}')
+
     print('')
     show_banner('Plant Seedling Classifier')
     print("Number of GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
@@ -38,9 +41,6 @@ def run_main_pipeline():
     # @todo - plant.describe_data()
     # @todo - plant.describe_label()
     df_labels = plant.get_labels()
-
-    # Get Plant Species
-    plant_species = get_plant_species(df_labels)
 
     print('Image Information')
     image_width, image_height, image_channels = plant.describe_images()
@@ -59,7 +59,7 @@ def run_main_pipeline():
     """
 
     # Check for NaN values
-    print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
+    # @todo - print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
 
     # Perform Exploratory Data Analysis
 
@@ -117,32 +117,85 @@ def run_main_pipeline():
     - Before you proceed to build a model, you need to split the data into train, test, and validation to be able to evaluate the model that you build on the train data
     - You'll have to encode categorical features and scale the pixel values.
     - You will build a model using the train data and then check its performance
-    
-    Split the dataset
     """
+
+    # ==========================================
+    #  DATA PREPARATION FOR MODELING (CORRECT)
+    # ==========================================
     prog_start_time = start_timer()
 
+    # 1. Split the raw image matrices and target series
     dataset = plant.split_data(resized_images)
-    dataset['plant_species'] = plant_species
 
+
+
+    # === INSERT THIS DIAGNOSTIC CHECK IN main.py ===
+    print("\n==================================================")
+    print("       CRITICAL SPLIT ALIGNMENT CHECK             ")
+    print("==================================================")
+
+    # Grab the first 3 samples from your raw training split
+    for idx in [0, 1, 2]:
+        raw_x_img = dataset['x_train'][idx]
+
+        # Pull the label from y_train (safely checking if it's a Pandas Series or array)
+        if hasattr(dataset['y_train'], 'iloc'):
+            raw_y_label = dataset['y_train'].iloc[idx]
+        else:
+            raw_y_label = dataset['y_train'][idx]
+
+        print(f"\nChecking Sample Split Row {idx}:")
+        print(f"-> Target Label reads: '{raw_y_label}'")
+        print(f"-> Image Mean Pixel Value: {np.mean(raw_x_img):.4f}")
+
+        # Pop up the image so you can visually verify it
+        import matplotlib.pyplot as plt
+        plt.figure(figsize=(2, 2))
+        # Handle both normalized and raw scale safely
+        if np.max(raw_x_img) <= 1.0:
+            plt.imshow((raw_x_img * 255).astype('uint8'))
+        else:
+            plt.imshow(raw_x_img.astype('uint8'))
+        plt.title(f"Row {idx}: {raw_y_label}")
+        plt.axis('off')
+        plt.show()
+    print("==================================================\n")
+
+    # Exit early so you don't have to wait 5 minutes for training to fail
+    #sys.exit(0)
+
+
+
+
+    # 2. Fit the LabelEncoder globally on the raw label series.
+    # This automatically creates a internal alphabetical lookup index map.
     _encoder = LabelEncoder()
-    _encoder.fit(plant_species)
+    _encoder.fit(df_labels['Label'])
+
+    # 3. Extract the exact list of string classes directly from the encoder.
+    # This guarantees that index 0 in the text array matches index 0 in the one-hot array.
+    plant_species = list(_encoder.classes_)
+
+    # 4. Lock them securely into the initial dataset dictionary configuration
+    dataset['plant_species'] = plant_species
     dataset['_encoder'] = _encoder
 
-    # We use a temporary CnnModel instance to handle the initial 
-    # encoding and normalization logic for the entire pipeline.
+    # 5. Instantiate your processor instance to encode (one-hot) and normalize arrays
     cnn = CnnModel(dataset)
     cnn.encode_data()
     cnn.normalize()
 
-    # Retrieve the dataset dictionary now populated with normalized/encoded arrays
-    dataset = cnn.get_proc_dataset()
+    # 6. Build the safe runtime payload by merging the processed array dictionaries
+    proc_dataset = cnn.get_proc_dataset()
+    merged_dataset = {**dataset, **proc_dataset}
+    #dataset |= cnn.get_proc_dataset()
+    #print(f'Merged Dataset: {merged_dataset}')
 
     # --- Build Models --- #
 
     # Base Model
-    base_model = BaseModel(image_params, dataset)
-    base_model.run()
+    base_model = BaseModel(image_params, merged_dataset)
+    # @todo - base_model.run()
 
     """
     Observations:
@@ -150,7 +203,7 @@ def run_main_pipeline():
     By comparing the final Training Accuracy ($90.53%) and Validation Accuracy ($80.63%), we 
     can draw two conclusions:
     Final Accuracy Gap: There is an $9.90% gap between the training and validation accuracy 
-    ($90.53%} - 80.63%).This confirms that the model is overfitting, meaning it learned the 
+    ($90.53% - 80.63%).This confirms that the model is overfitting, meaning it learned the 
     training data much better than the validation data. However, a $10%$ gap is manageable and a strong improvement 
     from earlier runs.
     
@@ -166,7 +219,6 @@ def run_main_pipeline():
     *   Training loss diminishes more extremely than validation losses as epochs increase.  In other words it more 
         volatile dealing with the training loss.
     """
-
 
     """
     🎯 Interpretation
@@ -184,7 +236,6 @@ def run_main_pipeline():
     Classification task, meeting your performance goals.
     """
 
-
     """
     Data Augmentation
     
@@ -197,7 +248,7 @@ def run_main_pipeline():
     """
 
     # Data Augmented CNN Model
-    data_augm_model = DataAugmentedModel(image_params, dataset)
+    data_augm_model = DataAugmentedModel(image_params, merged_dataset)
 
     # Augment the data without using validation or test data.  Only training data.
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
@@ -208,11 +259,11 @@ def run_main_pipeline():
         data_augm_model.y_train_enc
     )
 
-    data_augm_model.run(train_datagen)
+    #@todo - data_augm_model.run(train_datagen)
 
     """
     "The training accuracy starts low and increases, but the final score is much lower than the $90% seen in the Base 
-    CNN.
+    CNN Model.
     
     The validation accuracy reached a peak of $70.95% at Epoch 27, which aligns with the final 
     $71.58% testing accuracy you reported for this model."
@@ -253,12 +304,12 @@ def run_main_pipeline():
     """
 
     # VGG Model
-    # Pass the processed dataset so VggModel() can configure its output layers
-    vgg_model = VggModel(dataset)
+    # Pass the processed dataset so VggModel() can configure its output layers.
+    vgg_model = VggModel(merged_dataset)
     vgg_model.show_summary()
 
     # Transfer Learning Model
-    tl_model = TransferLayerModel(vgg_model, dataset)
+    tl_model = TransferLayerModel(vgg_model, merged_dataset)
     tl_model.run(train_datagen)
 
     """
@@ -275,21 +326,13 @@ def run_main_pipeline():
 
     image_handle.show_augmented_image_batch(train_generator, _encoder)
 
-    models = [base_model, data_augm_model, tl_model]
+    # @todo - models = [base_model, data_augm_model, tl_model]
+    models = [tl_model]
 
     # --- Print Model Performance --- #
     for model in models:
         print(f'{model.title} Training Performance')
         print(model.training_perf)
-
-    #print('Base Model: Training Performances')
-    #print(base_model.training_perf)
-
-    #print('Data Augmented Model: Training Performance')
-    #print(data_augm_model.training_perf)
-
-    #print('Transfer Layer Model: Training Performance')
-    #print(tl_model.training_perf)
 
     # --- Final Results --- #
     final = FinalReport(models)
@@ -343,6 +386,7 @@ def run_main_pipeline():
     improve crop yield by enabling early-stage weed detection.
     """
 
+    print(f'Start Run ID: {id}')
 
 # --- Start Program --- #
 if __name__ == '__main__':

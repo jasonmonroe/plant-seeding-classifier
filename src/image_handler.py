@@ -62,23 +62,14 @@ class ImageHandler:
         # Initialize the random number generator once outside the loops
         rng = np.random.default_rng(SEED)
 
-        for i in range(cols):
-            for j in range(rows):
-                # Generate a unique random index for each iteration
-                #random_index =  random.randint(0, label_cnt)
+        for i in range(rows):       # Outer loop handles row indexes
+            for j in range(cols):   # Inner loop handles column indexes
                 random_index = rng.integers(0, label_cnt)
 
-                # Subplots are 1-indexed (i * rows + j + 1)
+                # Grid index math formula: current_row * total_columns + current_col + 1
                 ax = fig.add_subplot(rows, cols, i * cols + j + 1)
-                # Note: Changed i * rows to i * cols for standard subplot counting
-
-                # Display the image data
                 ax.imshow(self._images[random_index, :])
-
-                # Set the title for the subplot
                 ax.set_title(labels[random_index])
-
-                # Remove the ticks/labels for a cleaner image visualization
                 ax.axis('off')
 
         # Automatically adjust subplot parameters to give a tight layout.
@@ -106,6 +97,21 @@ class ImageHandler:
         plt.show()
 
     def convert_to_rgb(self, imgs: np.ndarray):
+        # Vectorized conversion across the array instead of looping via raw Python
+        if imgs.ndim == 4:
+            # Array shape is (Samples, Height, Width, Channels)
+            # OpenCV cv2.cvtColor expects 3D images, so we process color channels cleanly via numpy swapping
+            # or use a clean vector application:
+            rgb_images = imgs[..., ::-1] # Swaps BGR to RGB channel indices directly instantly keeping layout
+        else:
+            # Standard fallback for individual 3D arrays
+            rgb_images = cv2.cvtColor(imgs, cv2.COLOR_BGR2RGB)
+
+        print(f'Shape of RGB images: {rgb_images.shape}')
+
+        return rgb_images
+
+    def __convert_to_rgb_2(self, imgs: np.ndarray):
         # Using list comprehension for better performance and readability
         rgb_images = np.array([cv2.cvtColor(img, cv2.COLOR_BGR2RGB) for img in imgs])
 
@@ -113,7 +119,15 @@ class ImageHandler:
 
         return rgb_images
 
-    def get_resized_images(self, imgs: np.ndarray, reduced_img_dims: Tuple[int, int, int]) -> list:
+
+    def get_resized_images(self, imgs: np.ndarray, reduced_img_dims: Tuple[int, int]) -> np.ndarray:
+        # Accept reduced_img_dims as (Height, Width) without channels to avoid cv2 interpolation warnings
+        h, w = reduced_img_dims[0], reduced_img_dims[1]
+
+        return np.array([cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR) for img in imgs])
+        #return resized_images
+
+    def get_resized_images_2(self, imgs: np.ndarray, reduced_img_dims: Tuple[int, int, int]) -> list:
         resized_images = []
 
         for img in imgs:
@@ -151,7 +165,7 @@ class ImageHandler:
     # Show images from training data
     def show_augmented_image_batch(self, train_generator: NumpyArrayIterator, encoder: LabelEncoder) -> None:
         images, labels = next(train_generator)
-        
+
         # Initialize subplots with the desired window title (num) and size directly
         fig, axes = plt.subplots(4, 4, figsize=(12, 12), num="Plant Seedling Labeled Image Batch")
 

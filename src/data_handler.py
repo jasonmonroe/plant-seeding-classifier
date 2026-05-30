@@ -125,7 +125,10 @@ class DataHandler:
         if not isinstance(features, np.ndarray):
             features = np.array(features)
 
-        target = self._labels['Label']
+        target = self._labels['Label'].to_numpy()
+
+        # Defensive Assertion Check: Ensure absolute size alignment
+        assert len(features) == len(target), f"Data length mismatch! Features: {len(features)}, Labels: {len(target)}"
 
         # --- Split data into 70% training data and 30% temporary data --- #
         x_training_data, x_temp_data, y_training_data, y_temp_data = train_test_split(
@@ -158,6 +161,17 @@ class DataHandler:
         print(f'Data type of X training: {x_training_data.dtype}')
         print(f'Data type of Y training: {y_training_data.dtype}')
 
+        # === DEBUG: RAW DATA LOADING ALIGNMENT ===
+        print("--- Verification: Initial Loading Alignment ---")
+        for i in [0, 1, 2, -3, -2, -1]: # Check first 3 and last 3 items
+            # Adjust 'filename_column' to match your DataFrame's image path column
+            print(f"Index {i} -> File: {self._labels.iloc[i]} | Label: {self._labels.iloc[i]['Label']}")
+
+            # If features are loaded, print statistics of the loaded array at index i
+            if 'features' in locals() or 'features' in globals():
+                print(f"      -> Array Shape: {features[i].shape} | Mean Pixel: {features[i].mean():.4f}")
+        print("===========================================")
+
         return {
             'x_train': x_training_data,
             'y_train': y_training_data,
@@ -166,3 +180,7 @@ class DataHandler:
             'x_test': x_testing_data,
             'y_test': y_testing_data
         }
+
+
+
+

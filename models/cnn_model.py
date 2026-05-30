@@ -118,12 +118,15 @@ class CnnModel(Modeler):
         return self.history
 
     # Data Augmented, Transfer Learning
-    def fit_trained_model(self, datagen) -> History:
+    def fit_trained_model(self, datagen, val_datagen=None) -> History:
         # Use np.ceil to ensure remainder/partial batches aren't dropped
         steps_per_epoch = int(np.ceil(self.x_train_norm.shape[0] / TRAINED_BATCH_SIZE))
+        validation_steps = int(np.ceil(self.x_val_norm.shape[0] / TRAINED_BATCH_SIZE))
+        class_weights = self._get_class_weights()
 
-        # Fetch class weights if your dataset has an imbalance
-        class_weights = self._get_class_weights() if hasattr(self, '_get_class_weights') else None
+        # If no specific validation generator is provided, create a basic one
+        if val_datagen is None:
+            val_datagen = ImageDataGenerator()
 
         self.history = self.model.fit(
             datagen.flow(
@@ -135,8 +138,13 @@ class CnnModel(Modeler):
             ),
             epochs=TRAINED_EPOCH_CNT,
             steps_per_epoch=steps_per_epoch,
-            validation_data=(self.x_val_norm, self.y_val_enc),
-
+            validation_data=val_datagen.flow(
+                self.x_val_norm,
+                self.y_val_enc,
+                batch_size=TRAINED_BATCH_SIZE,
+                shuffle=False
+            ),
+            validation_steps=validation_steps,
             verbose=1,
             class_weight=class_weights,
             callbacks=[self._reduce_lr, self._early_stopping]
@@ -146,6 +154,7 @@ class CnnModel(Modeler):
 
     def evaluate(self, verbose: int = 2) -> tuple[float, float]:
         print(f'\n{self.title} Evaluation')
+
         self.loss, self.accuracy = self.model.evaluate(
             self.x_test_norm,
             self.y_test_enc,
@@ -220,7 +229,7 @@ class CnnModel(Modeler):
 
         return df_perform
 
-    def run(self, datagen: ImageDataGenerator=None) -> None:
+    def run(self, datagen: ImageDataGenerator=None, show_all: bool=False) -> None:
         """
         Run each model in a sequence:
         - Compile model
@@ -249,4 +258,4 @@ class CnnModel(Modeler):
         self.evaluate()
         self.calc_performance()
         self.get_predictions()
-        self.show_results()
+        self.show_results(show_all)

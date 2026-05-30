@@ -131,7 +131,7 @@ class DataHandler:
         assert len(features) == len(target), f"Data length mismatch! Features: {len(features)}, Labels: {len(target)}"
 
         # --- Split data into 70% training data and 30% temporary data --- #
-        x_training_data, x_temp_data, y_training_data, y_temp_data = train_test_split(
+        x_train, x_temp, y_train, y_temp = train_test_split(
             features,
             target,
             test_size=TEMPORARY_DATA_SPLIT,
@@ -140,26 +140,26 @@ class DataHandler:
         )
 
         # --- Then take remaining temporary data 30% and split in half --- #
-        x_validation_data, x_testing_data, y_validation_data, y_testing_data = train_test_split(
-            x_temp_data,
-            y_temp_data,
+        x_val, x_test, y_val, y_test = train_test_split(
+            x_temp,
+            y_temp,
             test_size=HALF_DATA_SPLIT,
             random_state=SEED,
-            stratify=y_temp_data
+            stratify=y_temp
         )
 
         # Printing the shapes
         print('\nData Shapes')
-        print(f'Shape of X training: {x_training_data.shape}')
-        print(f'Shape of Y training: {y_training_data.shape}')
-        print(f'Shape of X validation: {x_validation_data.shape}')
-        print(f'Shape of Y validation: {y_validation_data.shape}')
-        print(f'Shape of X testing: {x_testing_data.shape}')
-        print(f'Shape of Y testing: {y_testing_data.shape}')
+        print(f'Shape of X training: {x_train.shape}')
+        print(f'Shape of Y training: {y_train.shape}')
+        print(f'Shape of X validation: {x_val.shape}')
+        print(f'Shape of Y validation: {y_val.shape}')
+        print(f'Shape of X testing: {x_test.shape}')
+        print(f'Shape of Y testing: {y_test.shape}')
 
         print('\nData Types')
-        print(f'Data type of X training: {x_training_data.dtype}')
-        print(f'Data type of Y training: {y_training_data.dtype}')
+        print(f'Data type of X training: {x_train.dtype}')
+        print(f'Data type of Y training: {y_train.dtype}')
 
         # === DEBUG: RAW DATA LOADING ALIGNMENT ===
         print("--- Verification: Initial Loading Alignment ---")
@@ -173,12 +173,12 @@ class DataHandler:
         print("===========================================")
 
         return {
-            'x_train': x_training_data,
-            'y_train': y_training_data,
-            'x_val': x_validation_data,
-            'y_val': y_validation_data,
-            'x_test': x_testing_data,
-            'y_test': y_testing_data
+            'x_train': x_train,
+            'y_train': y_train,
+            'x_val': x_val,
+            'y_val': y_val,
+            'x_test': x_test,
+            'y_test': y_test
         }
 
 

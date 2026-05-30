@@ -29,11 +29,11 @@ def run_main_pipeline():
     # Fix warnings
     warnings.filterwarnings('ignore')
 
-    id = str(start_timer())[0, 6]
-    print(f'Start Run ID: {id}')
-
+    id = str(start_timer())[-6:]
+    print(f'\nStart Run ID: {id}')
     print('')
     show_banner('Plant Seedling Classifier')
+
     print("Number of GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
@@ -309,8 +309,9 @@ def run_main_pipeline():
     vgg_model.show_summary()
 
     # Transfer Learning Model
+    show_all = False
     tl_model = TransferLayerModel(vgg_model, merged_dataset)
-    tl_model.run(train_datagen)
+    tl_model.run(train_datagen, show_all)
 
     """
     Observations:
@@ -386,7 +387,7 @@ def run_main_pipeline():
     improve crop yield by enabling early-stage weed detection.
     """
 
-    print(f'Start Run ID: {id}')
+    print(f'Start Run ID: {id}\n')
 
 # --- Start Program --- #
 if __name__ == '__main__':

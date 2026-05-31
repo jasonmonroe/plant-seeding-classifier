@@ -31,16 +31,15 @@ def run_main_pipeline(args: dict):
     warnings.filterwarnings('ignore')
 
     eda, all_pred, ion = args['eda'], args['all_pred'], args['ion']
-    print(f'\n### DEBUG: eda={eda}, all_pred={all_pred}, ion={ion} ###\n')
 
     prog_start_time = start_timer()
-    id = str(int(prog_start_time))[-6:]
-    print(f'----- START RUN ID: {id} -----\n')
+    run_id = str(int(prog_start_time))[-6:]
+    print(f'----- START RUN ID: {run_id} -----\n')
 
     if ion:
         plt.ion()
 
-    show_banner('* Plant Seedling Classifier *')
+    show_banner('📚 Plant Seedling Classifier 📚')
     print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
@@ -55,7 +54,7 @@ def run_main_pipeline(args: dict):
     # Check for NaN values
     print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
 
-    # @todo - image_handle.show_random_image(images)
+    image_handle.show_random_image(images)
 
     # --- Perform Exploratory Data Analysis --- #
     if eda:
@@ -90,10 +89,9 @@ def run_main_pipeline(args: dict):
 
         show_plant_species_dist(df_labels)
 
-
     # Data Pre-Processing - Convert the BGR images to RGB images then convert BGR to RGB.
     # First, we will display the image as it is imported which means in BGR format.
-    # @todo - image_handle.show_random_cv2_image()
+    image_handle.show_random_cv2_image()
 
     bgr_images = image_handle.create_bgr_images()
     rgb_images = image_handle.convert_to_rgb(bgr_images)
@@ -112,13 +110,12 @@ def run_main_pipeline(args: dict):
     resized_images = image_handle.get_resized_images(rgb_images, resized_img_dims)
 
     # Random resized image to be shown...
-    print('Confirming if (random) image has been resized...')
-    # @todo - image_handle.show_random_image(resized_images)
+    print('\nConfirming if this (random) image has been resized...')
+    image_handle.show_random_image(resized_images)
 
     # Create the 3D shape tuple (Height, Width, Channels) for the models.
     image_params = resized_img_dims + (image_channels,)
 
-   
     """
     Data Preparation for Modeling
     
@@ -131,46 +128,6 @@ def run_main_pipeline(args: dict):
 
     # Split the raw image matrices and target series
     dataset = plant.split_data(resized_images)
-
-    """
-    # === DEBUG: INSERT THIS DIAGNOSTIC CHECK IN main.py ===
-    print("\n==================================================")
-    print("       DEBUG: CRITICAL SPLIT ALIGNMENT CHECK             ")
-    print("==================================================")
-
-    # Grab the first 3 samples from your raw training split
-    for idx in [0, 1, 2]:
-        raw_x_img = dataset['x_train'][idx]
-
-        # Pull the label from y_train (safely checking if it's a Pandas Series or array)
-        if hasattr(dataset['y_train'], 'iloc'):
-            raw_y_label = dataset['y_train'].iloc[idx]
-        else:
-            raw_y_label = dataset['y_train'][idx]
-
-        print(f"\nChecking Sample Split Row {idx}:")
-        print(f"-> Target Label reads: '{raw_y_label}'")
-        print(f"-> Image Mean Pixel Value: {np.mean(raw_x_img):.4f}")
-
-        # Pop up the image so you can visually verify it
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=(2, 2))
-
-        # Handle both normalized and raw scale safely
-        if np.max(raw_x_img) <= 1.0:
-            plt.imshow((raw_x_img * 255).astype('uint8'))
-        else:
-            plt.imshow(raw_x_img.astype('uint8'))
-        plt.title(f"Row {idx}: {raw_y_label}")
-        plt.axis('off')
-        plt.show()
-    print("==================================================\n")
-    # === DEBUG: INSERT THIS DIAGNOSTIC CHECK IN main.py ===
-    """
-
-    # Exit early so you don't have to wait 5 minutes for training to fail
-    #sys.exit(0)
-
 
     # Fit the LabelEncoder globally on the raw label series. This automatically creates a internal alphabetical lookup
     # index map.
@@ -198,8 +155,7 @@ def run_main_pipeline(args: dict):
 
     # Base Model
     base_model = BaseModel(image_params, dataset)
-    # @todo - base_model.run()
-
+    base_model.run()
 
     """
     Observations:
@@ -240,9 +196,6 @@ def run_main_pipeline(args: dict):
     Classification task, meeting your performance goals.
     """
 
-
-
-
     # Get training data generator and build it for performance
     # Augment the data without using validation or test data.  Only training data.
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
@@ -255,7 +208,7 @@ def run_main_pipeline(args: dict):
 
     # Data Augmented CNN Model
     data_augment_model = DataAugmentedModel(image_params, dataset)
-    # @todo - data_augment_model.run(train_datagen)
+    data_augment_model.run(train_datagen)
 
     """
     "The training accuracy starts low and increases, but the final score is much lower than the $90% seen in the Base 
@@ -305,8 +258,7 @@ def run_main_pipeline(args: dict):
 
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model, dataset, eda=eda, all_pred=all_pred)
-    tl_model.run(train_datagen) # Run original in cnn_model.run()
-    #tl_model.run2(train_generator)  # Run revised in tl_model.run2()
+    tl_model.run(train_generator)
 
     """
     Observations:
@@ -374,9 +326,9 @@ def run_main_pipeline(args: dict):
     """
 
     show_timer(prog_start_time)
-    print(f'----- END RUN ID: {id} -----\n')
+    print(f'----- END RUN ID: {run_id} -----\n')
 
-def get_args(command_line_args: list[str]) -> dict:
+def parse_args(command_line_args: list[str]) -> dict:
     """
     Get all arguments passed via command line.
 
@@ -390,24 +342,14 @@ def get_args(command_line_args: list[str]) -> dict:
     `ion` stands for "Interactive Mode On." # (Interactive Mode On) tells Matplotlib to draw windows immediately upon
     creation without halting the underlying Python execution thread.
     """
-    ion = eda = all_pred = False
-
-    if '--eda' in command_line_args:
-        eda = True
-
-    if '--all_pred' in command_line_args:
-        all_pred = True
-
-    if '--ion' in command_line_args:
-        ion = True
-
-    return {'eda': eda, 'all_pred': all_pred, 'ion': ion}
+    args_list = ['--eda', '--all_pred', '--ion']
+    return {arg.strip('--'): (arg in command_line_args) for arg in args_list}
 
 
 # --- Start Program --- #
 if __name__ == '__main__':
     try:
-        args = get_args(sys.argv[1:])
+        args = parse_args(sys.argv[1:])
         run_main_pipeline(args)
     except KeyboardInterrupt:
         print("\nProcess interrupted by user.  Exiting...")

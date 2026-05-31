@@ -32,7 +32,8 @@ class BaseModel(CnnModel):
         self._create()
 
     def _create(self) -> None:
-        print(f'\n--- Creating {self.title} ---')
+        print(f'\n--- 🪄 Creating {self.title} ---')
+
         self.model = Sequential([
             # --- Convolution Block 1 ---
             Conv2D(SM_CNT, KERNEL_SIZE_MED, activation='relu', padding='same', input_shape=self.image_params),

@@ -2,30 +2,39 @@
 
 import random
 from typing import Tuple, Optional, List
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
-from tensorflow.keras.optimizers.legacy import Adam
-from tensorflow.keras import Model
-from tensorflow.keras import Input, layers
-from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling2D, GlobalMaxPooling2D, BatchNormalization, Concatenate
+from tensorflow.keras import Input, Model, layers
 from tensorflow.keras.applications.vgg16 import preprocess_input
+from tensorflow.keras.callbacks import History
+from tensorflow.keras.layers import (
+    BatchNormalization,
+    Concatenate,
+    Dense,
+    Dropout,
+    GlobalAveragePooling2D,
+    GlobalMaxPooling2D
+)
+from tensorflow.keras.optimizers.legacy import Adam
+from tensorflow.keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator
 
 from models.vgg import VggModel
 from models.cnn_model import CnnModel
 from src.config import (
     DROPOUT_RATE,
-    IMAGE_NORMALIZED,
     IMAGE_PX_MAX,
     IMAGE_ROWS,
+    FINE_TUNE_EPOCH_CNT,
     TL_LEARNING_RATE,
     TL_FINE_TUNE_LEARNING_RATE,
     TRAINED_BATCH_SIZE,
-    XXLG_CNT
+    XXLG_CNT,
+    WARMUP_EPOCH_CNT
 )
 
 from src.eda import show_plot_confusion_matrix
-from src.utils import show_banner
+from src.utils import show_banner, show_timer, start_timer
 
 class TransferLayerModel(CnnModel):
     """
@@ -44,15 +53,17 @@ class TransferLayerModel(CnnModel):
         self.all_pred = all_pred
 
         # Keep a tracking reference to the base model block
-        self.base_network = vgg16_model.get_base()
-        self._create(self.base_network)
+        self.vgg16_base_model = vgg16_model.get_base()
+        self._create()
 
-    def _create(self, vgg16_base_model: Model) -> None:
+    def _create(self) -> None:
+        print(f'\n--- 🪄 Creating {self.title} ---')
+
         inputs = Input(shape=self.image_params)
-        outputs = self.__build_outputs(vgg16_base_model, inputs)
+        outputs = self.__build_outputs(inputs)
         self.model = Model(inputs, outputs, name='vgg16_refined')
 
-    def __build_outputs(self, vgg16_base_model: Model, inputs: tf.Tensor) -> Dense:
+    def __build_outputs(self, inputs: tf.Tensor) -> Dense:
         # Logic: VGG16 preprocess_input expects 0-255 range BGR data.
         # We check the max of the input tensor; if <= 1.0, we assume it's normalized 
         # and scale it up. If > 1.0, we treat it as raw pixels.
@@ -64,9 +75,9 @@ class TransferLayerModel(CnnModel):
         )(inputs)
 
         # 2. Forward pass through VGG base (Keep training=False to protect batch-norm layers)
-        tensor_img = vgg16_base_model(tensor_img, training=False)
+        tensor_img = self.vgg16_base_model(tensor_img, training=False)
 
-        # World-Class Trick: Use both Average and Max pooling to catch textures AND edges
+        # Use both Average and Max pooling to catch textures AND edges
         avg_pool = GlobalAveragePooling2D()(tensor_img)
         max_pool = GlobalMaxPooling2D()(tensor_img)
         tensor_img = Concatenate()([avg_pool, max_pool])
@@ -81,19 +92,19 @@ class TransferLayerModel(CnnModel):
 
         return Dense(self.plant_species_cnt, activation='softmax', name='prediction_layer')(tensor_img)
 
-    def fine_tune(self, unfreeze_block: str = 'block5', fine_tune_lr: float = 5e-6) -> None:
+    def fine_tune(self, unfreeze_block: str, fine_tune_lr: float) -> None:
         """
         Surgically unfreezes specific convolutional blocks of VGG16
         and re-compiles the system graph cleanly for target classification.
         """
-        print(f"\n--- Initiating Fine-Tuning: Unfreezing {unfreeze_block} ---")
+        print(f"\n--- 🔥Initiating Fine-Tuning: Unfreezing {unfreeze_block} 🔥 ---")
 
         # Unfreeze the base convolutional block layers
-        self.base_network.trainable = True
-        for layer in self.base_network.layers:
+        self.vgg16_base_model.trainable = True
+        for layer in self.vgg16_base_model.layers:
             if unfreeze_block in layer.name:
                 layer.trainable = True
-                print(f"  -> Unfrozen: {layer.name}")
+                print(f" -> 🔥 Unfrozen: {layer.name}")
             else:
                 layer.trainable = False
 
@@ -102,6 +113,18 @@ class TransferLayerModel(CnnModel):
             optimizer=Adam(learning_rate=fine_tune_lr), 
             loss='categorical_crossentropy',
             metrics=['accuracy']
+        )
+
+    def fit_model(self, generator: NumpyArrayIterator, class_weights: dict, epoch_cnt: int) -> History:
+        # Overrides cnn_model.fit_model()
+        return self.model.fit(
+            batch_size=TRAINED_BATCH_SIZE,
+            callbacks=[self._reduce_lr, self._early_stopping],
+            class_weight=class_weights,
+            epochs=epoch_cnt,
+            validation_data=(self.x_val_norm, self.y_val_enc),
+            verbose=1,
+            x=generator
         )
 
     def show_prediction_visualization(self, target_indices: Optional[List[int]] = None) -> Tuple[int, int]:
@@ -129,19 +152,17 @@ class TransferLayerModel(CnnModel):
             predicted_label = self._encoder.inverse_transform([pred_idx])[0]
             true_label = self._encoder.inverse_transform([true_idx])[0]
 
-
             print(f'\n--- [{i + 1} of {show_cnt}] (Index: {index}) ---')
 
             if pred_idx != true_idx:
                 probs = all_predicted_probs[index]
                 top_3 = np.argsort(probs)[-3:][::-1]
-                print(f"   ⚠️ Top 3 Confidence Scores:")
+                print(f'⚠️ Top 3 Confidence Scores:')
                 for rank, idx in enumerate(top_3):
                     lbl = self._encoder.inverse_transform([idx])[0]
                     marker = "⭐️" if rank == 0 else ("🔹" if idx == true_idx else "  ")
-                    print(f"     {marker} Rank {rank + 1}: {lbl:22s} -> {probs[idx]*100:.2f}%")
+                    print(f"\t{marker} Rank {rank + 1}: {lbl:22s} -> {probs[idx]*100:.2f}%")
 
-            #plt.figure(figsize=(3, 3))
             plt.figure(num=f"Predictions (Index {index})", figsize=(4, 4))
             plt.xlabel(f"Width: {self.image_params[0]}px")
             plt.ylabel(f"Height: {self.image_params[1]}px")
@@ -174,18 +195,19 @@ class TransferLayerModel(CnnModel):
         if self.eda:
             show_plot_confusion_matrix()
 
+        print(f'\n--- {self.title} Classification Report ---')
+        self.print_classification_report(self.model, self.x_test_norm, self.y_test_enc)
+
         predictions_correct, total = self.show_prediction_visualization()
         pct = (predictions_correct / total) * 100
 
-        print(f'--- {self.title} Results ---')
+        print(f'\n--- {self.title} Results ---')
         print(f'{predictions_correct} out of {total} correct.\nAccuracy: {pct:.2f}%')
 
         if predictions_correct == total:
-            print('\n⭐ PREDICTOR EARNED A PERFECT SCORE!  ⭐\n')
+            print('\n⭐ PREDICTOR EARNED A PERFECT SCORE! ⭐\n')
 
-    # @todo - revised version of run()
-    def run2(self, train_generator: NumpyArrayIterator):
-        print(f'\n--- Running transfer_layer_model:{self.title} ---')
+    def run(self, train_generator: NumpyArrayIterator):
         self.compile()
         self.show_summary()
         show_banner(self.title, 'Fitting Training Model...')
@@ -193,44 +215,36 @@ class TransferLayerModel(CnnModel):
         # Fetch class weights from parent logic to handle dataset imbalance
         class_weights = self._get_class_weights()
 
-        print("\n+-------------------------------------------------------+")
-        print("| PHASE 1: Training Classification Head (Base Locked)   |")
-        print("+-------------------------------------------------------+")
+        print('\n--- 📢 Phase #1: Training Classification Head (Base Locked) ---\n')
 
+        # Reduced warmup to prevent head-overfitting
         start_time = start_timer()
-        history_warmup = self.model.fit(
-            train_generator,
-            validation_data=(self.x_val_norm, self.y_val_enc),
-            epochs=10,  # Reduced warmup to prevent head-overfitting
-            batch_size=TRAINED_BATCH_SIZE,
-            class_weight=class_weights,
-            verbose=1,
-            callbacks=[self._reduce_lr, self._early_stopping]
+        history_warmup = self.fit_model(
+            generator=train_generator,
+            class_weights=class_weights,
+            epoch_cnt=WARMUP_EPOCH_CNT
         )
         show_timer(start_time)
 
         self.fine_tune(unfreeze_block='block5', fine_tune_lr=TL_FINE_TUNE_LEARNING_RATE)
 
-        print("\n+-------------------------------------------------------+")
-        print("| PHASE 2: Fine-Tuning Deep Convolutional Weights       |")
-        print("+-------------------------------------------------------+")
-
+        print('\n--- 📣 Phase #2: Fine-Tuning Deep Convolutional Weights ---\n')
+        
         start_time = start_timer()
-        history_finetune = self.model.fit(
-            train_generator,
-            validation_data=(self.x_val_norm, self.y_val_enc),
-            epochs=40, # Increase epochs for the deeper learning phase
-            batch_size=TRAINED_BATCH_SIZE,
-            class_weight=class_weights,
-            verbose=1,
-            callbacks=[self._reduce_lr, self._early_stopping]
+        history_finetune = self.fit_model(
+            generator=train_generator,
+            class_weights=class_weights,
+            epoch_cnt=FINE_TUNE_EPOCH_CNT
         )
         show_timer(start_time)
 
         # Capture the final state for the FinalReport
         self.history = history_finetune
-        self.evaluate(verbose=0) # Update self.loss and self.accuracy
+
+        if self.eda:
+            self.show_history()
         
+        self.evaluate(verbose=0) # Update self.loss and self.accuracy
         self.calc_performance()
         self.get_predictions()
         self.show_results()

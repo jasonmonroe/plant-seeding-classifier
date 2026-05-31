@@ -39,14 +39,15 @@ class DataAugmentedModel(CnnModel):
         self.title = 'Data Augmented CNN Model'
         self.image_params = image_params
         
-        # Using the legacy Adam optimizer is required on macOS to avoid 
-        # "Could not interpret optimizer identifier" errors when using custom learning rates.
+        # Note: Using the legacy Adam optimizer is required on macOS to avoid "Could not interpret optimizer identifier"
+        # errors when using custom learning rates.
         self.optimizer = Adam(learning_rate=DA_LEARNING_RATE)
         self._create()
 
     def _create(self) -> None:
-         print(f'\n--- Creating {self.title} ---')
-         self.model = Sequential([
+        print(f'\n--- 🪄 Creating {self.title} ---')
+
+        self.model = Sequential([
 
              # --- Block 1 ---
              Conv2D(SM_CNT, KERNEL_SIZE_MED, padding='same', input_shape=self.image_params),

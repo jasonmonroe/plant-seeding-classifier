@@ -38,7 +38,7 @@ class ImageHandler:
         plt.imshow(random_img, cmap='gray')
         plt.title(title)
         plt.show()
-        print(f'type={type(random_img)}')
+
         return random_img
 
     def show_all_images(self):
@@ -56,7 +56,7 @@ class ImageHandler:
         """
 
         # Assuming labels is an array where each element corresponds to an image
-        fig = plt.figure(num="Raw Image Labels", figsize=(10, 8))
+        fig = plt.figure(num='Raw Image Labels', figsize=(10, 8))
         label_cnt = len(labels)
         
         # Initialize the random number generator once outside the loops
@@ -126,7 +126,6 @@ class ImageHandler:
         self.height, self.weight = reduced_img_dims[0], reduced_img_dims[1]
 
         return np.array([cv2.resize(img, (self.weight, self.height), interpolation=cv2.INTER_LINEAR) for img in imgs])
-        #return resized_images
 
     def get_resized_images_2(self, imgs: np.ndarray, reduced_img_dims: Tuple[int, int, int]) -> list:
         resized_images = []

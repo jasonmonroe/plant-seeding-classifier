@@ -10,7 +10,6 @@ import tensorflow as tf
 from sklearn.metrics import (
     classification_report
 )
-
 from src.config import IMAGE_PX_MAX
 
 
@@ -46,40 +45,6 @@ class Modeler:
         # Dynamically return the count of plant species.
         return len(self.plant_species) if self.plant_species else 0
 
-    def set_dataset_old(self, dataset: dict) -> None:
-        """
-        Dynamically sets attributes and synchronizes the plant_species list
-        with the internal LabelEncoder to prevent mapping drift.
-        """
-        for key, value in dataset.items():
-            if hasattr(self, key) and key != 'plant_species_cnt':
-                print(f'Debug: Setting {key} to {value}')
-                setattr(self, key, value)
-
-        # World-Class Sync: Force self.plant_species to match the encoder's internal mapping.
-        # This ensures that Index 0 in the model always matches Index 0 in the display list.
-        if hasattr(self._encoder, 'classes_'):
-            self.plant_species = list(self._encoder.classes_)
-
-    # new!
-    def set_dataset_2(self, dataset: dict) -> None:
-        """
-        Dynamically sets attributes and synchronizes the plant_species list
-        with the internal LabelEncoder to prevent mapping drift.
-        """
-        for key, value in dataset.items():
-            # Add 'plant_species' to the exclusion guard so incoming dict entries
-            # don't clobber our clean, synchronized encoder mapping.
-            if hasattr(self, key) and key not in ['plant_species_cnt', 'plant_species']:
-                #print(f'Debug: Setting {key} to {value}')
-                setattr(self, key, value)
-
-        # World-Class Sync: Force self.plant_species to match the encoder's internal mapping.
-        # This guarantees that Index 0 in the model ALWAYS matches Index 0 in the display list.
-        if hasattr(self._encoder, 'classes_'):
-            self.plant_species = list(self._encoder.classes_)
-
-    # current
     def set_dataset(self, dataset: dict) -> None:
         """
         Dynamically sets attributes and synchronizes the plant_species list
@@ -123,71 +88,37 @@ class Modeler:
         self.y_test_enc = self._encode_label(self.y_test)
         self.y_val_enc = self._encode_label(self.y_val)
 
-    """
-    def _encode_label(self, y_data: pd.DataFrame) -> np.ndarray:
-        
-        Transforms raw targets into one-hot categories, forcing input stability
-        by flattening multidimensional DataFrame structures to a 1D sequence.
-         
-
-        if hasattr(y_data, 'values'):
-            y_data_flat = y_data.values.ravel()
-        else:
-            y_data_flat = np.squeeze(y_data)
-
-        return tf.keras.utils.to_categorical(
-            self._encoder.transform(y_data_flat),
-            num_classes=self.plant_species_cnt
-        )
-    """
-
     def _encode_label(self, y_data) -> np.ndarray:
-        """
-        Safely flattens string targets regardless of whether they are
-        passed as Pandas DataFrames, Series, or 1D NumPy arrays.
-        """
 
-        # Convert to a clean, flat 1D list of raw strings safely
-        if hasattr(y_data, 'values'):
-            # If it's a Pandas object
-            y_data_flat = list(y_data.values.ravel())
-        elif isinstance(y_data, np.ndarray):
-            # If it's already a NumPy array, ensure it is completely flattened
-            y_data_flat = list(y_data.ravel())
-        else:
-            # Fallback for standard lists
-            y_data_flat = list(y_data)
-            
-        # 1. Generate the local one-hot encoded result first
+        # Generate the local one-hot encoded result first
+        y_data = self.__convert(y_data)
+
         encoded_result = tf.keras.utils.to_categorical(
-            self._encoder.transform(y_data_flat),
+            self._encoder.transform(y_data),
             num_classes=self.plant_species_cnt
         )
-
-        # === DEBUG: ENCODER MATCH CHECK ===
-        print("### DEBUG: Verification: Encoding Matrix Sync ###")
-        # Pick 3 arbitrary rows relative to the CURRENT data size to trace
-        data_len = len(y_data_flat)
-        sample_indices = [0, data_len // 2, data_len - 1] if data_len > 0 else []
-        
-        print(f'sample_indices: {sample_indices}')
-        for idx in sample_indices:
-            raw_string_label = y_data_flat[idx]
-            one_hot_vector = encoded_result[idx]
-            encoded_integer = np.argmax(one_hot_vector)
-
-            print(f"Row {idx}:")
-            print(f"  -> Original String: {raw_string_label}")
-            print(f"  -> One-Hot Vector Index: {encoded_integer}")
-        print("===========================================")
-        # === DEBUG: ENCODER MATCH CHECK ===
 
         return encoded_result
 
-    def normalize(self) -> None:
+    def __convert(self, y_data) -> list:
+        """
+        Safely flattens string targets regardless of whether they are
+        passed as Pandas DataFrames, Series, or 1D NumPy arrays.
+        Convert to a clean, flat 1D list of raw strings safely
         """
 
-        """
+        if hasattr(y_data, 'values'):
+            # If it's a Pandas object
+            return list(y_data.values.ravel())
+        elif isinstance(y_data, np.ndarray):
+            # If it's already a NumPy array, ensure it is completely flattened
+            return list(y_data.ravel())
+        else:
+            # Fallback for standard lists
+            return list(y_data)
+
+    def normalize(self) -> None:
+        # Scaling numerical features into a standardized range, typically 0 to 1 or -1 to 1.
         self.x_train_norm = self.x_train.astype('float32') / IMAGE_PX_MAX
         self.x_test_norm = self.x_test.astype('float32') / IMAGE_PX_MAX
         self.x_val_norm = self.x_val.astype('float32') / IMAGE_PX_MAX

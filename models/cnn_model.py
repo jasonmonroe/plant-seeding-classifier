@@ -10,7 +10,6 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, NumpyArrayIterator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import History
-
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
@@ -23,9 +22,7 @@ from sklearn.metrics import (
     mean_absolute_error,
     explained_variance_score,
 )
-
 from models.modeler import Modeler
-
 from src.config import (
     BASE_BATCH_SIZE, 
     BASE_EPOCH_CNT, 
@@ -37,10 +34,19 @@ from src.eda import (
     show_plot_confusion_matrix, 
     show_plot_history
 )
+from src.utils import (
+    show_banner,
+    early_stopping,
+    reduce_lr,
+    start_timer,
+    show_timer
+)
 
-from src.utils import show_banner, early_stopping, reduce_lr, start_timer, show_timer
 
 class CnnModel(Modeler):
+    """
+    Parent model of all CNN models.
+    """
     def __init__(self, dataset: dict):
         super().__init__(dataset=dataset)
 
@@ -55,8 +61,8 @@ class CnnModel(Modeler):
         self.history = None
         self.loss = 0.0
         self.accuracy = 0.0
-        self.y_test_pred = None
-        self.y_train_pred = None
+        self.y_test_pred = []
+        self.y_train_pred = []
         self.training_perf = pd.DataFrame({})
 
     def __init_session(self) -> None:
@@ -83,8 +89,8 @@ class CnnModel(Modeler):
     def _get_class_weights(self):
         """
         Calculates balanced class weights based on the training labels.
+        axis=1 ensures we get the max index for each sample, resulting in a 1D array
         """
-        # axis=1 ensures we get the max index for each sample, resulting in a 1D array
         y_train_classes = np.argmax(self.y_train_enc, axis=1)
         unique_classes = np.unique(y_train_classes)
 
@@ -180,7 +186,7 @@ class CnnModel(Modeler):
 
     def show_results(self) -> None:
         show_plot_confusion_matrix(self.y_test_enc, self.y_test_pred)
-        show_banner(self.title, 'Classification Report')
+        show_banner(self.title, '- Classification Report -')
         self.print_classification_report(self.model, self.x_test_norm, self.y_test_enc)
 
     def show_history(self) -> None:
@@ -233,8 +239,40 @@ class CnnModel(Modeler):
 
         return df_perform
 
+
+    def calc_model_score(self, y_true_enc, y_pred_probs, alpha=1.0, beta=1.0):
+        # Convert one-hot vectors to 1D integer class arrays
+        y_true = np.argmax(y_true_enc, axis=1)
+        y_pred = np.argmax(y_pred_probs, axis=1)
+
+        # 1. Compute Macro F1-Score (unweighted mean across all classes)
+        macro_f1 = f1_score(y_true, y_pred, average='macro')
+
+        # 2. Get the full confusion matrix
+        cm = confusion_matrix(y_true, y_pred)
+
+        # Calculate global False Positives and False Negatives across all classes
+        # FP: Column sums minus diagonal (predicted as class X, but wasn't)
+        # FN: Row sums minus diagonal (was class X, but predicted as something else)
+        fp_count = np.sum(cm, axis=0) - np.diag(cm)
+        fn_count = np.sum(cm, axis=1) - np.diag(cm)
+
+        total_fp = np.sum(fp_count)
+        total_fn = np.sum(fn_count)
+
+        # 3. Apply the Weighted Penalty Score formula
+        performance_score = (100 * macro_f1) - ((alpha * total_fp) + (beta * total_fn))
+
+        print(f"--- Score Breakdown ---")
+        print(f"Macro F1-Score:     {macro_f1:.4f}")
+        print(f"Total False Pos:    {total_fp}")
+        print(f"Total False Neg:    {total_fn}")
+        print(f"FINAL MODEL SCORE:  {performance_score:.2f}")
+
+        return performance_score
+
+
     def run(self, datagen: ImageDataGenerator=None) -> None:
-        print(f'\n--- Running cnn_model:{self.title} ---')
         """
         Run each model in a sequence:
         - Compile model
@@ -245,8 +283,9 @@ class CnnModel(Modeler):
         - Calculate the model performance
         - Get the predictions
         - Show all the results
+
+        Note: Transfer Layer Model will override this function w/ its own version.
         """
-        #print(f'\n--- Running {self.title} ---')
 
         self.compile()
         self.show_summary()

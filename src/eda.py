@@ -44,7 +44,7 @@ def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=N
     ax = sns.countplot(
         data=data,
         x=feature,
-        palette="Paired",
+        palette='Paired',
         order=data[feature].value_counts().index[:n].sort_values(),
     )
 
@@ -213,9 +213,10 @@ def show_plot_histogram(img: np.ndarray, title: str='') -> None:
 def show_plant_species_dist(df_labels) -> None:
 
     column_name = 'Label'
+    title = 'Distribution of Plant Species'
 
     # Assuming df_labels contains the column 'Label' with your classification target.
-    plt.figure(num='Distribution of Plant Species', figsize=(10, 6))
+    plt.figure(num=title, figsize=(10, 6))
 
     # Use the 'y' parameter to create a horizontal bar chart (flipped axes)
     # Use a nice palette for better aesthetics
@@ -227,7 +228,7 @@ def show_plant_species_dist(df_labels) -> None:
     )
 
     # Add Title and Labels
-    ax.set_title('Distribution of Plant Species', fontsize=16, fontweight='bold')
+    ax.set_title(title, fontsize=16, fontweight='bold')
     ax.set_xlabel('Count', fontsize=12)
     ax.set_ylabel('Plant Species ~ Class', fontsize=12)
 

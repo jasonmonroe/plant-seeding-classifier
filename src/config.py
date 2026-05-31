@@ -1,32 +1,33 @@
 # config.py
 
+# File Information
 SOURCE_DIR = 'data/'
 CSV_FILE = 'plant_labels.csv'
 NPY_FILE = 'plant_images.npy'
 
 # Generic (used primarily for Conv2D Filters)
+SEED = 42
 XXLG_CNT = 512
 XLG_CNT = 256
 LG_CNT = 128
 MED_CNT = 64
 SM_CNT = 32
 XSM_CNT = 16
-SEED = 42
 
 # Time
 MSEC = 1000
 SECS_IN_MIN = 60
 
 # Data Split Percentages
-TEMPORARY_DATA_SPLIT = 0.2
-TRAINING_DATA_SPLIT = 0.8
-TESTING_DATA_SPLIT = 0.1
-VALIDATION_DATA_SPLIT = 0.1
 HALF_DATA_SPLIT = 0.5
+TEMPORARY_DATA_SPLIT = 0.2
+TESTING_DATA_SPLIT = 0.1
+TRAINING_DATA_SPLIT = 0.8
+VALIDATION_DATA_SPLIT = 0.1
 
 # Image Data
 IMAGE_CHANNELS = 3
-IMAGE_NORMALIZED = 1 # image normalization max value
+#IMAGE_NORMALIZED = 1 # image normalization max value
 IMAGE_PX_MAX = 255.0
 IMAGE_ROWS = IMAGE_COLS = 4
 
@@ -39,15 +40,15 @@ L2_LEARNING_RATE = 1e-7
 TL_FINE_TUNE_LEARNING_RATE = 5e-6
 #L2_REGRESSION_RATE = 0.01
 
-# Conv2D
+# Conv2D Kernels
 KERNEL_SIZE_MED = (3, 3)
 KERNEL_SIZE_SM = (2, 2)
 
-# Base Model Fit
-BASE_EPOCH_CNT = 30
+# Model Fits
 BASE_BATCH_SIZE = 64
+BASE_EPOCH_CNT = 30
+FINE_TUNE_EPOCH_CNT = 40
 GENERATOR_BATCH_SIZE = 48
-
-# Trained Model Fit
 TRAINED_EPOCH_CNT = 36
 TRAINED_BATCH_SIZE = 32
+WARMUP_EPOCH_CNT = 10

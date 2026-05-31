@@ -26,7 +26,8 @@ class VggModel(CnnModel):
         self._create()
 
     def _create_base_model(self) -> VGG16:
-        print(f'\n--- Creating {self.title} ---')
+        print(f'\n--- 🪄 Creating {self.title} ---')
+
         return VGG16(
             weights='imagenet',
             include_top=False,

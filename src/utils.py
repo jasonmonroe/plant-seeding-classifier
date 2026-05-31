@@ -29,6 +29,7 @@ def show_banner(title: str, section: str='') -> None:
     """
     padding = 2
     title_upper = title.upper()
+
     # The dashes should match the length of the title plus the two spaces of padding
     dash_count = len(title_upper) + padding
 

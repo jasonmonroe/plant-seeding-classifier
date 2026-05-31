@@ -1,6 +1,6 @@
-# plant-seeding-classifier
-Classified plant seed images
+# Plant Seedling Classifier
 
+This project implements a machine learning pipeline to classify images of plant seedlings. Utilizing deep learning techniques and image processing, it aims to accurately identify different species of seedlings, which can be crucial for agricultural automation and research. The project leverages popular Python libraries such as TensorFlow, scikit-learn, and OpenCV for model development, training, and evaluation.
 
 ---
 
@@ -12,6 +12,7 @@ Follow these steps to isolate your dependencies, configure your environment, and
 ```sh
 git clone <your-repository-url>
 cd plant-seedling-classifier
+```
 
 ### 2. Create a Virtual Environment
 It is recommended to use a virtual environment to keep dependencies isolated.
@@ -26,11 +27,11 @@ source venv/bin/activate
 
 ### 4. Configure your IDE
 To resolve "unresolved reference" warnings for built-ins like `print`:
-- **PyCharm**: Go to `Settings > Project > Python Interpreter` and select the `python` executable inside your `venv` folder.
+- **PyCharm/IntelliJ IDEA**: Go to `Settings > Project > Python Interpreter` and select the `python` executable inside your `venv` folder.
 - **VS Code**: Type `Cmd+Shift+P`, search for `Python: Select Interpreter`, and choose the one in your project `venv`.
 
 ### 5. Install Dependencies
-Install the required data science libraries:
+Install the required data science libraries. For macOS users, `tensorflow-metal` will be automatically installed to leverage GPU acceleration on Apple Silicon, as specified in `requirements.txt`.
 ```sh
 pip install -r requirements.txt
 ```
@@ -43,34 +44,3 @@ python main.py
 
 ### 7. Deactivate
 When you are finished, you can exit the virtual environment by running `deactivate`.
-
-## Troubleshooting
-
-### "zsh: no such file or directory" error
-If you see an error pointing to a missing Python path in `/opt/homebrew/`, your virtual environment link is likely broken due to a Homebrew update. To fix it:
-```sh
-rm -rf venv
-python3 -m venv venv
-source venv/bin/activate
-```
-
-
-
-```
-# 1. Deactivate and completely delete the broken virtual environment
-deactivate 2>/dev/null
-rm -rf venv
-
-# 2. Create a fresh environment using a stable Python version (e.g., 3.11)
-python3.11 -m venv venv
-source venv/bin/activate
-
-# 3. Upgrade your environment's core installation tools
-pip install --upgrade pip setuptools wheel
-
-# 4. Install your updated, cross-platform requirements file
-pip install -r requirements.txt
-
-# 5. Install Apple's official plugin to unlock your Mac's GPU hardware acceleration
-pip install tensorflow-metal
-```

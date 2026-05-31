@@ -27,7 +27,7 @@ def show_banner(title: str, section: str='') -> None:
     Prints a stylized banner for notebook readability, adjusted to remove
     the trailing hash symbol on the bottom line.
     """
-    padding = 2
+    padding = 4
     title_upper = title.upper()
 
     # The dashes should match the length of the title plus the two spaces of padding

@@ -100,7 +100,7 @@ class FinalReport():
         print(f"Global Macro F1 Baseline: {macro_pct:.2f}")
         print(f"Total Penalties Applied:  -{penalty_costs:.2f}")
         print('--------------------------------')
-        print(f"FINAL MODEL SCORE:        {performance_score:.2f}\n")
+        print(f"💡 FINAL MODEL SCORE:        {performance_score:.2f}\n")
 
         return performance_score
 

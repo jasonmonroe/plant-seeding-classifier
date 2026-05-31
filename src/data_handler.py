@@ -95,10 +95,6 @@ class DataHandler:
         print('Standard Deviation:', np.std(img))
         print('Minimum:', np.min(img))
         print('Maximum:', np.max(img))
-
-        print('Printing the first element')
-        #print(img[:1])  # Print the first element
-
         print(f"\nLoaded Images shape (Features, X): {img.shape}, Type: {type(img)}")
         print(img.shape)
 

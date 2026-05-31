@@ -42,5 +42,14 @@ Execute the main script to process the data and generate visualizations:
 python main.py
 ```
 
+### Use these arguments for additional information.
+```sh
+python main.py --eda --all_pred --ion
+```
+
+`--eda` shows Exploratory Data Analysis
+`--all_pred` predicts *all* images in the set instead of four random images.
+`--ion` allows you to bypass all the plot charts/graphs that pause the program.
+
 ### 7. Deactivate
 When you are finished, you can exit the virtual environment by running `deactivate`.

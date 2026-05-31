@@ -167,7 +167,7 @@ class CnnModel(Modeler):
             verbose=verbose
         )
 
-        print(f'Test Loss: {self.loss}, Test Accuracy: {self.accuracy}')
+        print(f'* Evaluation Results: Test Loss: {self.loss}, Test Accuracy: {self.accuracy}')
 
         return self.loss, self.accuracy
 
@@ -186,19 +186,18 @@ class CnnModel(Modeler):
 
     def show_results(self) -> None:
         show_plot_confusion_matrix(self.y_test_enc, self.y_test_pred)
-        show_banner(self.title, '- Classification Report -')
+        print(f'\n--- {self.title} Classification Report ---')
         self.print_classification_report(self.model, self.x_test_norm, self.y_test_enc)
 
     def show_history(self) -> None:
-        return None
         # Show plot history for accuracy, loss
         show_plot_history(self.history, self.title, 'accuracy')
         show_plot_history(self.history, self.title, 'loss')
 
     """
-    ==================================
-    MODEL PERFORMANCE CLASSIFICATION
-    ==================================
+    ----------------------------------
+     MODEL PERFORMANCE CLASSIFICATION
+    ----------------------------------
     
     Metric, Working (Minimum Signal), Good (Expected Target), Excellent (Production Goal)
     Test Accuracy, 60%−75%, 75%−85%, >85%
@@ -256,7 +255,7 @@ class CnnModel(Modeler):
 
         self.compile()
         self.show_summary()
-        show_banner(self.title, '- Fitting Training Model -')
+        print(f'--- {self.title} Fitting Training Model ---')
 
         start_time = start_timer()
         if datagen is None:

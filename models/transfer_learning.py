@@ -57,7 +57,7 @@ class TransferLayerModel(CnnModel):
         self._create()
 
     def _create(self) -> None:
-        print(f'\n--- 🪄 Creating {self.title} ---')
+        print(f'\n--- 🖥️ Creating {self.title} ---')
 
         inputs = Input(shape=self.image_params)
         outputs = self.__build_outputs(inputs)
@@ -179,8 +179,8 @@ class TransferLayerModel(CnnModel):
             plt.tight_layout()
             plt.show()
 
-            print('Predicted Label:', predicted_label)
-            print('True Label:     ', true_label)
+            print('🏷️ Predicted Label:', predicted_label)
+            print('🏷️ True Label:     ', true_label)
 
             if pred_idx == true_idx:
                 print('✅ Correct Prediction!')
@@ -210,12 +210,12 @@ class TransferLayerModel(CnnModel):
     def run(self, train_generator: NumpyArrayIterator):
         self.compile()
         self.show_summary()
-        show_banner(self.title, 'Fitting Training Model...')
+        print(f'\n--- {self.title} Fitting Training Model ---')
 
         # Fetch class weights from parent logic to handle dataset imbalance
         class_weights = self._get_class_weights()
 
-        print('\n--- 📢 Phase #1: Training Classification Head (Base Locked) ---\n')
+        print('\n--- 📢 Phase #1: Training Classification Head (Base Locked) 📢 ---\n')
 
         # Reduced warmup to prevent head-overfitting
         start_time = start_timer()
@@ -228,7 +228,7 @@ class TransferLayerModel(CnnModel):
 
         self.fine_tune(unfreeze_block='block5', fine_tune_lr=TL_FINE_TUNE_LEARNING_RATE)
 
-        print('\n--- 📣 Phase #2: Fine-Tuning Deep Convolutional Weights ---\n')
+        print('\n--- 📣 Phase #2: Fine-Tuning Deep Convolutional Weights 📣 ---\n')
         
         start_time = start_timer()
         history_finetune = self.fit_model(

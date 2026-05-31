@@ -1,24 +1,24 @@
 # final_report.py
 
 """
-==================================
- FINAL RESULT METRICS
-==================================
-
-Training Accuracy: >= 90%
-Validation Accuracy: >= 85%
-Testing Accuracy: >= 85%
-Testing Loss: <= 50% (want it closes to 0)
+FINAL RESULT METRICS
+--------------------
+- Training Accuracy: >= 90%
+- Validation Accuracy: >= 85%
+- Testing Accuracy: >= 85%
+- Testing Loss: <= 50% (want it closes to 0)
 """
 
+import numpy as np
 import pandas as pd
+from sklearn.metrics import f1_score, confusion_matrix
 from tensorflow.keras.models import Model
 from src.utils import show_banner
 
 
 class FinalReport():
     def __init__(self, models) -> None:
-
+        self.models = models
         self.model_titles = [model.title for model in models]
         self.loss = [model.loss for model in models]
 
@@ -35,46 +35,72 @@ class FinalReport():
                 return model_obj.history.history[metric_name][-1]
         return 0.0
 
-    def pick_winner(self, report) -> str:
+    def get_all_scores(self) -> dict:
         """
-        Testing Accuracy and Testing Loss are the most important metrics
-        To determine the true winner, you must look at the Per-Class Precision, Recall, and F1-Scores generated in your
-        evaluation reports:
-        F1-Score: The harmonic mean of Precision and Recall. The model with the highest macro-averaged F1-Score across
-        all 12 classes is your true winner.
+        Calculates performance scores for all models.
         """
+        model_scores = {}
+        for model in self.models:
+            y_pred_probs = model.model.predict(model.x_test_norm)
+            model_scores[model.title] = self.calc_model_score(model.title, model.y_test_enc, y_pred_probs)
+        return model_scores
 
-        return ''
+    def pick_winner(self, model_scores: dict) -> str:
+        """
+        Identifies the winning model from a dictionary of scores.
+        """
+        if not model_scores:
+            return "No Models Evaluated"
 
+        # Find the model title with the highest performance score
+        return max(model_scores, key=model_scores.get)
 
-    def calc_model_score(self, y_true_enc, y_pred_probs, alpha=1.0, beta=1.0):
+    def calc_model_score(
+        self,
+        model_title: str,
+        y_true_enc: np.ndarray,
+        y_pred_probs: np.ndarray,
+        alpha: float = 1.0,
+        beta: float = 1.0
+    ):
         # Convert one-hot vectors to 1D integer class arrays
         y_true = np.argmax(y_true_enc, axis=1)
         y_pred = np.argmax(y_pred_probs, axis=1)
 
-        # 1. Compute Macro F1-Score (unweighted mean across all classes)
+        # Compute Macro F1-Score (unweighted mean across all classes)
         macro_f1 = f1_score(y_true, y_pred, average='macro')
 
-        # 2. Get the full confusion matrix
+        # Get the full confusion matrix
         cm = confusion_matrix(y_true, y_pred)
 
         # Calculate global False Positives and False Negatives across all classes
-        # FP: Column sums minus diagonal (predicted as class X, but wasn't)
-        # FN: Row sums minus diagonal (was class X, but predicted as something else)
         fp_count = np.sum(cm, axis=0) - np.diag(cm)
         fn_count = np.sum(cm, axis=1) - np.diag(cm)
 
         total_fp = np.sum(fp_count)
         total_fn = np.sum(fn_count)
 
-        # 3. Apply the Weighted Penalty Score formula
-        performance_score = (100 * macro_f1) - ((alpha * total_fp) + (beta * total_fn))
+        # Find out exactly how many images were tested total
+        total_samples = len(y_true)
 
-        print(f"--- Score Breakdown ---")
-        print(f"Macro F1-Score:     {macro_f1:.4f}")
-        print(f"Total False Pos:    {total_fp}")
-        print(f"Total False Neg:    {total_fn}")
-        print(f"FINAL MODEL SCORE:  {performance_score:.2f}")
+        # Calculate the percentage of data that resulted in errors
+        fp_percentage = (total_fp / total_samples) * 100
+        fn_percentage = (total_fn / total_samples) * 100
+
+        # Apply the weights to the error percentages instead of raw counts
+        macro_pct = macro_f1 * 100
+        penalty_costs = (alpha * fp_percentage) + (beta * fn_percentage)
+        performance_score = macro_pct - penalty_costs
+
+        print(f"\n--- 📊 {model_title} Score Breakdown 📊 ---")
+        print(f"Macro F1-Score:           {macro_f1:.4f}")
+        print(f"Total Test Images:        {total_samples}")
+        print(f"Total False Pos (Raw):    {total_fp} ({fp_percentage:.2f}%)")
+        print(f"Total False Neg (Raw):    {total_fn} ({fn_percentage:.2f}%)")
+        print(f"Global Macro F1 Baseline: {macro_pct:.2f}")
+        print(f"Total Penalties Applied:  -{penalty_costs:.2f}")
+        print('--------------------------------')
+        print(f"FINAL MODEL SCORE:        {performance_score:.2f}\n")
 
         return performance_score
 
@@ -87,12 +113,15 @@ class FinalReport():
             'Testing Loss': self.loss,
         })
 
-        # --- FINDINGS ----
-        show_banner('Final Report')
+        # --- Final Report --- #
+        show_banner('📈 FINAL REPORT 📉')
         print(report)
 
-        # Pick Winner
-        winning_model = self.pick_winner(report)
-        print(f'*** Winning Model is 🏆 {winning_model}. ***')
+        # --- Evaluate and Pick Winner --- #
+        all_scores = self.get_all_scores()
+        winning_title = self.pick_winner(all_scores)
+        winning_score = all_scores[winning_title]
 
-
+        show_banner('🏆 WINNING MODEL 🏆')
+        print(f'The winner is: {winning_title}')
+        print(f'Performance Score: {winning_score:.2f}')

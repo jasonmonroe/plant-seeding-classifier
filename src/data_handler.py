@@ -50,8 +50,8 @@ class DataHandler:
         labels = self._labels
         count = labels['Label'].value_counts()
 
-        print('\n--- Describing Data ---')
-        print(f'Plant Seedling Counts: {count}')
+        print('\n--- 📚 Describing Data 📚 ---')
+        print(f'🌱 Plant Seedling Counts: {count}')
         print(f'Head: {labels.head()}')
         print(f'Tail: {labels.tail()}')
         print(f'Shape: {labels.shape}')
@@ -74,7 +74,7 @@ class DataHandler:
     def describe_label(self) -> None:
         labels = self._labels
 
-        print('\n--- Describing Labels ---')
+        print('\n--- 🏷️ Describing Labels 🏷️---')
         print(f'Loaded Labels shape (Target, Y): {labels.shape}, Type: {type(labels)}')
 
         # Outputs: (batch_size, height, width, channels)
@@ -89,7 +89,7 @@ class DataHandler:
 
         img = self._images
 
-        print('\n--- Describing Image ---')
+        print('\n--- 🏞️ Describing Image 🏞 ---')
         print('Mean:', np.mean(img))
         print('Median:', np.median(img))
         print('Standard Deviation:', np.std(img))

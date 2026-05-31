@@ -33,7 +33,7 @@ class ImageHandler:
         random_index = random.randrange(len(imgs))
         random_img = imgs[random_index]
 
-        title = f'Random Image (Sample) | Index: {random_index}'
+        title = f'🏞️ Random Image (Sample) | Index: {random_index}'
         plt.figure(num=title, figsize=(5, 5))
         plt.imshow(random_img, cmap='gray')
         plt.title(title)

@@ -1,5 +1,6 @@
 # main.py
 
+import os
 import sys
 import warnings
 
@@ -27,19 +28,16 @@ from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
 def run_main_pipeline(args: dict):
 
-    # Fix warnings
-    warnings.filterwarnings('ignore')
-
     eda, all_pred, ion = args['eda'], args['all_pred'], args['ion']
 
     prog_start_time = start_timer()
     run_id = str(int(prog_start_time))[-6:]
-    print(f'----- START RUN ID: {run_id} -----\n')
+    print(f'\n----- ⏱️ START RUN ID: {run_id} ⏱️ -----')
 
     if ion:
         plt.ion()
 
-    show_banner('📚 Plant Seedling Classifier 📚')
+    show_banner('🌱 Plant Seedling Classifier 🌱')
     print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
@@ -52,7 +50,7 @@ def run_main_pipeline(args: dict):
     image_handle = ImageHandler(images, image_width, image_height, image_channels)
 
     # Check for NaN values
-    print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
+    print(f'\n❗ There are {np.isnan(images).sum()} NaN values in the dataset. ❗\n')
 
     image_handle.show_random_image(images)
 
@@ -277,7 +275,6 @@ def run_main_pipeline(args: dict):
 
     # --- Final Report Results --- #
     final = FinalReport([base_model, data_augment_model, tl_model])
-    #final = FinalReport([tl_model])
     final.results()
 
     """
@@ -326,7 +323,7 @@ def run_main_pipeline(args: dict):
     """
 
     show_timer(prog_start_time)
-    print(f'----- END RUN ID: {run_id} -----\n')
+    print(f'----- ⏱️ END RUN ID: {run_id} ⏱️ -----\n')
 
 def parse_args(command_line_args: list[str]) -> dict:
     """
@@ -343,12 +340,18 @@ def parse_args(command_line_args: list[str]) -> dict:
     creation without halting the underlying Python execution thread.
     """
     args_list = ['--eda', '--all_pred', '--ion']
+
     return {arg.strip('--'): (arg in command_line_args) for arg in args_list}
 
 
 # --- Start Program --- #
 if __name__ == '__main__':
     try:
+
+        # Fix warnings
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Suppresses Info, Warning, and Error logs
+        warnings.filterwarnings('ignore')
+
         args = parse_args(sys.argv[1:])
         run_main_pipeline(args)
     except KeyboardInterrupt:

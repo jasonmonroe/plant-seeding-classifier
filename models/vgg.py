@@ -1,4 +1,5 @@
 # vgg.py
+
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
@@ -19,14 +20,16 @@ class VggModel(CnnModel):
         self._base = self._create_base_model()
 
         self._base.trainable = True # False
+        print('\n--- 🧯 Freezing Layers ---')
         for layer in self._base.layers[:-4]:
+            print(f' -> 🧯 Freezing: {layer.name}')
             layer.trainable = False
 
         # Construct the final Functional Model
         self._create()
 
     def _create_base_model(self) -> VGG16:
-        print(f'\n--- 🪄 Creating {self.title} ---')
+        print(f'\n--- 🖥️ Creating {self.title} ---')
 
         return VGG16(
             weights='imagenet',

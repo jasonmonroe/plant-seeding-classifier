@@ -45,7 +45,7 @@ class DataAugmentedModel(CnnModel):
         self._create()
 
     def _create(self) -> None:
-        print(f'\n--- 🪄 Creating {self.title} ---')
+        print(f'\n--- 🖥️ Creating {self.title} ---')
 
         self.model = Sequential([
 

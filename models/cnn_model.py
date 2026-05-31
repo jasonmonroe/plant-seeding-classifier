@@ -168,11 +168,14 @@ class CnnModel(Modeler):
     def calc_performance(self) -> None:
         self.training_perf = self.get_model_performance_classification(self.model, self.x_train_norm, self.y_train_enc)
 
+        print(f'\n--- {self.title} Training Performance ---')
+        print(self.training_perf)
+
     def get_predictions(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         self.y_train_pred = self.model.predict(self.x_train_norm)
         self.y_test_pred = self.model.predict(self.x_test_norm)
-        self.y_test_true_labels = np.argmax(self.y_test_enc, axis=1)
-        
+        self.y_test_true_labels = np.argmax(self.y_test_enc, axis=1) # @todo - normalized?
+
         return self.y_train_pred, self.y_test_pred, self.y_test_true_labels
 
     def show_results(self) -> None:
@@ -181,6 +184,7 @@ class CnnModel(Modeler):
         self.print_classification_report(self.model, self.x_test_norm, self.y_test_enc)
 
     def show_history(self) -> None:
+        return None
         # Show plot history for accuracy, loss
         show_plot_history(self.history, self.title, 'accuracy')
         show_plot_history(self.history, self.title, 'loss')
@@ -229,7 +233,7 @@ class CnnModel(Modeler):
 
         return df_perform
 
-    def run(self, datagen: ImageDataGenerator=None, show_all: bool=False) -> None:
+    def run(self, datagen: ImageDataGenerator=None) -> None:
         """
         Run each model in a sequence:
         - Compile model
@@ -241,11 +245,11 @@ class CnnModel(Modeler):
         - Get the predictions
         - Show all the results
         """
-        print(f'\nRunning {self.title}...')
+        print(f'\n--- Running {self.title} ---')
 
         self.compile()
         self.show_summary()
-        show_banner(self.title, 'Fitting Training Model')
+        show_banner(self.title, '- Fitting Training Model -')
 
         start_time = start_timer()
         if datagen is None:
@@ -258,4 +262,4 @@ class CnnModel(Modeler):
         self.evaluate()
         self.calc_performance()
         self.get_predictions()
-        self.show_results(show_all)
+        self.show_results()

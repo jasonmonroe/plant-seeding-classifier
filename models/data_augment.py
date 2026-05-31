@@ -26,11 +26,14 @@ from src.config import (
 
 
 class DataAugmentedModel(CnnModel):
-    def __init__(self, params, dataset):
+    """
+
+    """
+    def __init__(self, image_params, dataset: dict):
         super().__init__(dataset=dataset)
 
         self.title = 'Data Augmented CNN Model'
-        self.image_params = params
+        self.image_params = image_params
         
         # Using the legacy Adam optimizer is required on macOS to avoid 
         # "Could not interpret optimizer identifier" errors when using custom learning rates.
@@ -38,7 +41,7 @@ class DataAugmentedModel(CnnModel):
         self._create()
 
     def _create(self) -> None:
-         print(f'\n* Creating {self.title} *')
+         print(f'\n--- Creating {self.title} ---')
          self.model = Sequential([
 
              # --- Block 1 ---

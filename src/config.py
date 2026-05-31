@@ -26,6 +26,7 @@ HALF_DATA_SPLIT = 0.5
 
 # Image Data
 IMAGE_CHANNELS = 3
+IMAGE_NORMALIZED = 1 # image normalization max value
 IMAGE_PX_MAX = 255.0
 IMAGE_ROWS = IMAGE_COLS = 4
 

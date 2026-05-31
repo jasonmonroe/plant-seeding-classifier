@@ -12,11 +12,13 @@ from tensorflow.keras.layers import (
 )
 
 from models.cnn_model import CnnModel
-from src.config import DROPOUT_RATE, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SM_CNT
+from src.config import (
+    DROPOUT_RATE, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SM_CNT
+)
 
 
 class BaseModel(CnnModel):
-    def __init__(self, image_params, dataset):
+    def __init__(self, image_params: tuple[int, int, int], dataset: dict):
         super().__init__(dataset=dataset)
 
         self.title = 'CNN Base Model'
@@ -25,7 +27,7 @@ class BaseModel(CnnModel):
         self._create()
 
     def _create(self) -> None:
-        print(f'\n* Creating {self.title} *')
+        print(f'\n--- Creating {self.title} ---')
         self.model = Sequential([
             # --- Convolution Block 1 ---
             Conv2D(SM_CNT, KERNEL_SIZE_MED, activation='relu', padding='same', input_shape=self.image_params),

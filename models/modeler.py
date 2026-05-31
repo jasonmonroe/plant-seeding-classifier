@@ -165,7 +165,7 @@ class Modeler:
         )
 
         # === DEBUG: ENCODER MATCH CHECK ===
-        print("--- Verification: Encoding Matrix Sync ---")
+        print("### DEBUG: Verification: Encoding Matrix Sync ###")
         # Pick 3 arbitrary rows relative to the CURRENT data size to trace
         data_len = len(y_data_flat)
         sample_indices = [0, data_len // 2, data_len - 1] if data_len > 0 else []
@@ -180,10 +180,14 @@ class Modeler:
             print(f"  -> Original String: {raw_string_label}")
             print(f"  -> One-Hot Vector Index: {encoded_integer}")
         print("===========================================")
+        # === DEBUG: ENCODER MATCH CHECK ===
 
         return encoded_result
 
     def normalize(self) -> None:
+        """
+
+        """
         self.x_train_norm = self.x_train.astype('float32') / IMAGE_PX_MAX
         self.x_test_norm = self.x_test.astype('float32') / IMAGE_PX_MAX
         self.x_val_norm = self.x_val.astype('float32') / IMAGE_PX_MAX

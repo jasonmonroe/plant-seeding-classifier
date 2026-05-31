@@ -86,8 +86,9 @@ class ImageHandler:
         return bgr_images
 
     def show_random_cv2_image(self) -> None:
-
         # Using cv2_imshow to display the image
+        print('Showing random CV2 image...')
+
         img = random.choice(self._images)
         title = 'Random Image (OpenCV Display)'
         plt.figure(num=title, figsize=(5, 5))
@@ -122,9 +123,9 @@ class ImageHandler:
 
     def get_resized_images(self, imgs: np.ndarray, reduced_img_dims: Tuple[int, int]) -> np.ndarray:
         # Accept reduced_img_dims as (Height, Width) without channels to avoid cv2 interpolation warnings
-        h, w = reduced_img_dims[0], reduced_img_dims[1]
+        self.height, self.weight = reduced_img_dims[0], reduced_img_dims[1]
 
-        return np.array([cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR) for img in imgs])
+        return np.array([cv2.resize(img, (self.weight, self.height), interpolation=cv2.INTER_LINEAR) for img in imgs])
         #return resized_images
 
     def get_resized_images_2(self, imgs: np.ndarray, reduced_img_dims: Tuple[int, int, int]) -> list:
@@ -167,7 +168,7 @@ class ImageHandler:
         images, labels = next(train_generator)
 
         # Initialize subplots with the desired window title (num) and size directly
-        fig, axes = plt.subplots(4, 4, figsize=(12, 12), num="Plant Seedling Labeled Image Batch")
+        fig, axes = plt.subplots(4, 4, figsize=(12, 12), num='Labeled Plant Seedling Image Batch')
 
         keys = dict(enumerate(encoder.classes_))
 

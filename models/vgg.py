@@ -9,11 +9,11 @@ from src.config import LG_CNT, IMAGE_CHANNELS
 
 # @link https://keras.io/api/applications/vgg/vgg_models
 class VggModel(CnnModel):
-    def __init__(self, dataset: dict):
+    def __init__(self, image_params, dataset: dict):
         super().__init__(dataset=dataset)
 
         self.title = 'VGG16 Model'
-        self.image_params = (LG_CNT, LG_CNT, IMAGE_CHANNELS)
+        self.image_params = image_params
 
         # Initialize the base VGG16 model
         self._base = self._create_base_model()
@@ -25,7 +25,7 @@ class VggModel(CnnModel):
         self._create(self._get_head_output())
 
     def _create_base_model(self):
-        print(f'\n* Creating {self.title} *')
+        print(f'\n--- Creating {self.title} ---')
 
         return VGG16(
             weights='imagenet',
@@ -34,6 +34,7 @@ class VggModel(CnnModel):
         )
 
     def _create(self, head_output: Dense) -> Model:
+        print('line 37: vgg.py')
         self.model = Model(
             inputs=self._base.input,
             outputs=head_output,

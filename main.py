@@ -13,7 +13,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 # Local Source Files
 from models.base import BaseModel
 from models.cnn_model import CnnModel
-from models.data_augm import DataAugmentedModel
+from models.data_augment import DataAugmentedModel
 from models.transfer_learning import TransferLayerModel
 from models.vgg import VggModel
 
@@ -24,72 +24,78 @@ from src.final_report import FinalReport
 from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
 
-def run_main_pipeline():
+def run_main_pipeline(args: dict):
 
     # Fix warnings
     warnings.filterwarnings('ignore')
 
-    id = str(start_timer())[-6:]
-    print(f'\nStart Run ID: {id}')
-    print('')
-    show_banner('Plant Seedling Classifier')
+    eda = args['eda'] or False
+    all_pred = args['all_pred'] or False
+    print(f'\n### DEBUG: eda={eda}, all_pred={all_pred} ###\n')
 
-    print("Number of GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
+
+    id = str(start_timer())[-6:]
+    print(f'----- START RUN ID: {id} -----\n')
+
+    prog_start_time = start_timer()
+    show_banner('Plant Seedling Classifier')
+    print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
     plant = DataHandler()
-    # @todo - plant.describe_data()
-    # @todo - plant.describe_label()
     df_labels = plant.get_labels()
 
-    print('Image Information')
+    # Get image information
     image_width, image_height, image_channels = plant.describe_images()
     images = plant.get_images()
-
-    # Randomly sample pixel data
     image_handle = ImageHandler(images, image_width, image_height, image_channels)
-    # @todo - image_handle.show_random_image(images)
-
-    # Plot histogram to check distribution
-    # @todo - show_plot_histogram(images)
-
-    """
-    Most of the pixels RGB values are between 50-100 with the peak around 75.  This means most of the image data and 
-    value is in the middle.
-    """
 
     # Check for NaN values
-    # @todo - print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
+    print(f'There are {np.isnan(images).sum()} NaN values in the dataset.')
 
-    # Perform Exploratory Data Analysis
+    # @todo - image_handle.show_random_image(images)
 
-    # Plot images like a grid.
-    # @todo - image_handle.show_raw_images(df_labels.values.ravel())
+    # --- Perform Exploratory Data Analysis --- #
+    if eda:
+        pass
 
-    # Label barplot with label
-    # @todo - show_labeled_barplot(df_labels, 'Label', perc=True)
+        # @todo - plant.describe_data()
+        # @todo - plant.describe_label()
 
-    """
-    Observations:
-    These are the 12 labels of images.  
-    
-    1. Data is not even.  Some labels are less than others meaning there are fewer types of plants in the sample set.
-    2. If all labels were even the average would be 8.3% a piece.  Anything over is over represented.  Anything under 
-    is under represented.
-    3. Charlock is the closest label to the average.
-    4. Loose Silky-Ben has the most labels with 13.8%.
-    5. Maize and Common wheat are tied for last at 4.7%.
-    """
-    
-    # eda.py 
-    # @todo - show_plant_species_dist(df_labels)
+        # Plot histogram to check distribution
+        # @todo - show_plot_histogram(images)
 
-    # Data Pre-Processing - Convert the BGR images to RGB images.
+        """
+        Most of the pixels RGB values are between 50-100 with the peak around 75.  This means most of the image data and 
+        value is in the middle.
+        """
+
+        # Plot images like a grid.
+        # @todo - image_handle.show_raw_images(df_labels.values.ravel())
+
+        # Label barplot with label
+        # @todo - show_labeled_barplot(df_labels, 'Label', perc=True)
+
+        """
+        Observations:
+        These are the 12 labels of images.  
+        
+        1. Data is not even.  Some labels are less than others meaning there are fewer types of plants in the sample set.
+        2. If all labels were even the average would be 8.3% a piece.  Anything over is over represented.  Anything under 
+        is under represented.
+        3. Charlock is the closest label to the average.
+        4. Loose Silky-Ben has the most labels with 13.8%.
+        5. Maize and Common wheat are tied for last at 4.7%.
+        """
+
+        # @todo - show_plant_species_dist(df_labels)
+
+
+    # Data Pre-Processing - Convert the BGR images to RGB images then convert BGR to RGB.
     # First, we will display the image as it is imported which means in BGR format.
     # @todo - image_handle.show_random_cv2_image()
-    bgr_images = image_handle.create_bgr_images()
 
-    # Now to convert BGR to RGB
+    bgr_images = image_handle.create_bgr_images()
     rgb_images = image_handle.convert_to_rgb(bgr_images)
 
     """
@@ -101,15 +107,18 @@ def run_main_pipeline():
     Note: Your scores will reduce if you lower image size. So it's your choice.
     You can reduce the image in half but for now we will keep same size due to original images having a small filesize.
     """
-    reduce_by = 1 # Note: was 2
+    reduce_by = 1 # Note: value was 2 (half)
     resized_img_dims = image_handle.get_resized_img_dims(reduce_by)
     resized_images = image_handle.get_resized_images(rgb_images, resized_img_dims)
 
     # Random resized image to be shown...
+    print('Confirming if (random) image has been resized...')
     # @todo - image_handle.show_random_image(resized_images)
 
-    # Create the 3D shape tuple (Height, Width, Channels) for the models
+    # Create the 3D shape tuple (Height, Width, Channels) for the models.
     image_params = resized_img_dims + (image_channels,)
+
+    print(f'Data type of resized image_params: {type(image_params)}')
    
     """
     Data Preparation for Modeling
@@ -119,17 +128,13 @@ def run_main_pipeline():
     - You will build a model using the train data and then check its performance
     """
 
-    # ==========================================
-    #  DATA PREPARATION FOR MODELING (CORRECT)
-    # ==========================================
-    prog_start_time = start_timer()
+    # --- Data preparation for modeling ---
 
-    # 1. Split the raw image matrices and target series
+    # Split the raw image matrices and target series
     dataset = plant.split_data(resized_images)
 
 
-
-    # === INSERT THIS DIAGNOSTIC CHECK IN main.py ===
+    # === DEBUG: INSERT THIS DIAGNOSTIC CHECK IN main.py ===
     print("\n==================================================")
     print("       CRITICAL SPLIT ALIGNMENT CHECK             ")
     print("==================================================")
@@ -151,6 +156,7 @@ def run_main_pipeline():
         # Pop up the image so you can visually verify it
         import matplotlib.pyplot as plt
         plt.figure(figsize=(2, 2))
+
         # Handle both normalized and raw scale safely
         if np.max(raw_x_img) <= 1.0:
             plt.imshow((raw_x_img * 255).astype('uint8'))
@@ -160,42 +166,43 @@ def run_main_pipeline():
         plt.axis('off')
         plt.show()
     print("==================================================\n")
+    # === DEBUG: INSERT THIS DIAGNOSTIC CHECK IN main.py ===
 
     # Exit early so you don't have to wait 5 minutes for training to fail
     #sys.exit(0)
 
 
-
-
-    # 2. Fit the LabelEncoder globally on the raw label series.
-    # This automatically creates a internal alphabetical lookup index map.
+    # Fit the LabelEncoder globally on the raw label series. This automatically creates a internal alphabetical lookup
+    # index map.
     _encoder = LabelEncoder()
     _encoder.fit(df_labels['Label'])
 
-    # 3. Extract the exact list of string classes directly from the encoder.
+    # Extract the exact list of string classes directly from the encoder.
     # This guarantees that index 0 in the text array matches index 0 in the one-hot array.
     plant_species = list(_encoder.classes_)
 
-    # 4. Lock them securely into the initial dataset dictionary configuration
+    # Lock them securely into the initial dataset dictionary configuration.
     dataset['plant_species'] = plant_species
     dataset['_encoder'] = _encoder
 
-    # 5. Instantiate your processor instance to encode (one-hot) and normalize arrays
+    # Instantiate your processor instance to encode (one-hot) and normalize arrays.
     cnn = CnnModel(dataset)
     cnn.encode_data()
     cnn.normalize()
 
-    # 6. Build the safe runtime payload by merging the processed array dictionaries
+    # Build the safe runtime payload by merging the processed array dictionaries.
     proc_dataset = cnn.get_proc_dataset()
-    merged_dataset = {**dataset, **proc_dataset}
-    #dataset |= cnn.get_proc_dataset()
-    #print(f'Merged Dataset: {merged_dataset}')
+    dataset = {**dataset, **proc_dataset}
+    #print(f'Merged Dataset: {dataset}')
+    #print(f'dataset["x_train_norm"]={dataset["x_train_norm"]}')
+    #sys.exit(0)
 
-    # --- Build Models --- #
+    # --- BUILD MODELS --- #
 
     # Base Model
-    base_model = BaseModel(image_params, merged_dataset)
+    base_model = BaseModel(image_params, dataset)
     # @todo - base_model.run()
+
 
     """
     Observations:
@@ -247,19 +254,20 @@ def run_main_pipeline():
     to artificially increase the size and diversity of your training data without collecting new physical images.
     """
 
-    # Data Augmented CNN Model
-    data_augm_model = DataAugmentedModel(image_params, merged_dataset)
 
+    # Get training data generator and build it for performance
     # Augment the data without using validation or test data.  Only training data.
     # The rescale=1./IMAGE_PX_MAX is removed as data is already normalized.
     train_datagen = image_handle.get_train_generator()
     train_generator = image_handle.build_generator(
         train_datagen,
-        data_augm_model.x_train_norm,
-        data_augm_model.y_train_enc
+        dataset['x_train_norm'],
+        dataset['y_train_enc']
     )
 
-    #@todo - data_augm_model.run(train_datagen)
+    # Data Augmented CNN Model
+    data_augment_model = DataAugmentedModel(image_params, dataset)
+    # @todo - data_augment_model.run(train_datagen)
 
     """
     "The training accuracy starts low and increases, but the final score is much lower than the $90% seen in the Base 
@@ -303,15 +311,13 @@ def run_main_pipeline():
     each epoch.
     """
 
-    # VGG Model
-    # Pass the processed dataset so VggModel() can configure its output layers.
-    vgg_model = VggModel(merged_dataset)
+    # VGG16 Model - Pass the processed dataset so VggModel() can configure its output layers.
+    vgg_model = VggModel(image_params, dataset)
     vgg_model.show_summary()
 
     # Transfer Learning Model
-    show_all = False
-    tl_model = TransferLayerModel(vgg_model, merged_dataset)
-    tl_model.run(train_datagen, show_all)
+    tl_model = TransferLayerModel(vgg_model, dataset, eda=eda, all_pred=all_pred)
+    tl_model.run(train_datagen)
 
     """
     Observations:
@@ -325,25 +331,16 @@ def run_main_pipeline():
     5. The training accuracy is not enough to evaluate the model's performance.
     """
 
-    image_handle.show_augmented_image_batch(train_generator, _encoder)
+    if eda:
+        image_handle.show_augmented_image_batch(train_generator, _encoder)
 
-    # @todo - models = [base_model, data_augm_model, tl_model]
-    models = [tl_model]
-
-    # --- Print Model Performance --- #
-    for model in models:
-        print(f'{model.title} Training Performance')
-        print(model.training_perf)
-
-    # --- Final Results --- #
-    final = FinalReport(models)
-    final.output_report()
-
-    print("\n--- End of Program ---")
-    show_timer(prog_start_time)
+    # --- Final Report Results --- #
+    # @todo - final = FinalReport([base_model, data_augment_model, tl_model])
+    final = FinalReport([tl_model])
+    final.results()
 
     """
-    ### Model Performance Analysis
+    Model Performance Analysis
 
     1. CNN Base Model (Baseline)
        - Metrics: 59.58% Accuracy | 1.1469 Loss
@@ -387,12 +384,21 @@ def run_main_pipeline():
     improve crop yield by enabling early-stage weed detection.
     """
 
-    print(f'Start Run ID: {id}\n')
+    # check encoder
+    if _encoder == dataset['_encoder'] and _encoder == base_model._encoder and _encoder == data_augment_model._encoder and _encoder == tl_model._encoder:
+            print("DEBUG: _encoder are all the same for each model!")
+
+    show_timer(prog_start_time)
+    print(f'----- END RUN ID: {id} -----\n')
+
 
 # --- Start Program --- #
 if __name__ == '__main__':
     try:
-        run_main_pipeline()
+        # Arguments: display_eda? show all predictions?
+        # python main.py --eda --all_pred
+        arg_inputs = {'eda': False, 'all_pred': False}
+        run_main_pipeline(arg_inputs)
     except KeyboardInterrupt:
         print("\nProcess interrupted by user.  Exiting...")
         sys.exit(0)

@@ -50,6 +50,7 @@ class DataHandler:
 
         count = labels['Label'].value_counts()
 
+        print('--- Describing Data ---')
         print(f'Plant Seedling Counts: {count}')
         print(f'Head: {labels.head()}')
         print(f'Tail: {labels.tail()}')
@@ -73,6 +74,8 @@ class DataHandler:
 
     def describe_label(self) -> None:
         labels = self._labels
+
+        print('--- Describing Labels ---')
         print(f"Loaded Labels shape (Target, Y): {labels.shape}, Type: {type(labels)}")
 
         # Outputs: (batch_size, height, width, channels)
@@ -87,13 +90,14 @@ class DataHandler:
 
         img = self._images
 
+        print('--- Describing Image ---')
         print('Mean:', np.mean(img))
         print('Median:', np.median(img))
         print('Standard Deviation:', np.std(img))
         print('Minimum:', np.min(img))
         print('Maximum:', np.max(img))
 
-        print("Print the first element")
+        print('Printing the first element')
         print(img[:1])  # Print the first element
 
         print(f"Loaded Images shape (Features, X): {img.shape}, Type: {type(img)}")
@@ -108,9 +112,9 @@ class DataHandler:
 
     def split_data(self, features: np.ndarray) -> dict:
         """
-        # ===========================================
-        #  CREATE TRAINING, VALIDATION, TESTING DATA
-        # ===========================================
+        -------------------------------------------
+         CREATE TRAINING, VALIDATION, TESTING DATA
+        -------------------------------------------
         https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
 
         Training Data ~ 80%
@@ -124,7 +128,6 @@ class DataHandler:
         # Ensure features is a numpy array for efficient slicing and processing
         if not isinstance(features, np.ndarray):
             features = np.array(features)
-
         target = self._labels['Label'].to_numpy()
 
         # Defensive Assertion Check: Ensure absolute size alignment
@@ -149,7 +152,7 @@ class DataHandler:
         )
 
         # Printing the shapes
-        print('\nData Shapes')
+        print('--- (Split) Data Shapes ---')
         print(f'Shape of X training: {x_train.shape}')
         print(f'Shape of Y training: {y_train.shape}')
         print(f'Shape of X validation: {x_val.shape}')
@@ -157,12 +160,12 @@ class DataHandler:
         print(f'Shape of X testing: {x_test.shape}')
         print(f'Shape of Y testing: {y_test.shape}')
 
-        print('\nData Types')
+        print('---(Split) Data Types ---')
         print(f'Data type of X training: {x_train.dtype}')
         print(f'Data type of Y training: {y_train.dtype}')
 
         # === DEBUG: RAW DATA LOADING ALIGNMENT ===
-        print("--- Verification: Initial Loading Alignment ---")
+        print("### DEBUG: Verification: Initial Loading Alignment ###")
         for i in [0, 1, 2, -3, -2, -1]: # Check first 3 and last 3 items
             # Adjust 'filename_column' to match your DataFrame's image path column
             print(f"Index {i} -> File: {self._labels.iloc[i]} | Label: {self._labels.iloc[i]['Label']}")
@@ -170,7 +173,8 @@ class DataHandler:
             # If features are loaded, print statistics of the loaded array at index i
             if 'features' in locals() or 'features' in globals():
                 print(f"      -> Array Shape: {features[i].shape} | Mean Pixel: {features[i].mean():.4f}")
-        print("===========================================")
+        print("### =========================================== ####")
+        # === DEBUG: RAW DATA LOADING ALIGNMENT ===
 
         return {
             'x_train': x_train,
@@ -180,7 +184,3 @@ class DataHandler:
             'x_test': x_test,
             'y_test': y_test
         }
-
-
-
-

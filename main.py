@@ -276,8 +276,8 @@ def run_main_pipeline(args: dict):
         image_handle.show_augmented_image_batch(train_generator, _encoder)
 
     # --- Final Report Results --- #
-    # @todo - final = FinalReport([base_model, data_augment_model, tl_model])
-    final = FinalReport([tl_model])
+    final = FinalReport([base_model, data_augment_model, tl_model])
+    #final = FinalReport([tl_model])
     final.results()
 
     """

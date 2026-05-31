@@ -46,6 +46,38 @@ class FinalReport():
 
         return ''
 
+
+    def calc_model_score(self, y_true_enc, y_pred_probs, alpha=1.0, beta=1.0):
+        # Convert one-hot vectors to 1D integer class arrays
+        y_true = np.argmax(y_true_enc, axis=1)
+        y_pred = np.argmax(y_pred_probs, axis=1)
+
+        # 1. Compute Macro F1-Score (unweighted mean across all classes)
+        macro_f1 = f1_score(y_true, y_pred, average='macro')
+
+        # 2. Get the full confusion matrix
+        cm = confusion_matrix(y_true, y_pred)
+
+        # Calculate global False Positives and False Negatives across all classes
+        # FP: Column sums minus diagonal (predicted as class X, but wasn't)
+        # FN: Row sums minus diagonal (was class X, but predicted as something else)
+        fp_count = np.sum(cm, axis=0) - np.diag(cm)
+        fn_count = np.sum(cm, axis=1) - np.diag(cm)
+
+        total_fp = np.sum(fp_count)
+        total_fn = np.sum(fn_count)
+
+        # 3. Apply the Weighted Penalty Score formula
+        performance_score = (100 * macro_f1) - ((alpha * total_fp) + (beta * total_fn))
+
+        print(f"--- Score Breakdown ---")
+        print(f"Macro F1-Score:     {macro_f1:.4f}")
+        print(f"Total False Pos:    {total_fp}")
+        print(f"Total False Neg:    {total_fn}")
+        print(f"FINAL MODEL SCORE:  {performance_score:.2f}")
+
+        return performance_score
+
     def results(self) -> None:
         report = pd.DataFrame({
             'Models': self.model_titles,

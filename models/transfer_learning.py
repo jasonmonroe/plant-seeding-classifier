@@ -43,7 +43,7 @@ class TransferLayerModel(CnnModel):
     Leverages pre-trained ImageNet feature weights from a frozen VGG16 base
     to accurately classify target plant seedling images.
     """
-    def __init__(self, vgg16_model: VggModel, dataset: dict, eda: bool = False, all_pred: bool = False):
+    def __init__(self, vgg16_model: VggModel, dataset: dict, eda: bool, all_pred: bool):
         super().__init__(dataset=dataset)
 
         self.title = 'Transfer Learning Model'

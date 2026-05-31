@@ -1,5 +1,5 @@
 # vgg.py
-
+import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 from tensorflow.keras.applications.vgg16 import VGG16
@@ -15,41 +15,37 @@ class VggModel(CnnModel):
         self.title = 'VGG16 Model'
         self.image_params = image_params
 
-        # Initialize the base VGG16 model
+        # Initialize the base VGG16 model and lock pre-trained weights by default
         self._base = self._create_base_model()
+        self._base.trainable = True # False
+        for layer in self._base.layers[:-4]:
+            layer.trainable = False
 
-        # This locks the 14.7 million parameters so they don't update during training
-        self._base.trainable = False
+        # Construct the final Functional Model
+        self._create()
 
-        # Build the final model by connecting the VGG base to the custom head
-        self._create(self._get_head_output())
-
-    def _create_base_model(self):
+    def _create_base_model(self) -> VGG16:
         print(f'\n--- Creating {self.title} ---')
-
         return VGG16(
             weights='imagenet',
             include_top=False,
             input_shape=self.image_params,
         )
 
-    def _create(self, head_output: Dense) -> Model:
-        print('line 37: vgg.py')
+    def _create(self) -> None:
+        # Connect the 4D output of VGG to the 2D classification head
+        head_input = GlobalAveragePooling2D()(self._base.output)
+        head_output = Dense(
+            units=self.plant_species_cnt,
+            activation='softmax',
+            name='species_projection'
+        )(head_input)
+
         self.model = Model(
             inputs=self._base.input,
             outputs=head_output,
             name='vgg16_classifier'
         )
-
-    def _get_head_input(self):
-        # Takes the 4D output tensor from VGG16 and flattens it via pooling
-        return GlobalAveragePooling2D()(self._base.output)
-
-    def _get_head_output(self) -> Dense:
-        return Dense(
-            units=self.plant_species_cnt,
-            activation='softmax'
-            )(self._get_head_input())
 
     def get_base(self) -> VGG16:
         return self._base

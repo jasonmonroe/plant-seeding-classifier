@@ -98,9 +98,9 @@ class DataHandler:
         print('Maximum:', np.max(img))
 
         print('Printing the first element')
-        print(img[:1])  # Print the first element
+        #print(img[:1])  # Print the first element
 
-        print(f"Loaded Images shape (Features, X): {img.shape}, Type: {type(img)}")
+        print(f"\nLoaded Images shape (Features, X): {img.shape}, Type: {type(img)}")
         print(img.shape)
 
         print(f'Total number of images: {img.shape[0]}')
@@ -142,7 +142,7 @@ class DataHandler:
             stratify=target
         )
 
-        # --- Then take remaining temporary data 30% and split in half --- #
+        # --- Next, take remaining temporary data 30% and split in half --- #
         x_val, x_test, y_val, y_test = train_test_split(
             x_temp,
             y_temp,
@@ -151,6 +151,7 @@ class DataHandler:
             stratify=y_temp
         )
 
+        """
         # Printing the shapes
         print('--- (Split) Data Shapes ---')
         print(f'Shape of X training: {x_train.shape}')
@@ -175,6 +176,7 @@ class DataHandler:
                 print(f"      -> Array Shape: {features[i].shape} | Mean Pixel: {features[i].mean():.4f}")
         print("### =========================================== ####")
         # === DEBUG: RAW DATA LOADING ALIGNMENT ===
+        """
 
         return {
             'x_train': x_train,

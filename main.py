@@ -6,6 +6,7 @@ import warnings
 import numpy as np
 
 # TensorFlow and Keras libraries
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -26,20 +27,21 @@ from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
 def run_main_pipeline(args: dict):
 
+    # Sets the global behavior for the entire run.
+    plt.ion()
+
     # Fix warnings
     warnings.filterwarnings('ignore')
 
-    eda = args['eda'] or False
-    all_pred = args['all_pred'] or False
+    eda, all_pred = args['eda'], args['all_pred']
     print(f'\n### DEBUG: eda={eda}, all_pred={all_pred} ###\n')
-
-
-    id = str(start_timer())[-6:]
+    #sys.exit(0)
+    id = str(int(start_timer()))[-6:]
     print(f'----- START RUN ID: {id} -----\n')
 
     prog_start_time = start_timer()
     show_banner('Plant Seedling Classifier')
-    print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
+    #print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
     plant = DataHandler()
@@ -57,13 +59,11 @@ def run_main_pipeline(args: dict):
 
     # --- Perform Exploratory Data Analysis --- #
     if eda:
-        pass
+        plant.describe_data()
+        plant.describe_label()
 
-        # @todo - plant.describe_data()
-        # @todo - plant.describe_label()
-
-        # Plot histogram to check distribution
-        # @todo - show_plot_histogram(images)
+        # Plot histogram to check distribution.
+        show_plot_histogram(images)
 
         """
         Most of the pixels RGB values are between 50-100 with the peak around 75.  This means most of the image data and 
@@ -71,10 +71,10 @@ def run_main_pipeline(args: dict):
         """
 
         # Plot images like a grid.
-        # @todo - image_handle.show_raw_images(df_labels.values.ravel())
+        image_handle.show_raw_images(df_labels.values.ravel())
 
-        # Label barplot with label
-        # @todo - show_labeled_barplot(df_labels, 'Label', perc=True)
+        # Label barplot with label.
+        show_labeled_barplot(df_labels, 'Label', perc=True)
 
         """
         Observations:
@@ -88,7 +88,7 @@ def run_main_pipeline(args: dict):
         5. Maize and Common wheat are tied for last at 4.7%.
         """
 
-        # @todo - show_plant_species_dist(df_labels)
+        show_plant_species_dist(df_labels)
 
 
     # Data Pre-Processing - Convert the BGR images to RGB images then convert BGR to RGB.
@@ -133,10 +133,10 @@ def run_main_pipeline(args: dict):
     # Split the raw image matrices and target series
     dataset = plant.split_data(resized_images)
 
-
+    """
     # === DEBUG: INSERT THIS DIAGNOSTIC CHECK IN main.py ===
     print("\n==================================================")
-    print("       CRITICAL SPLIT ALIGNMENT CHECK             ")
+    print("       DEBUG: CRITICAL SPLIT ALIGNMENT CHECK             ")
     print("==================================================")
 
     # Grab the first 3 samples from your raw training split
@@ -167,6 +167,7 @@ def run_main_pipeline(args: dict):
         plt.show()
     print("==================================================\n")
     # === DEBUG: INSERT THIS DIAGNOSTIC CHECK IN main.py ===
+    """
 
     # Exit early so you don't have to wait 5 minutes for training to fail
     #sys.exit(0)
@@ -193,9 +194,6 @@ def run_main_pipeline(args: dict):
     # Build the safe runtime payload by merging the processed array dictionaries.
     proc_dataset = cnn.get_proc_dataset()
     dataset = {**dataset, **proc_dataset}
-    #print(f'Merged Dataset: {dataset}')
-    #print(f'dataset["x_train_norm"]={dataset["x_train_norm"]}')
-    #sys.exit(0)
 
     # --- BUILD MODELS --- #
 
@@ -317,7 +315,7 @@ def run_main_pipeline(args: dict):
 
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model, dataset, eda=eda, all_pred=all_pred)
-    tl_model.run(train_datagen)
+    tl_model.run(train_generator)
 
     """
     Observations:
@@ -391,13 +389,38 @@ def run_main_pipeline(args: dict):
     show_timer(prog_start_time)
     print(f'----- END RUN ID: {id} -----\n')
 
+def get_args(command_line_args: list[str]) -> dict:
+    """
+    Get all arguments passed via command line.
+    If `--eda` is found set `eda` to True.
+    If `--all_pred` is found set `all_pred` to True.`
+
+    Note: eda stands for Exploratory Data Analysis and will display multiple charts for understanding.
+    `all_pred` means "All Predictions".  Every image will be analyzed and predicted as opposed to four
+    random picked images used for analysis.
+    """
+
+    eda = all_pred = False
+
+    if '--eda' in command_line_args:
+        eda = True
+    if '--all_pred' in command_line_args:
+        all_pred = True
+
+    #for arg in command_line_args:
+    #    if arg == '--eda':
+    #        eda = True
+    #    elif arg == '--all_pred':
+    #        all_pred = True
+
+    return {'eda': eda, 'all_pred': all_pred}
 
 # --- Start Program --- #
 if __name__ == '__main__':
     try:
         # Arguments: display_eda? show all predictions?
         # python main.py --eda --all_pred
-        arg_inputs = {'eda': False, 'all_pred': False}
+        arg_inputs = get_args(sys.argv[1:])
         run_main_pipeline(arg_inputs)
     except KeyboardInterrupt:
         print("\nProcess interrupted by user.  Exiting...")

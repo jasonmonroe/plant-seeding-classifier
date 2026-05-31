@@ -234,6 +234,7 @@ class CnnModel(Modeler):
         return df_perform
 
     def run(self, datagen: ImageDataGenerator=None) -> None:
+        print(f'\n--- Running cnn_model:{self.title} ---')
         """
         Run each model in a sequence:
         - Compile model
@@ -245,7 +246,7 @@ class CnnModel(Modeler):
         - Get the predictions
         - Show all the results
         """
-        print(f'\n--- Running {self.title} ---')
+        #print(f'\n--- Running {self.title} ---')
 
         self.compile()
         self.show_summary()

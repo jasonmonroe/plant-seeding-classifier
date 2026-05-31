@@ -19,6 +19,7 @@ from src.config import (
     IMAGE_PX_MAX,
     IMAGE_ROWS,
     TL_LEARNING_RATE,
+    TL_FINE_TUNE_LEARNING_RATE,
     TRAINED_BATCH_SIZE,
     XXLG_CNT
 )
@@ -27,8 +28,15 @@ from src.eda import show_plot_confusion_matrix
 from src.utils import show_banner
 
 class TransferLayerModel(CnnModel):
+    """
+    Transfer Learning Model
+
+    Leverages pre-trained ImageNet feature weights from a frozen VGG16 base
+    to accurately classify target plant seedling images.
+    """
     def __init__(self, vgg16_model: VggModel, dataset: dict, eda: bool = False, all_pred: bool = False):
         super().__init__(dataset=dataset)
+
         self.title = 'Transfer Learning Model'
         self.optimizer = Adam(learning_rate=TL_LEARNING_RATE)
         self.image_params = vgg16_model.image_params
@@ -70,6 +78,7 @@ class TransferLayerModel(CnnModel):
         tensor_img = Dense(XXLG_CNT, activation='relu')(tensor_img)
         tensor_img = BatchNormalization()(tensor_img)
         tensor_img = Dropout(DROPOUT_RATE)(tensor_img)
+
         return Dense(self.plant_species_cnt, activation='softmax', name='prediction_layer')(tensor_img)
 
     def fine_tune(self, unfreeze_block: str = 'block5', fine_tune_lr: float = 5e-6) -> None:
@@ -161,7 +170,6 @@ class TransferLayerModel(CnnModel):
         return correct_cnt, show_cnt
 
     def show_results(self) -> None:
-        #predictions_correct, total = self.show_prediction_visualization()
 
         if self.eda:
             show_plot_confusion_matrix()
@@ -169,18 +177,18 @@ class TransferLayerModel(CnnModel):
         predictions_correct, total = self.show_prediction_visualization()
         pct = (predictions_correct / total) * 100
 
-        show_banner(f'{self.title} Results')
+        print(f'--- {self.title} Results ---')
         print(f'{predictions_correct} out of {total} correct.\nAccuracy: {pct:.2f}%')
 
         if predictions_correct == total:
             print('\n⭐ PREDICTOR EARNED A PERFECT SCORE!  ⭐\n')
 
-
-    def run(self, train_generator):
+    # @todo - revised version of run()
+    def run2(self, train_generator: NumpyArrayIterator):
         print(f'\n--- Running transfer_layer_model:{self.title} ---')
         self.compile()
         self.show_summary()
-        show_banner(self.title, '- Fitting Training Model -')
+        show_banner(self.title, 'Fitting Training Model...')
 
         # Fetch class weights from parent logic to handle dataset imbalance
         class_weights = self._get_class_weights()
@@ -189,29 +197,35 @@ class TransferLayerModel(CnnModel):
         print("| PHASE 1: Training Classification Head (Base Locked)   |")
         print("+-------------------------------------------------------+")
 
+        start_time = start_timer()
         history_warmup = self.model.fit(
             train_generator,
             validation_data=(self.x_val_norm, self.y_val_enc),
             epochs=10,  # Reduced warmup to prevent head-overfitting
             batch_size=TRAINED_BATCH_SIZE,
             class_weight=class_weights,
-            verbose=1
+            verbose=1,
+            callbacks=[self._reduce_lr, self._early_stopping]
         )
+        show_timer(start_time)
 
-        self.fine_tune(unfreeze_block='block5', fine_tune_lr=1e-5)
+        self.fine_tune(unfreeze_block='block5', fine_tune_lr=TL_FINE_TUNE_LEARNING_RATE)
 
         print("\n+-------------------------------------------------------+")
         print("| PHASE 2: Fine-Tuning Deep Convolutional Weights       |")
         print("+-------------------------------------------------------+")
 
+        start_time = start_timer()
         history_finetune = self.model.fit(
             train_generator,
             validation_data=(self.x_val_norm, self.y_val_enc),
             epochs=40, # Increase epochs for the deeper learning phase
             batch_size=TRAINED_BATCH_SIZE,
             class_weight=class_weights,
-            verbose=1
+            verbose=1,
+            callbacks=[self._reduce_lr, self._early_stopping]
         )
+        show_timer(start_time)
 
         # Capture the final state for the FinalReport
         self.history = history_finetune

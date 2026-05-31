@@ -27,21 +27,21 @@ from src.utils import get_plant_species, show_banner, start_timer, show_timer
 
 def run_main_pipeline(args: dict):
 
-    # Sets the global behavior for the entire run.
-    plt.ion()
-
     # Fix warnings
     warnings.filterwarnings('ignore')
 
-    eda, all_pred = args['eda'], args['all_pred']
-    print(f'\n### DEBUG: eda={eda}, all_pred={all_pred} ###\n')
-    #sys.exit(0)
-    id = str(int(start_timer()))[-6:]
-    print(f'----- START RUN ID: {id} -----\n')
+    eda, all_pred, ion = args['eda'], args['all_pred'], args['ion']
+    print(f'\n### DEBUG: eda={eda}, all_pred={all_pred}, ion={ion} ###\n')
 
     prog_start_time = start_timer()
-    show_banner('Plant Seedling Classifier')
-    #print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
+    id = str(int(prog_start_time))[-6:]
+    print(f'----- START RUN ID: {id} -----\n')
+
+    if ion:
+        plt.ion()
+
+    show_banner('* Plant Seedling Classifier *')
+    print("GPU's Available: ", len(tf.config.list_physical_devices('GPU')))
 
     # Initialize Data Handler for Plant Seedlings
     plant = DataHandler()
@@ -118,7 +118,6 @@ def run_main_pipeline(args: dict):
     # Create the 3D shape tuple (Height, Width, Channels) for the models.
     image_params = resized_img_dims + (image_channels,)
 
-    print(f'Data type of resized image_params: {type(image_params)}')
    
     """
     Data Preparation for Modeling
@@ -241,16 +240,7 @@ def run_main_pipeline(args: dict):
     Classification task, meeting your performance goals.
     """
 
-    """
-    Data Augmentation
-    
-    Note: Data augmentation should not be used in the validation/test data set.
-    
-    CNN Model with Data Augmentation
-    
-    The purpose of using a Data Augmented Model (DAM)—or more accurately, applying data augmentation during training—is 
-    to artificially increase the size and diversity of your training data without collecting new physical images.
-    """
+
 
 
     # Get training data generator and build it for performance
@@ -315,7 +305,8 @@ def run_main_pipeline(args: dict):
 
     # Transfer Learning Model
     tl_model = TransferLayerModel(vgg_model, dataset, eda=eda, all_pred=all_pred)
-    tl_model.run(train_generator)
+    tl_model.run(train_datagen) # Run original in cnn_model.run()
+    #tl_model.run2(train_generator)  # Run revised in tl_model.run2()
 
     """
     Observations:
@@ -382,46 +373,42 @@ def run_main_pipeline(args: dict):
     improve crop yield by enabling early-stage weed detection.
     """
 
-    # check encoder
-    if _encoder == dataset['_encoder'] and _encoder == base_model._encoder and _encoder == data_augment_model._encoder and _encoder == tl_model._encoder:
-            print("DEBUG: _encoder are all the same for each model!")
-
     show_timer(prog_start_time)
     print(f'----- END RUN ID: {id} -----\n')
 
 def get_args(command_line_args: list[str]) -> dict:
     """
     Get all arguments passed via command line.
-    If `--eda` is found set `eda` to True.
-    If `--all_pred` is found set `all_pred` to True.`
 
-    Note: eda stands for Exploratory Data Analysis and will display multiple charts for understanding.
+    If `--eda` is found, set `eda` to True.
+    If `--all_pred` is found, set `all_pred` to True.
+    If `--ion` is found, set `ion` to True.
+
+    Note: `eda` stands for Exploratory Data Analysis and will display multiple charts for understanding.
     `all_pred` means "All Predictions".  Every image will be analyzed and predicted as opposed to four
     random picked images used for analysis.
+    `ion` stands for "Interactive Mode On." # (Interactive Mode On) tells Matplotlib to draw windows immediately upon
+    creation without halting the underlying Python execution thread.
     """
-
-    eda = all_pred = False
+    ion = eda = all_pred = False
 
     if '--eda' in command_line_args:
         eda = True
+
     if '--all_pred' in command_line_args:
         all_pred = True
 
-    #for arg in command_line_args:
-    #    if arg == '--eda':
-    #        eda = True
-    #    elif arg == '--all_pred':
-    #        all_pred = True
+    if '--ion' in command_line_args:
+        ion = True
 
-    return {'eda': eda, 'all_pred': all_pred}
+    return {'eda': eda, 'all_pred': all_pred, 'ion': ion}
+
 
 # --- Start Program --- #
 if __name__ == '__main__':
     try:
-        # Arguments: display_eda? show all predictions?
-        # python main.py --eda --all_pred
-        arg_inputs = get_args(sys.argv[1:])
-        run_main_pipeline(arg_inputs)
+        args = get_args(sys.argv[1:])
+        run_main_pipeline(args)
     except KeyboardInterrupt:
         print("\nProcess interrupted by user.  Exiting...")
         sys.exit(0)

@@ -17,6 +17,7 @@ class VggModel(CnnModel):
 
         # Initialize the base VGG16 model and lock pre-trained weights by default
         self._base = self._create_base_model()
+
         self._base.trainable = True # False
         for layer in self._base.layers[:-4]:
             layer.trainable = False

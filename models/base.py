@@ -13,7 +13,12 @@ from tensorflow.keras.layers import (
 
 from models.cnn_model import CnnModel
 from src.config import (
-    DROPOUT_RATE, KERNEL_SIZE_MED, KERNEL_SIZE_SM, LG_CNT, MED_CNT, SM_CNT
+    DROPOUT_RATE,
+    KERNEL_SIZE_MED,
+    KERNEL_SIZE_SM,
+    LG_CNT,
+    MED_CNT,
+    SM_CNT
 )
 
 

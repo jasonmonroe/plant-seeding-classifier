@@ -40,13 +40,6 @@ def show_labeled_barplot(data: pd.DataFrame, feature: str, perc: bool=False, n=N
         fig_size_cnt = (n + 1, 5)
 
     plt.figure(num=f"{title}", figsize=fig_size_cnt)
-    """
-    if n is None:
-        plt.figure(num=f"{title}", figsize=(count + 1, 5))
-    else:
-        plt.figure(num=f"{title}", figsize=(n + 1, 5))
-    """
-
     plt.xticks(rotation=90, fontsize=15)
     ax = sns.countplot(
         data=data,

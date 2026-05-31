@@ -27,7 +27,11 @@ from src.config import (
 
 class DataAugmentedModel(CnnModel):
     """
+    CNN Model with Data Augmentation
+    Note: Data augmentation should not be used in the validation/test data set.
 
+    The purpose of using a Data Augmented Model (DAM)—or more accurately, applying data augmentation during training—is
+    to artificially increase the size and diversity of your training data without collecting new physical images.
     """
     def __init__(self, image_params, dataset: dict):
         super().__init__(dataset=dataset)

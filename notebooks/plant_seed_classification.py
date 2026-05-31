@@ -13,7 +13,7 @@ Original file is located at
 
 ## **Jason Monroe**
 
-<p> ✉️ <a href="mailto:jason@jasonmonroe.com?subject=GitHub Machine Learning Plant Seeding Classification">jason@jasonmonroe.com</a></p>
+<p> ✉️ <a href="mailto:jason@jasonmonroe.com?subject=GitHub Machine Learning Plant seedlings Classification">jason@jasonmonroe.com</a></p>
 
 <p>📅 December 10, 2024</p>
 
@@ -325,7 +325,7 @@ labels_df.isnull().sum()
 
 """There is no missing data in the csv file."""
 
-show_banner('Plant Seeding Counts')
+show_banner('Plant seedlings Counts')
 counts = labels_df['Label'].value_counts()
 print(counts)
 print('')
@@ -1648,21 +1648,21 @@ pd.DataFrame({
 """## Actionable Insights and Business Recommendations
 
 * The model correctly identified seedlings.
-* The predictor value for each model was high enough to correctly identify which seeding was which.
+* The predictor value for each model was high enough to correctly identify which seedlings was which.
 * Augmenting the data with encoders changed the accuracy and the loss dramatically.
-* Transfer Learning helped with the final model in identifying seedings compared to the augmented one.
+* Transfer Learning helped with the final model in identifying seedlingss compared to the augmented one.
 * Training these models at 64x64 sufficed although 128px would probably be better.
 * The size of the filtering helped determine the results.  
-* The base CNN model was the best and efficient model to identify the seedings.
+* The base CNN model was the best and efficient model to identify the seedlingss.
 * CNN Model accuracy was 95.2%.
 * CNN Model with Augmented Data was 71%.
 * Transfer Learning Model was at 92%.
 * Visualizing the prediction displayed the correct results the majority of the time!
 * The Image Data Manipulator was the biggest factor in determining accuracy.
 * Have better photos that show plants at various stages of growth.
-* Keep backgrounds consistent so that we can focus on the seeding/plants.
-* 12 different seedings suffice but wouldn't hurt to have a few more.
-* There will be economic benefits with using automation to detect seeding in the future.
+* Keep backgrounds consistent so that we can focus on the seedlings/plants.
+* 12 different seedlingss suffice but wouldn't hurt to have a few more.
+* There will be economic benefits with using automation to detect seedlings in the future.
 _____
 
 # **End of Program**

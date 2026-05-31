@@ -45,12 +45,12 @@ class FinalReport():
             model_scores[model.title] = self.calc_model_score(model.title, model.y_test_enc, y_pred_probs)
         return model_scores
 
-    def pick_winner(self, model_scores: dict) -> str:
+    def pick_best_model(self, model_scores: dict) -> str:
         """
         Identifies the winning model from a dictionary of scores.
         """
         if not model_scores:
-            return "No Models Evaluated"
+            return 'No Models Evaluated'
 
         # Find the model title with the highest performance score
         return max(model_scores, key=model_scores.get)
@@ -117,11 +117,11 @@ class FinalReport():
         show_banner('📈 FINAL REPORT 📉')
         print(report)
 
-        # --- Evaluate and Pick Winner --- #
+        # --- Evaluate and Pick Best Model --- #
         all_scores = self.get_all_scores()
-        winning_title = self.pick_winner(all_scores)
-        winning_score = all_scores[winning_title]
+        best_model_title = self.pick_best_model(all_scores)
+        best_model_score = all_scores[best_model_title]
 
-        show_banner('🏆 WINNING MODEL 🏆')
-        print(f'The winner is: {winning_title}')
-        print(f'Performance Score: {winning_score:.2f}')
+        show_banner('🏆 BEST MODEL 🏆')
+        print(f'The best_model is: {best_model_title}')
+        print(f'Performance Score: {best_model_score:.2f}')

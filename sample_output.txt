@@ -1,0 +1,3213 @@
+----- ⏱️ START RUN ID: 260448 ⏱️ -----
+
++---------------------------------+
+| 🌱 PLANT SEEDLING CLASSIFIER 🌱 |
++---------------------------------+
+
+GPU's Available:  1
+
+--- 🏞️ Describing Image 🏞 ---
+Mean: 70.04363745545504
+Median: 67.0
+Standard Deviation: 31.996876308515
+Minimum: 0
+Maximum: 255
+
+Loaded Images shape (Features, X): (4750, 128, 128, 3), Type: <class 'numpy.ndarray'>
+(4750, 128, 128, 3)
+Total number of images: 4750
+Width:128, Height: 128, RGB Channels: 3
+
+❗ There are 0 NaN values in the dataset. ❗
+
+Showing random CV2 image...
+Shape of BGR images: (4750, 128, 128, 3)
+Shape of RGB images: (4750, 128, 128, 3)
+
+Confirming if this (random) image has been resized...
+
+--- (Split) Data Shapes ---
+Shape of X training: (3800, 128, 128, 3)
+Shape of Y training: (3800,)
+Shape of X validation: (475, 128, 128, 3)
+Shape of Y validation: (475,)
+Shape of X testing: (475, 128, 128, 3)
+Shape of Y testing: (475,)
+
+--- (Split) Data Types ---
+Data type of X training: uint8
+Data type of Y training: object
+
+--- 🖥️ Creating CNN Base Model ---
+Model: "sequential_1"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ conv2d (Conv2D)             (None, 128, 128, 32)      896
+
+ max_pooling2d (MaxPooling2  (None, 64, 64, 32)        0
+ D)
+
+ conv2d_1 (Conv2D)           (None, 64, 64, 64)        18496
+
+ max_pooling2d_1 (MaxPoolin  (None, 32, 32, 64)        0
+ g2D)
+
+ conv2d_2 (Conv2D)           (None, 32, 32, 128)       73856
+
+ max_pooling2d_2 (MaxPoolin  (None, 16, 16, 128)       0
+ g2D)
+
+ conv2d_3 (Conv2D)           (None, 16, 16, 32)        36896
+
+ batch_normalization (Batch  (None, 16, 16, 32)        128
+ Normalization)
+
+ activation (Activation)     (None, 16, 16, 32)        0
+
+ flatten (Flatten)           (None, 8192)              0
+
+ dense (Dense)               (None, 128)               1048704
+
+ dropout (Dropout)           (None, 128)               0
+
+ dense_1 (Dense)             (None, 12)                1548
+
+=================================================================
+Total params: 1180524 (4.50 MB)
+Trainable params: 1180460 (4.50 MB)
+Non-trainable params: 64 (256.00 Byte)
+_________________________________________________________________
+--- CNN Base Model Fitting Training Model ---
+Epoch 1/30
+60/60 - 4s - loss: 3.3720 - accuracy: 0.1471 - val_loss: 2.4073 - val_accuracy: 0.2863 - lr: 0.0010 - 4s/epoch - 60ms/step
+Epoch 2/30
+60/60 - 2s - loss: 4.0006 - accuracy: 0.3000 - val_loss: 2.1285 - val_accuracy: 0.3958 - lr: 0.0010 - 2s/epoch - 35ms/step
+Epoch 3/30
+60/60 - 2s - loss: 4.5902 - accuracy: 0.3716 - val_loss: 1.8061 - val_accuracy: 0.4968 - lr: 0.0010 - 2s/epoch - 31ms/step
+Epoch 4/30
+60/60 - 2s - loss: 3.9165 - accuracy: 0.4353 - val_loss: 1.5365 - val_accuracy: 0.5095 - lr: 0.0010 - 2s/epoch - 31ms/step
+Epoch 5/30
+60/60 - 2s - loss: 3.2566 - accuracy: 0.4763 - val_loss: 1.4360 - val_accuracy: 0.5074 - lr: 0.0010 - 2s/epoch - 33ms/step
+Epoch 6/30
+60/60 - 2s - loss: 2.7995 - accuracy: 0.5034 - val_loss: 1.2744 - val_accuracy: 0.5537 - lr: 0.0010 - 2s/epoch - 34ms/step
+Epoch 7/30
+60/60 - 2s - loss: 2.6161 - accuracy: 0.5263 - val_loss: 1.4815 - val_accuracy: 0.5263 - lr: 0.0010 - 2s/epoch - 31ms/step
+Epoch 8/30
+60/60 - 2s - loss: 2.2843 - accuracy: 0.5718 - val_loss: 2.1052 - val_accuracy: 0.4189 - lr: 0.0010 - 2s/epoch - 32ms/step
+Epoch 9/30
+60/60 - 2s - loss: 2.2263 - accuracy: 0.5676 - val_loss: 1.5622 - val_accuracy: 0.6084 - lr: 0.0010 - 2s/epoch - 30ms/step
+Epoch 10/30
+60/60 - 2s - loss: 2.0028 - accuracy: 0.5900 - val_loss: 2.4485 - val_accuracy: 0.4568 - lr: 0.0010 - 2s/epoch - 30ms/step
+Epoch 11/30
+
+Epoch 11: ReduceLROnPlateau reducing learning rate to 0.0005000000237487257.
+60/60 - 2s - loss: 1.9515 - accuracy: 0.6042 - val_loss: 1.7121 - val_accuracy: 0.6716 - lr: 0.0010 - 2s/epoch - 30ms/step
+Epoch 12/30
+60/60 - 2s - loss: 1.6074 - accuracy: 0.6376 - val_loss: 1.2854 - val_accuracy: 0.7053 - lr: 5.0000e-04 - 2s/epoch - 33ms/step
+Epoch 13/30
+60/60 - 2s - loss: 1.5527 - accuracy: 0.6408 - val_loss: 1.5330 - val_accuracy: 0.6316 - lr: 5.0000e-04 - 2s/epoch - 32ms/step
+Epoch 14/30
+60/60 - 2s - loss: 1.4655 - accuracy: 0.6553 - val_loss: 1.9123 - val_accuracy: 0.6000 - lr: 5.0000e-04 - 2s/epoch - 32ms/step
+Epoch 15/30
+60/60 - 2s - loss: 1.3433 - accuracy: 0.6661 - val_loss: 1.7766 - val_accuracy: 0.6653 - lr: 5.0000e-04 - 2s/epoch - 32ms/step
+Epoch 16/30
+
+Epoch 16: ReduceLROnPlateau reducing learning rate to 0.0002500000118743628.
+60/60 - 2s - loss: 1.3556 - accuracy: 0.6721 - val_loss: 1.5891 - val_accuracy: 0.6695 - lr: 5.0000e-04 - 2s/epoch - 31ms/step
+
+Run Time: 0m 33s 77ms
+
+--- CNN Base Model Evaluation ---
+15/15 - 0s - loss: 1.1469 - accuracy: 0.5958 - 219ms/epoch - 15ms/step
+* Evaluation Results: Test Loss: 1.1469095945358276, Test Accuracy: 0.5957894921302795
+119/119 [==============================] - 1s 8ms/step
+
+--- CNN Base Model Training Performance ---
+   Accuracy  Precision    Recall       F1
+0  0.590526   0.706637  0.590526  0.55441
+119/119 [==============================] - 1s 7ms/step
+15/15 [==============================] - 0s 8ms/step
+
+--- CNN Base Model Classification Report ---
+15/15 [==============================] - 0s 7ms/step
+                           precision    recall  f1-score   support
+
+              Black-grass     0.2376    0.9231    0.3780        26
+                 Charlock     0.7222    1.0000    0.8387        39
+                 Cleavers     0.8462    0.7586    0.8000        29
+         Common Chickweed     0.8246    0.7705    0.7966        61
+             Common wheat     0.5882    0.4545    0.5128        22
+                  Fat Hen     0.8929    0.5319    0.6667        47
+         Loose Silky-bent     1.0000    0.0303    0.0588        66
+                    Maize     0.4681    1.0000    0.6377        22
+        Scentless Mayweed     0.6250    0.3846    0.4762        52
+          Shepherds Purse     0.8000    0.1739    0.2857        23
+Small-flowered Cranesbill     0.8511    0.8000    0.8247        50
+               Sugar beet     0.4746    0.7368    0.5773        38
+
+                 accuracy                         0.5958       475
+                macro avg     0.6942    0.6304    0.5711       475
+             weighted avg     0.7408    0.5958    0.5671       475
+
+
+--- 🖥️ Creating Data Augmented CNN Model ---
+Model: "sequential_1"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ conv2d (Conv2D)             (None, 128, 128, 32)      896
+
+ batch_normalization (Batch  (None, 128, 128, 32)      128
+ Normalization)
+
+ activation (Activation)     (None, 128, 128, 32)      0
+
+ max_pooling2d (MaxPooling2  (None, 64, 64, 32)        0
+ D)
+
+ conv2d_1 (Conv2D)           (None, 64, 64, 64)        18496
+
+ batch_normalization_1 (Bat  (None, 64, 64, 64)        256
+ chNormalization)
+
+ activation_1 (Activation)   (None, 64, 64, 64)        0
+
+ max_pooling2d_1 (MaxPoolin  (None, 32, 32, 64)        0
+ g2D)
+
+ conv2d_2 (Conv2D)           (None, 32, 32, 128)       73856
+
+ batch_normalization_2 (Bat  (None, 32, 32, 128)       512
+ chNormalization)
+
+ activation_2 (Activation)   (None, 32, 32, 128)       0
+
+ max_pooling2d_2 (MaxPoolin  (None, 16, 16, 128)       0
+ g2D)
+
+ global_average_pooling2d (  (None, 128)               0
+ GlobalAveragePooling2D)
+
+ dense (Dense)               (None, 256)               33024
+
+ batch_normalization_3 (Bat  (None, 256)               1024
+ chNormalization)
+
+ activation_3 (Activation)   (None, 256)               0
+
+ dropout (Dropout)           (None, 256)               0
+
+ dense_1 (Dense)             (None, 12)                3084
+
+=================================================================
+Total params: 131276 (512.80 KB)
+Trainable params: 130316 (509.05 KB)
+Non-trainable params: 960 (3.75 KB)
+_________________________________________________________________
+--- Data Augmented CNN Model Fitting Training Model ---
+Epoch 1/36
+119/119 [==============================] - 6s 44ms/step - loss: 2.3780 - accuracy: 0.2274 - val_loss: 2.5863 - val_accuracy: 0.0484 - lr: 1.0000e-04
+Epoch 2/36
+119/119 [==============================] - 5s 43ms/step - loss: 1.8525 - accuracy: 0.3603 - val_loss: 2.6726 - val_accuracy: 0.0484 - lr: 1.0000e-04
+Epoch 3/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.6327 - accuracy: 0.4403 - val_loss: 2.6449 - val_accuracy: 0.1074 - lr: 1.0000e-04
+Epoch 4/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.4535 - accuracy: 0.5026 - val_loss: 2.2854 - val_accuracy: 0.1958 - lr: 1.0000e-04
+Epoch 5/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.3601 - accuracy: 0.5442 - val_loss: 1.8954 - val_accuracy: 0.3874 - lr: 1.0000e-04
+Epoch 6/36
+119/119 [==============================] - 5s 44ms/step - loss: 1.2506 - accuracy: 0.5684 - val_loss: 1.2517 - val_accuracy: 0.5811 - lr: 1.0000e-04
+Epoch 7/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.1882 - accuracy: 0.5997 - val_loss: 1.1735 - val_accuracy: 0.6126 - lr: 1.0000e-04
+Epoch 8/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.1341 - accuracy: 0.6118 - val_loss: 1.4474 - val_accuracy: 0.5242 - lr: 1.0000e-04
+Epoch 9/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.0554 - accuracy: 0.6466 - val_loss: 1.1502 - val_accuracy: 0.5874 - lr: 1.0000e-04
+Epoch 10/36
+119/119 [==============================] - 5s 42ms/step - loss: 1.0048 - accuracy: 0.6629 - val_loss: 1.2115 - val_accuracy: 0.5642 - lr: 1.0000e-04
+Epoch 11/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.9821 - accuracy: 0.6676 - val_loss: 1.0561 - val_accuracy: 0.6653 - lr: 1.0000e-04
+Epoch 12/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.9432 - accuracy: 0.6842 - val_loss: 1.1628 - val_accuracy: 0.6021 - lr: 1.0000e-04
+Epoch 13/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.9145 - accuracy: 0.6924 - val_loss: 0.9862 - val_accuracy: 0.6884 - lr: 1.0000e-04
+Epoch 14/36
+119/119 [==============================] - 5s 43ms/step - loss: 0.8666 - accuracy: 0.7182 - val_loss: 1.1899 - val_accuracy: 0.6253 - lr: 1.0000e-04
+Epoch 15/36
+119/119 [==============================] - 5s 43ms/step - loss: 0.8533 - accuracy: 0.7142 - val_loss: 1.3344 - val_accuracy: 0.5116 - lr: 1.0000e-04
+Epoch 16/36
+119/119 [==============================] - 6s 46ms/step - loss: 0.8279 - accuracy: 0.7187 - val_loss: 0.8859 - val_accuracy: 0.6905 - lr: 1.0000e-04
+Epoch 17/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.8006 - accuracy: 0.7347 - val_loss: 0.9781 - val_accuracy: 0.6126 - lr: 1.0000e-04
+Epoch 18/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.7664 - accuracy: 0.7432 - val_loss: 0.9649 - val_accuracy: 0.6547 - lr: 1.0000e-04
+Epoch 19/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.7632 - accuracy: 0.7416 - val_loss: 1.1694 - val_accuracy: 0.6337 - lr: 1.0000e-04
+Epoch 20/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.7466 - accuracy: 0.7437 - val_loss: 0.7958 - val_accuracy: 0.7242 - lr: 1.0000e-04
+Epoch 21/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.7176 - accuracy: 0.7632 - val_loss: 0.8102 - val_accuracy: 0.7347 - lr: 1.0000e-04
+Epoch 22/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.7029 - accuracy: 0.7524 - val_loss: 0.9543 - val_accuracy: 0.6674 - lr: 1.0000e-04
+Epoch 23/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.6714 - accuracy: 0.7811 - val_loss: 1.2314 - val_accuracy: 0.5579 - lr: 1.0000e-04
+Epoch 24/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.6840 - accuracy: 0.7713 - val_loss: 1.1961 - val_accuracy: 0.6526 - lr: 1.0000e-04
+Epoch 25/36
+119/119 [==============================] - ETA: 0s - loss: 0.6676 - accuracy: 0.7792
+119/119 [==============================] - 5s 42ms/step - loss: 0.6676 - accuracy: 0.7792 - val_loss: 1.0976 - val_accuracy: 0.6253 - lr: 1.0000e-04
+Epoch 26/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.6264 - accuracy: 0.7871 - val_loss: 0.6580 - val_accuracy: 0.7832 - lr: 5.0000e-05
+Epoch 27/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.6133 - accuracy: 0.8021 - val_loss: 0.9111 - val_accuracy: 0.7011 - lr: 5.0000e-05
+Epoch 28/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.6227 - accuracy: 0.7932 - val_loss: 1.1302 - val_accuracy: 0.5768 - lr: 5.0000e-05
+Epoch 29/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.5971 - accuracy: 0.8047 - val_loss: 0.7255 - val_accuracy: 0.7242 - lr: 5.0000e-05
+Epoch 30/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.6093 - accuracy: 0.7992 - val_loss: 0.6894 - val_accuracy: 0.7684 - lr: 5.0000e-05
+Epoch 31/36
+119/119 [==============================] - ETA: 0s - loss: 0.5743 - accuracy: 0.8150
+119/119 [==============================] - 5s 42ms/step - loss: 0.5743 - accuracy: 0.8150 - val_loss: 0.7729 - val_accuracy: 0.7621 - lr: 5.0000e-05
+Epoch 32/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.5680 - accuracy: 0.8126 - val_loss: 0.6847 - val_accuracy: 0.7558 - lr: 2.5000e-05
+Epoch 33/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.5482 - accuracy: 0.8242 - val_loss: 0.6213 - val_accuracy: 0.7726 - lr: 2.5000e-05
+Epoch 34/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.5523 - accuracy: 0.8142 - val_loss: 0.6353 - val_accuracy: 0.7811 - lr: 2.5000e-05
+Epoch 35/36
+119/119 [==============================] - 5s 41ms/step - loss: 0.5534 - accuracy: 0.8211 - val_loss: 0.6105 - val_accuracy: 0.7895 - lr: 2.5000e-05
+Epoch 36/36
+119/119 [==============================] - 5s 42ms/step - loss: 0.5563 - accuracy: 0.8111 - val_loss: 0.7134 - val_accuracy: 0.7600 - lr: 2.5000e-05
+
+Run Time: 3m 2s 512ms
+
+--- Data Augmented CNN Model Evaluation ---
+15/15 - 0s - loss: 0.7035 - accuracy: 0.7579 - 166ms/epoch - 11ms/step
+* Evaluation Results: Test Loss: 0.7035162448883057, Test Accuracy: 0.75789475440979
+119/119 [==============================] - 1s 8ms/step
+
+--- Data Augmented CNN Model Training Performance ---
+   Accuracy  Precision    Recall        F1
+0  0.786316   0.811662  0.786316  0.787161
+119/119 [==============================] - 1s 8ms/step
+15/15 [==============================] - 0s 8ms/step
+
+--- Data Augmented CNN Model Classification Report ---
+15/15 [==============================] - 0s 6ms/step
+                           precision    recall  f1-score   support
+
+              Black-grass     0.5263    0.3846    0.4444        26
+                 Charlock     0.7917    0.9744    0.8736        39
+                 Cleavers     1.0000    0.7931    0.8846        29
+         Common Chickweed     0.9138    0.8689    0.8908        61
+             Common wheat     0.8000    0.7273    0.7619        22
+                  Fat Hen     0.8571    0.7660    0.8090        47
+         Loose Silky-bent     0.8704    0.7121    0.7833        66
+                    Maize     0.5641    1.0000    0.7213        22
+        Scentless Mayweed     0.8611    0.5962    0.7045        52
+          Shepherds Purse     0.6111    0.4783    0.5366        23
+Small-flowered Cranesbill     0.8235    0.8400    0.8317        50
+               Sugar beet     0.4627    0.8158    0.5905        38
+
+                 accuracy                         0.7579       475
+                macro avg     0.7568    0.7464    0.7360       475
+             weighted avg     0.7887    0.7579    0.7599       475
+
+
+--- 🖥️ Creating VGG16 Model ---
+
+--- 🧯 Freezing Layers ---
+ -> 🧯 Freezing: input_1
+ -> 🧯 Freezing: block1_conv1
+ -> 🧯 Freezing: block1_conv2
+ -> 🧯 Freezing: block1_pool
+ -> 🧯 Freezing: block2_conv1
+ -> 🧯 Freezing: block2_conv2
+ -> 🧯 Freezing: block2_pool
+ -> 🧯 Freezing: block3_conv1
+ -> 🧯 Freezing: block3_conv2
+ -> 🧯 Freezing: block3_conv3
+ -> 🧯 Freezing: block3_pool
+ -> 🧯 Freezing: block4_conv1
+ -> 🧯 Freezing: block4_conv2
+ -> 🧯 Freezing: block4_conv3
+ -> 🧯 Freezing: block4_pool
+Model: "vgg16_classifier"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ input_1 (InputLayer)        [(None, 128, 128, 3)]     0
+
+ block1_conv1 (Conv2D)       (None, 128, 128, 64)      1792
+
+ block1_conv2 (Conv2D)       (None, 128, 128, 64)      36928
+
+ block1_pool (MaxPooling2D)  (None, 64, 64, 64)        0
+
+ block2_conv1 (Conv2D)       (None, 64, 64, 128)       73856
+
+ block2_conv2 (Conv2D)       (None, 64, 64, 128)       147584
+
+ block2_pool (MaxPooling2D)  (None, 32, 32, 128)       0
+
+ block3_conv1 (Conv2D)       (None, 32, 32, 256)       295168
+
+ block3_conv2 (Conv2D)       (None, 32, 32, 256)       590080
+
+ block3_conv3 (Conv2D)       (None, 32, 32, 256)       590080
+
+ block3_pool (MaxPooling2D)  (None, 16, 16, 256)       0
+
+ block4_conv1 (Conv2D)       (None, 16, 16, 512)       1180160
+
+ block4_conv2 (Conv2D)       (None, 16, 16, 512)       2359808
+
+ block4_conv3 (Conv2D)       (None, 16, 16, 512)       2359808
+
+ block4_pool (MaxPooling2D)  (None, 8, 8, 512)         0
+
+ block5_conv1 (Conv2D)       (None, 8, 8, 512)         2359808
+
+ block5_conv2 (Conv2D)       (None, 8, 8, 512)         2359808
+
+ block5_conv3 (Conv2D)       (None, 8, 8, 512)         2359808
+
+ block5_pool (MaxPooling2D)  (None, 4, 4, 512)         0
+
+ global_average_pooling2d (  (None, 512)               0
+ GlobalAveragePooling2D)
+
+ species_projection (Dense)  (None, 12)                6156
+
+=================================================================
+Total params: 14720844 (56.16 MB)
+Trainable params: 7085580 (27.03 MB)
+Non-trainable params: 7635264 (29.13 MB)
+_________________________________________________________________
+
+--- 🖥️ Creating Transfer Learning Model ---
+Model: "vgg16_refined"
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to
+==================================================================================================
+ input_1 (InputLayer)        [(None, 128, 128, 3)]        0         []
+
+ vgg16_preprocess_robust (L  (None, 128, 128, 3)          0         ['input_1[0][0]']
+ ambda)
+
+ vgg16 (Functional)          (None, 4, 4, 512)            1471468   ['vgg16_preprocess_robust[0][0
+                                                          8         ]']
+
+ global_average_pooling2d (  (None, 512)                  0         ['vgg16[0][0]']
+ GlobalAveragePooling2D)
+
+ global_max_pooling2d (Glob  (None, 512)                  0         ['vgg16[0][0]']
+ alMaxPooling2D)
+
+ concatenate (Concatenate)   (None, 1024)                 0         ['global_average_pooling2d[0][
+                                                                    0]',
+                                                                     'global_max_pooling2d[0][0]']
+
+ batch_normalization (Batch  (None, 1024)                 4096      ['concatenate[0][0]']
+ Normalization)
+
+ dense (Dense)               (None, 512)                  524800    ['batch_normalization[0][0]']
+
+ batch_normalization_1 (Bat  (None, 512)                  2048      ['dense[0][0]']
+ chNormalization)
+
+ dropout (Dropout)           (None, 512)                  0         ['batch_normalization_1[0][0]'
+                                                                    ]
+
+ prediction_layer (Dense)    (None, 12)                   6156      ['dropout[0][0]']
+
+==================================================================================================
+Total params: 15251788 (58.18 MB)
+Trainable params: 7613452 (29.04 MB)
+Non-trainable params: 7638336 (29.14 MB)
+__________________________________________________________________________________________________
+
+--- Transfer Learning Model Fitting Training Model ---
+
+--- 📢 Phase #1: Training Classification Head (Base Locked) 📢 ---
+
+Epoch 1/10
+80/80 [==============================] - 9s 99ms/step - loss: 2.2010 - accuracy: 0.3442 - val_loss: 8.7712 - val_accuracy: 0.2779 - lr: 0.0010
+Epoch 2/10
+80/80 [==============================] - 8s 93ms/step - loss: 1.0992 - accuracy: 0.6192 - val_loss: 0.8959 - val_accuracy: 0.7305 - lr: 0.0010
+Epoch 3/10
+80/80 [==============================] - 7s 93ms/step - loss: 0.7358 - accuracy: 0.7461 - val_loss: 1.0023 - val_accuracy: 0.6968 - lr: 0.0010
+Epoch 4/10
+80/80 [==============================] - 8s 94ms/step - loss: 0.5815 - accuracy: 0.7834 - val_loss: 0.7970 - val_accuracy: 0.7158 - lr: 0.0010
+Epoch 5/10
+80/80 [==============================] - 549s 7s/step - loss: 0.4836 - accuracy: 0.8187 - val_loss: 1.1920 - val_accuracy: 0.6653 - lr: 0.0010
+Epoch 6/10
+80/80 [==============================] - 10s 120ms/step - loss: 0.4736 - accuracy: 0.8353 - val_loss: 1.8473 - val_accuracy: 0.5874 - lr: 0.0010
+Epoch 7/10
+80/80 [==============================] - 13s 165ms/step - loss: 0.4239 - accuracy: 0.8400 - val_loss: 0.6589 - val_accuracy: 0.8126 - lr: 0.0010
+Epoch 8/10
+80/80 [==============================] - 12s 154ms/step - loss: 0.4776 - accuracy: 0.8234 - val_loss: 0.5680 - val_accuracy: 0.8253 - lr: 0.0010
+Epoch 9/10
+80/80 [==============================] - 8s 96ms/step - loss: 0.3722 - accuracy: 0.8582 - val_loss: 0.7606 - val_accuracy: 0.7937 - lr: 0.0010
+Epoch 10/10
+80/80 [==============================] - 8s 95ms/step - loss: 0.3368 - accuracy: 0.8721 - val_loss: 0.5133 - val_accuracy: 0.8126 - lr: 0.0010
+
+Run Time: 10m 30s 667ms
+
+--- 🔥Initiating Fine-Tuning: Unfreezing block5 🔥 ---
+ -> 🔥 Unfrozen: block5_conv1
+ -> 🔥 Unfrozen: block5_conv2
+ -> 🔥 Unfrozen: block5_conv3
+ -> 🔥 Unfrozen: block5_pool
+
+--- 📣 Phase #2: Fine-Tuning Deep Convolutional Weights 📣 ---
+
+Epoch 1/40
+80/80 [==============================] - 10s 107ms/step - loss: 0.2657 - accuracy: 0.8966 - val_loss: 0.3883 - val_accuracy: 0.8653 - lr: 5.0000e-06
+Epoch 2/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2389 - accuracy: 0.9108 - val_loss: 0.3790 - val_accuracy: 0.8716 - lr: 5.0000e-06
+Epoch 3/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2404 - accuracy: 0.9097 - val_loss: 0.3740 - val_accuracy: 0.8779 - lr: 5.0000e-06
+Epoch 4/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2328 - accuracy: 0.9121 - val_loss: 0.3715 - val_accuracy: 0.8821 - lr: 5.0000e-06
+Epoch 5/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2277 - accuracy: 0.9150 - val_loss: 0.3667 - val_accuracy: 0.8842 - lr: 5.0000e-06
+Epoch 6/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2175 - accuracy: 0.9150 - val_loss: 0.3582 - val_accuracy: 0.8863 - lr: 5.0000e-06
+Epoch 7/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2068 - accuracy: 0.9187 - val_loss: 0.3542 - val_accuracy: 0.8863 - lr: 5.0000e-06
+Epoch 8/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2114 - accuracy: 0.9237 - val_loss: 0.3521 - val_accuracy: 0.8863 - lr: 5.0000e-06
+Epoch 9/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2057 - accuracy: 0.9242 - val_loss: 0.3521 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 10/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.2082 - accuracy: 0.9218 - val_loss: 0.3521 - val_accuracy: 0.8863 - lr: 5.0000e-06
+Epoch 11/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.2052 - accuracy: 0.9200 - val_loss: 0.3485 - val_accuracy: 0.8863 - lr: 5.0000e-06
+Epoch 12/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.2043 - accuracy: 0.9226 - val_loss: 0.3461 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 13/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.2051 - accuracy: 0.9232 - val_loss: 0.3428 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 14/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.1946 - accuracy: 0.9232 - val_loss: 0.3454 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 15/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.1938 - accuracy: 0.9211 - val_loss: 0.3428 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 16/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.1948 - accuracy: 0.9266 - val_loss: 0.3402 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 17/40
+80/80 [==============================] - 8s 100ms/step - loss: 0.1903 - accuracy: 0.9261 - val_loss: 0.3410 - val_accuracy: 0.8863 - lr: 5.0000e-06
+Epoch 18/40
+80/80 [==============================] - 8s 101ms/step - loss: 0.1910 - accuracy: 0.9266 - val_loss: 0.3365 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 19/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.1964 - accuracy: 0.9237 - val_loss: 0.3352 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 20/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.1785 - accuracy: 0.9374 - val_loss: 0.3378 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 21/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.1820 - accuracy: 0.9276 - val_loss: 0.3355 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 22/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.1734 - accuracy: 0.9337 - val_loss: 0.3369 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 23/40
+80/80 [==============================] - 8s 100ms/step - loss: 0.1869 - accuracy: 0.9316 - val_loss: 0.3350 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 24/40
+80/80 [==============================] - 8s 103ms/step - loss: 0.1786 - accuracy: 0.9289 - val_loss: 0.3328 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 25/40
+80/80 [==============================] - 8s 101ms/step - loss: 0.1748 - accuracy: 0.9334 - val_loss: 0.3328 - val_accuracy: 0.8884 - lr: 5.0000e-06
+Epoch 26/40
+80/80 [==============================] - 8s 101ms/step - loss: 0.1812 - accuracy: 0.9255 - val_loss: 0.3295 - val_accuracy: 0.8947 - lr: 5.0000e-06
+Epoch 27/40
+80/80 [==============================] - 8s 101ms/step - loss: 0.1969 - accuracy: 0.9232 - val_loss: 0.3304 - val_accuracy: 0.8926 - lr: 5.0000e-06
+Epoch 28/40
+80/80 [==============================] - 8s 101ms/step - loss: 0.1729 - accuracy: 0.9311 - val_loss: 0.3254 - val_accuracy: 0.8926 - lr: 5.0000e-06
+Epoch 29/40
+80/80 [==============================] - 8s 101ms/step - loss: 0.1797 - accuracy: 0.9295 - val_loss: 0.3253 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 30/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.1663 - accuracy: 0.9387 - val_loss: 0.3305 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 31/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.1772 - accuracy: 0.9289 - val_loss: 0.3289 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 32/40
+80/80 [==============================] - 8s 98ms/step - loss: 0.1767 - accuracy: 0.9350 - val_loss: 0.3260 - val_accuracy: 0.8905 - lr: 5.0000e-06
+Epoch 33/40
+80/80 [==============================] - ETA: 0s - loss: 0.1736 - accuracy: 0.9292
+80/80 [==============================] - 8s 101ms/step - loss: 0.1736 - accuracy: 0.9292 - val_loss: 0.3363 - val_accuracy: 0.8947 - lr: 5.0000e-06
+Epoch 34/40
+80/80 [==============================] - 8s 99ms/step - loss: 0.1727 - accuracy: 0.9350 - val_loss: 0.3287 - val_accuracy: 0.8926 - lr: 2.5000e-06
+Epoch 35/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.1745 - accuracy: 0.9308 - val_loss: 0.3286 - val_accuracy: 0.8926 - lr: 2.5000e-06
+Epoch 36/40
+80/80 [==============================] - 8s 103ms/step - loss: 0.1665 - accuracy: 0.9311 - val_loss: 0.3232 - val_accuracy: 0.8926 - lr: 2.5000e-06
+Epoch 37/40
+80/80 [==============================] - 8s 97ms/step - loss: 0.1743 - accuracy: 0.9271 - val_loss: 0.3197 - val_accuracy: 0.8926 - lr: 2.5000e-06
+Epoch 38/40
+80/80 [==============================] - 8s 95ms/step - loss: 0.1635 - accuracy: 0.9411 - val_loss: 0.3194 - val_accuracy: 0.8968 - lr: 2.5000e-06
+Epoch 39/40
+80/80 [==============================] - 8s 94ms/step - loss: 0.1658 - accuracy: 0.9334 - val_loss: 0.3226 - val_accuracy: 0.8926 - lr: 2.5000e-06
+Epoch 40/40
+80/80 [==============================] - 8s 94ms/step - loss: 0.1636 - accuracy: 0.9371 - val_loss: 0.3225 - val_accuracy: 0.8926 - lr: 2.5000e-06
+
+Run Time: 5m 19s 871ms
+
+--- Transfer Learning Model Evaluation ---
+* Evaluation Results: Test Loss: 0.3202374279499054, Test Accuracy: 0.8968421220779419
+119/119 [==============================] - 5s 45ms/step
+
+--- Transfer Learning Model Training Performance ---
+   Accuracy  Precision    Recall        F1
+0  0.947895    0.96058  0.947895  0.949586
+119/119 [==============================] - 5s 45ms/step
+15/15 [==============================] - 1s 50ms/step
+
+--- Transfer Learning Model Classification Report ---
+15/15 [==============================] - 1s 46ms/step
+                           precision    recall  f1-score   support
+
+              Black-grass     0.4583    0.8462    0.5946        26
+                 Charlock     1.0000    1.0000    1.0000        39
+                 Cleavers     1.0000    0.9655    0.9825        29
+         Common Chickweed     0.9836    0.9836    0.9836        61
+             Common wheat     0.8000    0.9091    0.8511        22
+                  Fat Hen     0.9362    0.9362    0.9362        47
+         Loose Silky-bent     0.9348    0.6515    0.7679        66
+                    Maize     0.8696    0.9091    0.8889        22
+        Scentless Mayweed     0.9245    0.9423    0.9333        52
+          Shepherds Purse     0.9048    0.8261    0.8636        23
+Small-flowered Cranesbill     1.0000    0.9600    0.9796        50
+               Sugar beet     0.9444    0.8947    0.9189        38
+
+                 accuracy                         0.8968       475
+                macro avg     0.8963    0.9020    0.8917       475
+             weighted avg     0.9202    0.8968    0.9015       475
+
+
+* Generating 475 Sample Visualizations *
+
+--- [1 of 475] (Index: 0) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [2 of 475] (Index: 1) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [3 of 475] (Index: 2) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [4 of 475] (Index: 3) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [5 of 475] (Index: 4) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [6 of 475] (Index: 5) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [7 of 475] (Index: 6) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [8 of 475] (Index: 7) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [9 of 475] (Index: 8) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [10 of 475] (Index: 9) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [11 of 475] (Index: 10) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [12 of 475] (Index: 11) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [13 of 475] (Index: 12) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [14 of 475] (Index: 13) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [15 of 475] (Index: 14) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [16 of 475] (Index: 15) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [17 of 475] (Index: 16) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [18 of 475] (Index: 17) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [19 of 475] (Index: 18) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [20 of 475] (Index: 19) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [21 of 475] (Index: 20) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [22 of 475] (Index: 21) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [23 of 475] (Index: 22) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [24 of 475] (Index: 23) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [25 of 475] (Index: 24) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [26 of 475] (Index: 25) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [27 of 475] (Index: 26) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Common Chickweed       -> 50.76%
+           Rank 2: Fat Hen                -> 25.73%
+           Rank 3: Sugar beet             -> 16.58%
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Cleavers
+❌ Incorrect Prediction
+
+--- [28 of 475] (Index: 27) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [29 of 475] (Index: 28) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [30 of 475] (Index: 29) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [31 of 475] (Index: 30) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Fat Hen                -> 85.96%
+        🔹 Rank 2: Black-grass            -> 7.12%
+           Rank 3: Loose Silky-bent       -> 5.86%
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Black-grass
+❌ Incorrect Prediction
+
+--- [32 of 475] (Index: 31) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [33 of 475] (Index: 32) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [34 of 475] (Index: 33) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [35 of 475] (Index: 34) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [36 of 475] (Index: 35) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [37 of 475] (Index: 36) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 67.11%
+        🔹 Rank 2: Loose Silky-bent       -> 32.69%
+           Rank 3: Common wheat           -> 0.14%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [38 of 475] (Index: 37) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [39 of 475] (Index: 38) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [40 of 475] (Index: 39) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [41 of 475] (Index: 40) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [42 of 475] (Index: 41) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 95.01%
+           Rank 2: Loose Silky-bent       -> 3.78%
+        🔹 Rank 3: Fat Hen                -> 0.46%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Fat Hen
+❌ Incorrect Prediction
+
+--- [43 of 475] (Index: 42) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [44 of 475] (Index: 43) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [45 of 475] (Index: 44) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [46 of 475] (Index: 45) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [47 of 475] (Index: 46) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [48 of 475] (Index: 47) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [49 of 475] (Index: 48) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 89.61%
+           Rank 2: Loose Silky-bent       -> 6.96%
+           Rank 3: Common wheat           -> 2.63%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Fat Hen
+❌ Incorrect Prediction
+
+--- [50 of 475] (Index: 49) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 80.48%
+           Rank 2: Loose Silky-bent       -> 14.19%
+           Rank 3: Sugar beet             -> 2.86%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Common wheat
+❌ Incorrect Prediction
+
+--- [51 of 475] (Index: 50) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [52 of 475] (Index: 51) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [53 of 475] (Index: 52) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [54 of 475] (Index: 53) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [55 of 475] (Index: 54) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [56 of 475] (Index: 55) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [57 of 475] (Index: 56) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Scentless Mayweed      -> 97.22%
+        🔹 Rank 2: Shepherds Purse        -> 2.78%
+           Rank 3: Common Chickweed       -> 0.00%
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Shepherds Purse
+❌ Incorrect Prediction
+
+--- [58 of 475] (Index: 57) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [59 of 475] (Index: 58) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [60 of 475] (Index: 59) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [61 of 475] (Index: 60) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [62 of 475] (Index: 61) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [63 of 475] (Index: 62) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Fat Hen                -> 61.01%
+           Rank 2: Common Chickweed       -> 28.66%
+        🔹 Rank 3: Shepherds Purse        -> 8.28%
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Shepherds Purse
+❌ Incorrect Prediction
+
+--- [64 of 475] (Index: 63) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [65 of 475] (Index: 64) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [66 of 475] (Index: 65) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [67 of 475] (Index: 66) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [68 of 475] (Index: 67) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [69 of 475] (Index: 68) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [70 of 475] (Index: 69) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [71 of 475] (Index: 70) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [72 of 475] (Index: 71) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [73 of 475] (Index: 72) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [74 of 475] (Index: 73) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [75 of 475] (Index: 74) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [76 of 475] (Index: 75) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [77 of 475] (Index: 76) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [78 of 475] (Index: 77) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 54.20%
+        🔹 Rank 2: Loose Silky-bent       -> 45.64%
+           Rank 3: Scentless Mayweed      -> 0.06%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [79 of 475] (Index: 78) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [80 of 475] (Index: 79) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [81 of 475] (Index: 80) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [82 of 475] (Index: 81) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [83 of 475] (Index: 82) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [84 of 475] (Index: 83) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [85 of 475] (Index: 84) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [86 of 475] (Index: 85) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [87 of 475] (Index: 86) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [88 of 475] (Index: 87) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [89 of 475] (Index: 88) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [90 of 475] (Index: 89) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [91 of 475] (Index: 90) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [92 of 475] (Index: 91) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [93 of 475] (Index: 92) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [94 of 475] (Index: 93) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [95 of 475] (Index: 94) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [96 of 475] (Index: 95) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [97 of 475] (Index: 96) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [98 of 475] (Index: 97) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [99 of 475] (Index: 98) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [100 of 475] (Index: 99) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [101 of 475] (Index: 100) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [102 of 475] (Index: 101) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [103 of 475] (Index: 102) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [104 of 475] (Index: 103) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [105 of 475] (Index: 104) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [106 of 475] (Index: 105) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [107 of 475] (Index: 106) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [108 of 475] (Index: 107) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [109 of 475] (Index: 108) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [110 of 475] (Index: 109) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Common wheat           -> 64.09%
+           Rank 2: Fat Hen                -> 31.72%
+        🔹 Rank 3: Sugar beet             -> 1.94%
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Sugar beet
+❌ Incorrect Prediction
+
+--- [111 of 475] (Index: 110) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [112 of 475] (Index: 111) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 72.18%
+           Rank 2: Common wheat           -> 14.52%
+        🔹 Rank 3: Loose Silky-bent       -> 12.08%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [113 of 475] (Index: 112) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Maize                  -> 86.98%
+        🔹 Rank 2: Sugar beet             -> 9.65%
+           Rank 3: Fat Hen                -> 3.18%
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Sugar beet
+❌ Incorrect Prediction
+
+--- [114 of 475] (Index: 113) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [115 of 475] (Index: 114) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [116 of 475] (Index: 115) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [117 of 475] (Index: 116) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [118 of 475] (Index: 117) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [119 of 475] (Index: 118) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [120 of 475] (Index: 119) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [121 of 475] (Index: 120) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [122 of 475] (Index: 121) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [123 of 475] (Index: 122) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [124 of 475] (Index: 123) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [125 of 475] (Index: 124) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [126 of 475] (Index: 125) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [127 of 475] (Index: 126) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [128 of 475] (Index: 127) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [129 of 475] (Index: 128) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 51.83%
+        🔹 Rank 2: Loose Silky-bent       -> 47.26%
+           Rank 3: Common wheat           -> 0.72%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [130 of 475] (Index: 129) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [131 of 475] (Index: 130) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [132 of 475] (Index: 131) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [133 of 475] (Index: 132) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 79.44%
+        🔹 Rank 2: Loose Silky-bent       -> 20.43%
+           Rank 3: Common wheat           -> 0.07%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [134 of 475] (Index: 133) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [135 of 475] (Index: 134) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [136 of 475] (Index: 135) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [137 of 475] (Index: 136) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [138 of 475] (Index: 137) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [139 of 475] (Index: 138) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [140 of 475] (Index: 139) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [141 of 475] (Index: 140) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [142 of 475] (Index: 141) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [143 of 475] (Index: 142) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [144 of 475] (Index: 143) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [145 of 475] (Index: 144) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [146 of 475] (Index: 145) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [147 of 475] (Index: 146) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [148 of 475] (Index: 147) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [149 of 475] (Index: 148) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 83.62%
+        🔹 Rank 2: Loose Silky-bent       -> 16.25%
+           Rank 3: Maize                  -> 0.06%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [150 of 475] (Index: 149) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [151 of 475] (Index: 150) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [152 of 475] (Index: 151) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [153 of 475] (Index: 152) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [154 of 475] (Index: 153) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [155 of 475] (Index: 154) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [156 of 475] (Index: 155) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [157 of 475] (Index: 156) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [158 of 475] (Index: 157) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 41.65%
+        🔹 Rank 2: Loose Silky-bent       -> 40.93%
+           Rank 3: Common wheat           -> 15.90%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [159 of 475] (Index: 158) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [160 of 475] (Index: 159) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [161 of 475] (Index: 160) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [162 of 475] (Index: 161) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [163 of 475] (Index: 162) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [164 of 475] (Index: 163) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [165 of 475] (Index: 164) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [166 of 475] (Index: 165) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [167 of 475] (Index: 166) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [168 of 475] (Index: 167) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [169 of 475] (Index: 168) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [170 of 475] (Index: 169) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [171 of 475] (Index: 170) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [172 of 475] (Index: 171) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [173 of 475] (Index: 172) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [174 of 475] (Index: 173) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [175 of 475] (Index: 174) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [176 of 475] (Index: 175) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [177 of 475] (Index: 176) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [178 of 475] (Index: 177) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [179 of 475] (Index: 178) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [180 of 475] (Index: 179) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [181 of 475] (Index: 180) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [182 of 475] (Index: 181) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [183 of 475] (Index: 182) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [184 of 475] (Index: 183) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 68.64%
+           Rank 2: Loose Silky-bent       -> 29.24%
+           Rank 3: Common wheat           -> 2.00%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Small-flowered Cranesbill
+❌ Incorrect Prediction
+
+--- [185 of 475] (Index: 184) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [186 of 475] (Index: 185) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Maize                  -> 64.68%
+           Rank 2: Sugar beet             -> 26.51%
+        🔹 Rank 3: Common wheat           -> 5.97%
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Common wheat
+❌ Incorrect Prediction
+
+--- [187 of 475] (Index: 186) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [188 of 475] (Index: 187) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [189 of 475] (Index: 188) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [190 of 475] (Index: 189) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Loose Silky-bent       -> 60.27%
+           Rank 2: Shepherds Purse        -> 16.03%
+           Rank 3: Black-grass            -> 12.70%
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Scentless Mayweed
+❌ Incorrect Prediction
+
+--- [191 of 475] (Index: 190) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Scentless Mayweed      -> 41.08%
+           Rank 2: Black-grass            -> 32.26%
+        🔹 Rank 3: Loose Silky-bent       -> 25.64%
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [192 of 475] (Index: 191) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [193 of 475] (Index: 192) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [194 of 475] (Index: 193) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [195 of 475] (Index: 194) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [196 of 475] (Index: 195) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [197 of 475] (Index: 196) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Shepherds Purse        -> 83.94%
+        🔹 Rank 2: Scentless Mayweed      -> 14.34%
+           Rank 3: Common Chickweed       -> 1.08%
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Scentless Mayweed
+❌ Incorrect Prediction
+
+--- [198 of 475] (Index: 197) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [199 of 475] (Index: 198) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [200 of 475] (Index: 199) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [201 of 475] (Index: 200) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [202 of 475] (Index: 201) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [203 of 475] (Index: 202) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [204 of 475] (Index: 203) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [205 of 475] (Index: 204) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [206 of 475] (Index: 205) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [207 of 475] (Index: 206) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [208 of 475] (Index: 207) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [209 of 475] (Index: 208) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [210 of 475] (Index: 209) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [211 of 475] (Index: 210) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [212 of 475] (Index: 211) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [213 of 475] (Index: 212) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [214 of 475] (Index: 213) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 79.74%
+        🔹 Rank 2: Loose Silky-bent       -> 20.05%
+           Rank 3: Common wheat           -> 0.19%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [215 of 475] (Index: 214) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 54.36%
+           Rank 2: Common wheat           -> 33.50%
+        🔹 Rank 3: Loose Silky-bent       -> 11.95%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [216 of 475] (Index: 215) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Common wheat           -> 57.45%
+           Rank 2: Fat Hen                -> 17.54%
+           Rank 3: Scentless Mayweed      -> 12.02%
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Sugar beet
+❌ Incorrect Prediction
+
+--- [217 of 475] (Index: 216) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [218 of 475] (Index: 217) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Loose Silky-bent       -> 56.49%
+           Rank 2: Fat Hen                -> 27.76%
+           Rank 3: Black-grass            -> 14.27%
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Scentless Mayweed
+❌ Incorrect Prediction
+
+--- [219 of 475] (Index: 218) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [220 of 475] (Index: 219) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [221 of 475] (Index: 220) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [222 of 475] (Index: 221) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [223 of 475] (Index: 222) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [224 of 475] (Index: 223) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [225 of 475] (Index: 224) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [226 of 475] (Index: 225) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [227 of 475] (Index: 226) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [228 of 475] (Index: 227) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 83.64%
+        🔹 Rank 2: Loose Silky-bent       -> 15.12%
+           Rank 3: Common wheat           -> 1.04%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [229 of 475] (Index: 228) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [230 of 475] (Index: 229) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [231 of 475] (Index: 230) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [232 of 475] (Index: 231) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [233 of 475] (Index: 232) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [234 of 475] (Index: 233) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [235 of 475] (Index: 234) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [236 of 475] (Index: 235) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [237 of 475] (Index: 236) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [238 of 475] (Index: 237) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [239 of 475] (Index: 238) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [240 of 475] (Index: 239) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [241 of 475] (Index: 240) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [242 of 475] (Index: 241) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Common wheat           -> 78.34%
+        🔹 Rank 2: Black-grass            -> 15.55%
+           Rank 3: Maize                  -> 3.64%
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Black-grass
+❌ Incorrect Prediction
+
+--- [243 of 475] (Index: 242) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 52.09%
+        🔹 Rank 2: Loose Silky-bent       -> 45.71%
+           Rank 3: Fat Hen                -> 1.59%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [244 of 475] (Index: 243) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [245 of 475] (Index: 244) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [246 of 475] (Index: 245) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [247 of 475] (Index: 246) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [248 of 475] (Index: 247) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 69.26%
+        🔹 Rank 2: Loose Silky-bent       -> 30.54%
+           Rank 3: Common wheat           -> 0.16%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [249 of 475] (Index: 248) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [250 of 475] (Index: 249) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [251 of 475] (Index: 250) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [252 of 475] (Index: 251) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [253 of 475] (Index: 252) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [254 of 475] (Index: 253) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [255 of 475] (Index: 254) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [256 of 475] (Index: 255) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [257 of 475] (Index: 256) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [258 of 475] (Index: 257) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [259 of 475] (Index: 258) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [260 of 475] (Index: 259) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [261 of 475] (Index: 260) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [262 of 475] (Index: 261) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [263 of 475] (Index: 262) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [264 of 475] (Index: 263) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [265 of 475] (Index: 264) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [266 of 475] (Index: 265) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [267 of 475] (Index: 266) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [268 of 475] (Index: 267) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Shepherds Purse        -> 87.40%
+        🔹 Rank 2: Small-flowered Cranesbill -> 7.24%
+           Rank 3: Charlock               -> 3.72%
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Small-flowered Cranesbill
+❌ Incorrect Prediction
+
+--- [269 of 475] (Index: 268) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [270 of 475] (Index: 269) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [271 of 475] (Index: 270) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [272 of 475] (Index: 271) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [273 of 475] (Index: 272) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [274 of 475] (Index: 273) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [275 of 475] (Index: 274) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [276 of 475] (Index: 275) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 80.47%
+        🔹 Rank 2: Loose Silky-bent       -> 18.34%
+           Rank 3: Common wheat           -> 0.80%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [277 of 475] (Index: 276) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [278 of 475] (Index: 277) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [279 of 475] (Index: 278) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [280 of 475] (Index: 279) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [281 of 475] (Index: 280) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [282 of 475] (Index: 281) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [283 of 475] (Index: 282) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [284 of 475] (Index: 283) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [285 of 475] (Index: 284) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 88.28%
+        🔹 Rank 2: Loose Silky-bent       -> 11.02%
+           Rank 3: Common wheat           -> 0.51%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [286 of 475] (Index: 285) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [287 of 475] (Index: 286) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [288 of 475] (Index: 287) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [289 of 475] (Index: 288) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [290 of 475] (Index: 289) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [291 of 475] (Index: 290) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [292 of 475] (Index: 291) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [293 of 475] (Index: 292) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [294 of 475] (Index: 293) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [295 of 475] (Index: 294) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [296 of 475] (Index: 295) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [297 of 475] (Index: 296) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [298 of 475] (Index: 297) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [299 of 475] (Index: 298) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [300 of 475] (Index: 299) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [301 of 475] (Index: 300) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [302 of 475] (Index: 301) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [303 of 475] (Index: 302) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [304 of 475] (Index: 303) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [305 of 475] (Index: 304) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [306 of 475] (Index: 305) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [307 of 475] (Index: 306) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [308 of 475] (Index: 307) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [309 of 475] (Index: 308) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [310 of 475] (Index: 309) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [311 of 475] (Index: 310) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [312 of 475] (Index: 311) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [313 of 475] (Index: 312) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [314 of 475] (Index: 313) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [315 of 475] (Index: 314) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [316 of 475] (Index: 315) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [317 of 475] (Index: 316) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [318 of 475] (Index: 317) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [319 of 475] (Index: 318) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [320 of 475] (Index: 319) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [321 of 475] (Index: 320) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [322 of 475] (Index: 321) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [323 of 475] (Index: 322) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [324 of 475] (Index: 323) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [325 of 475] (Index: 324) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [326 of 475] (Index: 325) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [327 of 475] (Index: 326) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [328 of 475] (Index: 327) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [329 of 475] (Index: 328) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [330 of 475] (Index: 329) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [331 of 475] (Index: 330) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [332 of 475] (Index: 331) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Maize                  -> 90.19%
+        🔹 Rank 2: Sugar beet             -> 9.64%
+           Rank 3: Common wheat           -> 0.13%
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Sugar beet
+❌ Incorrect Prediction
+
+--- [333 of 475] (Index: 332) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [334 of 475] (Index: 333) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [335 of 475] (Index: 334) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [336 of 475] (Index: 335) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [337 of 475] (Index: 336) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [338 of 475] (Index: 337) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 97.78%
+        🔹 Rank 2: Loose Silky-bent       -> 2.18%
+           Rank 3: Common wheat           -> 0.02%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [339 of 475] (Index: 338) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 55.64%
+        🔹 Rank 2: Loose Silky-bent       -> 43.63%
+           Rank 3: Common wheat           -> 0.35%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [340 of 475] (Index: 339) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [341 of 475] (Index: 340) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [342 of 475] (Index: 341) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [343 of 475] (Index: 342) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Sugar beet             -> 68.58%
+        🔹 Rank 2: Common Chickweed       -> 21.63%
+           Rank 3: Fat Hen                -> 9.27%
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Common Chickweed
+❌ Incorrect Prediction
+
+--- [344 of 475] (Index: 343) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [345 of 475] (Index: 344) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [346 of 475] (Index: 345) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Fat Hen                -> 94.87%
+        🔹 Rank 2: Maize                  -> 3.36%
+           Rank 3: Charlock               -> 0.87%
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Maize
+❌ Incorrect Prediction
+
+--- [347 of 475] (Index: 346) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [348 of 475] (Index: 347) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [349 of 475] (Index: 348) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [350 of 475] (Index: 349) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [351 of 475] (Index: 350) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [352 of 475] (Index: 351) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [353 of 475] (Index: 352) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [354 of 475] (Index: 353) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [355 of 475] (Index: 354) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [356 of 475] (Index: 355) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [357 of 475] (Index: 356) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [358 of 475] (Index: 357) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Common wheat           -> 69.43%
+        🔹 Rank 2: Black-grass            -> 29.36%
+           Rank 3: Maize                  -> 0.78%
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Black-grass
+❌ Incorrect Prediction
+
+--- [359 of 475] (Index: 358) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [360 of 475] (Index: 359) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [361 of 475] (Index: 360) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [362 of 475] (Index: 361) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [363 of 475] (Index: 362) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [364 of 475] (Index: 363) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [365 of 475] (Index: 364) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [366 of 475] (Index: 365) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [367 of 475] (Index: 366) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [368 of 475] (Index: 367) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [369 of 475] (Index: 368) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Common wheat           -> 82.13%
+        🔹 Rank 2: Maize                  -> 14.76%
+           Rank 3: Charlock               -> 2.99%
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Maize
+❌ Incorrect Prediction
+
+--- [370 of 475] (Index: 369) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [371 of 475] (Index: 370) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [372 of 475] (Index: 371) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [373 of 475] (Index: 372) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [374 of 475] (Index: 373) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [375 of 475] (Index: 374) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [376 of 475] (Index: 375) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [377 of 475] (Index: 376) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [378 of 475] (Index: 377) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [379 of 475] (Index: 378) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [380 of 475] (Index: 379) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [381 of 475] (Index: 380) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [382 of 475] (Index: 381) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [383 of 475] (Index: 382) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [384 of 475] (Index: 383) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [385 of 475] (Index: 384) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [386 of 475] (Index: 385) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 89.41%
+        🔹 Rank 2: Loose Silky-bent       -> 9.88%
+           Rank 3: Common wheat           -> 0.59%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [387 of 475] (Index: 386) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [388 of 475] (Index: 387) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [389 of 475] (Index: 388) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [390 of 475] (Index: 389) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 76.70%
+        🔹 Rank 2: Loose Silky-bent       -> 22.68%
+           Rank 3: Common wheat           -> 0.42%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [391 of 475] (Index: 390) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [392 of 475] (Index: 391) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [393 of 475] (Index: 392) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [394 of 475] (Index: 393) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [395 of 475] (Index: 394) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [396 of 475] (Index: 395) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Scentless Mayweed      -> 91.53%
+        🔹 Rank 2: Shepherds Purse        -> 3.83%
+           Rank 3: Loose Silky-bent       -> 1.63%
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Shepherds Purse
+❌ Incorrect Prediction
+
+--- [397 of 475] (Index: 396) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [398 of 475] (Index: 397) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [399 of 475] (Index: 398) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 69.20%
+        🔹 Rank 2: Loose Silky-bent       -> 30.53%
+           Rank 3: Common wheat           -> 0.12%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [400 of 475] (Index: 399) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [401 of 475] (Index: 400) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 51.90%
+        🔹 Rank 2: Loose Silky-bent       -> 47.80%
+           Rank 3: Common wheat           -> 0.13%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [402 of 475] (Index: 401) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [403 of 475] (Index: 402) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [404 of 475] (Index: 403) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [405 of 475] (Index: 404) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [406 of 475] (Index: 405) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [407 of 475] (Index: 406) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [408 of 475] (Index: 407) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [409 of 475] (Index: 408) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [410 of 475] (Index: 409) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [411 of 475] (Index: 410) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [412 of 475] (Index: 411) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [413 of 475] (Index: 412) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [414 of 475] (Index: 413) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [415 of 475] (Index: 414) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [416 of 475] (Index: 415) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [417 of 475] (Index: 416) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Scentless Mayweed      -> 96.97%
+        🔹 Rank 2: Shepherds Purse        -> 2.75%
+           Rank 3: Common Chickweed       -> 0.28%
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Shepherds Purse
+❌ Incorrect Prediction
+
+--- [418 of 475] (Index: 417) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [419 of 475] (Index: 418) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [420 of 475] (Index: 419) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [421 of 475] (Index: 420) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [422 of 475] (Index: 421) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [423 of 475] (Index: 422) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [424 of 475] (Index: 423) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [425 of 475] (Index: 424) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [426 of 475] (Index: 425) ---
+🏷️ Predicted Label: Maize
+🏷️ True Label:      Maize
+✅ Correct Prediction!
+
+--- [427 of 475] (Index: 426) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [428 of 475] (Index: 427) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [429 of 475] (Index: 428) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [430 of 475] (Index: 429) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [431 of 475] (Index: 430) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [432 of 475] (Index: 431) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [433 of 475] (Index: 432) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [434 of 475] (Index: 433) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [435 of 475] (Index: 434) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [436 of 475] (Index: 435) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [437 of 475] (Index: 436) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Sugar beet             -> 89.84%
+        🔹 Rank 2: Fat Hen                -> 8.36%
+           Rank 3: Cleavers               -> 1.38%
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Fat Hen
+❌ Incorrect Prediction
+
+--- [438 of 475] (Index: 437) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [439 of 475] (Index: 438) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [440 of 475] (Index: 439) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [441 of 475] (Index: 440) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [442 of 475] (Index: 441) ---
+🏷️ Predicted Label: Common wheat
+🏷️ True Label:      Common wheat
+✅ Correct Prediction!
+
+--- [443 of 475] (Index: 442) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [444 of 475] (Index: 443) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [445 of 475] (Index: 444) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [446 of 475] (Index: 445) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [447 of 475] (Index: 446) ---
+🏷️ Predicted Label: Scentless Mayweed
+🏷️ True Label:      Scentless Mayweed
+✅ Correct Prediction!
+
+--- [448 of 475] (Index: 447) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [449 of 475] (Index: 448) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [450 of 475] (Index: 449) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 55.87%
+        🔹 Rank 2: Loose Silky-bent       -> 43.37%
+           Rank 3: Common wheat           -> 0.62%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [451 of 475] (Index: 450) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [452 of 475] (Index: 451) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [453 of 475] (Index: 452) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [454 of 475] (Index: 453) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [455 of 475] (Index: 454) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [456 of 475] (Index: 455) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Loose Silky-bent       -> 70.85%
+           Rank 2: Cleavers               -> 12.36%
+        🔹 Rank 3: Black-grass            -> 10.42%
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Black-grass
+❌ Incorrect Prediction
+
+--- [457 of 475] (Index: 456) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [458 of 475] (Index: 457) ---
+🏷️ Predicted Label: Loose Silky-bent
+🏷️ True Label:      Loose Silky-bent
+✅ Correct Prediction!
+
+--- [459 of 475] (Index: 458) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [460 of 475] (Index: 459) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [461 of 475] (Index: 460) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [462 of 475] (Index: 461) ---
+🏷️ Predicted Label: Small-flowered Cranesbill
+🏷️ True Label:      Small-flowered Cranesbill
+✅ Correct Prediction!
+
+--- [463 of 475] (Index: 462) ---
+🏷️ Predicted Label: Charlock
+🏷️ True Label:      Charlock
+✅ Correct Prediction!
+
+--- [464 of 475] (Index: 463) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- [465 of 475] (Index: 464) ---
+⚠️ Top 3 Confidence Scores:
+        ⭐️ Rank 1: Black-grass            -> 84.34%
+        🔹 Rank 2: Loose Silky-bent       -> 13.34%
+           Rank 3: Scentless Mayweed      -> 1.00%
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Loose Silky-bent
+❌ Incorrect Prediction
+
+--- [466 of 475] (Index: 465) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [467 of 475] (Index: 466) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [468 of 475] (Index: 467) ---
+🏷️ Predicted Label: Black-grass
+🏷️ True Label:      Black-grass
+✅ Correct Prediction!
+
+--- [469 of 475] (Index: 468) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [470 of 475] (Index: 469) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [471 of 475] (Index: 470) ---
+🏷️ Predicted Label: Sugar beet
+🏷️ True Label:      Sugar beet
+✅ Correct Prediction!
+
+--- [472 of 475] (Index: 471) ---
+🏷️ Predicted Label: Shepherds Purse
+🏷️ True Label:      Shepherds Purse
+✅ Correct Prediction!
+
+--- [473 of 475] (Index: 472) ---
+🏷️ Predicted Label: Fat Hen
+🏷️ True Label:      Fat Hen
+✅ Correct Prediction!
+
+--- [474 of 475] (Index: 473) ---
+🏷️ Predicted Label: Cleavers
+🏷️ True Label:      Cleavers
+✅ Correct Prediction!
+
+--- [475 of 475] (Index: 474) ---
+🏷️ Predicted Label: Common Chickweed
+🏷️ True Label:      Common Chickweed
+✅ Correct Prediction!
+
+--- Transfer Learning Model Results ---
+426 out of 475 correct.
+Accuracy: 89.68%
+
++--------------------+
+| 📈 FINAL REPORT 📉 |
++--------------------+
+
+                     Models  Training Accuracy  Validation Accuracy  Testing Accuracy  Testing Loss
+0            CNN Base Model           0.672105             0.669474          0.595789      1.146910
+1  Data Augmented CNN Model           0.811053             0.760000          0.757895      0.703516
+2   Transfer Learning Model           0.937105             0.892632          0.896842      0.320237
+15/15 [==============================] - 0s 12ms/step
+
+--- 📊 CNN Base Model Score Breakdown 📊 ---
+Macro F1-Score:           0.5711
+Total Test Images:        475
+Total False Pos (Raw):    192 (40.42%)
+Total False Neg (Raw):    192 (40.42%)
+Global Macro F1 Baseline: 57.11
+Total Penalties Applied:  -80.84
+--------------------------------
+💡 FINAL MODEL SCORE:        -23.73
+
+15/15 [==============================] - 0s 9ms/step
+
+--- 📊 Data Augmented CNN Model Score Breakdown 📊 ---
+Macro F1-Score:           0.7360
+Total Test Images:        475
+Total False Pos (Raw):    115 (24.21%)
+Total False Neg (Raw):    115 (24.21%)
+Global Macro F1 Baseline: 73.60
+Total Penalties Applied:  -48.42
+--------------------------------
+💡 FINAL MODEL SCORE:        25.18
+
+15/15 [==============================] - 1s 52ms/step
+
+--- 📊 Transfer Learning Model Score Breakdown 📊 ---
+Macro F1-Score:           0.8917
+Total Test Images:        475
+Total False Pos (Raw):    49 (10.32%)
+Total False Neg (Raw):    49 (10.32%)
+Global Macro F1 Baseline: 89.17
+Total Penalties Applied:  -20.63
+--------------------------------
+💡 FINAL MODEL SCORE:        68.54
+
+
++------------------+
+| 🏆 BEST MODEL 🏆 |
++------------------+
+
+The best_model is: Transfer Learning Model
+Performance Score: 68.54
+
+Run Time: 20m 59s 796ms
+----- ⏱️ END RUN ID: 260448 ⏱️ -----
